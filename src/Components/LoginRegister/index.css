@@ -1,0 +1,21 @@
+
+.authen-template{
+    width: 100vw;
+    height: 100vh;
+    background-color: red;
+    background-image: url(https://images.unsplash.com/photo-1521584934521-f27ac11b7523?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D);
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.authen-template__form{
+    width: 420px;
+    background-color: #3A67ED;
+    border-radius: 10px;
+    margin-right: 50px;
+    padding: 20px;
+}
+

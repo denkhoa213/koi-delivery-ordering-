@@ -1,0 +1,113 @@
+.container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Căn giữa theo chiều ngang */
+  justify-content: center; /* Căn giữa theo chiều dọc nếu cần */
+  min-height: 50vh; /* Chiều cao tối thiểu để căn giữa */
+}
+
+.main-tabs {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #f1f1f1;
+  border: none;
+  cursor: pointer;
+}
+
+button.active {
+  background-color: #ff4b4b;
+  color: white;
+}
+
+.sub-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.sub-tabs button {
+  padding: 8px 16px;
+  background-color: #f1f1f1;
+  border: none;
+  cursor: pointer;
+}
+
+.sub-tabs button.active {
+  background-color: #ff4b4b;
+  color: white;
+}
+
+.form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Căn giữa các input và button */
+}
+
+.form input {
+  display: block;
+  margin-bottom: 15px;
+  padding: 10px;
+  width: 100%;
+  max-width: 400px;
+}
+
+button {
+  background-color: #ff4b4b;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.form-image {
+  width: 100%;
+  max-width: 200px;
+  margin-top: 20px;
+}
+
+/* Styling for the service cards */
+.service-section {
+  margin-top: 20px;
+  text-align: center; /* Căn giữa tiêu đề */
+}
+
+.service-cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center; /* Căn giữa các card */
+}
+
+.card {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 20px;
+  width: 250px;
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card img {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 15px;
+}
+
+.card h5 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 14px;
+  color: #666;
+}
