@@ -61,7 +61,7 @@ button.active {
 
 button {
   background-color: #ff4b4b;
-  color: white;
+  color: black;
   border: none;
   padding: 10px 20px;
   cursor: pointer;

@@ -85,7 +85,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import AminDashboard from "./pages/DashBoard/Admin";
+import AminDashboard from "./Components/DashBoard/DashBoard-Admin";
+import ManageService from "./pages/DashBoard/Admin/Manage-service";
 
 function App() {
   const router = createBrowserRouter([
@@ -104,6 +105,12 @@ function App() {
     {
       path: "dashboard",
       element: <AminDashboard />,
+      children: [
+        {
+          path: "service",
+          element: <ManageService />,
+        },
+      ],
     },
   ]);
 
