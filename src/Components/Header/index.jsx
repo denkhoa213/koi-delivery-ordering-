@@ -1,11 +1,17 @@
 import React from "react";
 import { Input, Button } from "antd";
-import { HomeOutlined, UserOutlined, DownOutlined } from "@ant-design/icons";
-import "./index.css";
+import { DownOutlined } from "@ant-design/icons";
+import "./index.scss";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { store } from "../../redux/store";
+import { logout } from "../../redux/features/userSlice";
+import { AiFillHome, AiOutlineLogin, AiOutlineLogout } from "react-icons/ai";
 const { Search } = Input;
 
 const Header = () => {
+  const user = useSelector((store) => store.user);
+  const dispath = useDispatch();
   return (
     <>
       <header className="header">
@@ -20,12 +26,30 @@ const Header = () => {
           />
         </div>
         <div className="nav-links">
-          <Button type="link" icon={<HomeOutlined />} href="#home">
-            Trang chủ
+          <Button type="link" icon={<AiFillHome fontSize={18} />}>
+            <Link to="">Trang chủ</Link>
           </Button>
-          <Button type="link" icon={<UserOutlined />}>
-            <Link to="/login">Đăng nhập</Link>
-          </Button>
+
+          <div>
+            {user == null ? (
+              <>
+                <Button type="link" icon={<AiOutlineLogin fontSize={18} />}>
+                  <Link to="/login">Đăng nhập</Link>
+                </Button>
+              </>
+            ) : (
+              <div>
+                <span>{user?.email}</span>
+                <Button
+                  type="link"
+                  icon={<AiOutlineLogout fontSize={18} />}
+                  onClick={() => dispath(logout())}
+                >
+                  Logout
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -40,14 +64,14 @@ const Header = () => {
           </div>
         </div>
 
-        <Button type="link" href="#about">
-          Giới thiệu
+        <Button type="link">
+          <Link to="/about">Giới thiệu</Link>
         </Button>
-        <Button type="link" href="#support">
-          Hỗ trợ
+        <Button type="link">
+          <Link to="/sp">Hổ trợ</Link>
         </Button>
-        <Button type="link" href="#info">
-          Thông tin Khách
+        <Button type="link">
+          <Link to="/contact">Liên hệ</Link>
         </Button>
 
         <div className="nav-dropdown">

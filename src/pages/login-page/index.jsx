@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import AuthenTemplate from "../../Components/LoginRegister";
+import AuthenTemplate from "../../Components/login-register";
 import { FaLock, FaPhone } from "react-icons/fa";
 import "./index.css";
 import { Link, useNavigate } from "react-router-dom";
@@ -9,9 +9,10 @@ import { getAuth, signInWithPopup } from "firebase/auth";
 import { Button, Checkbox, Form, Input } from "antd";
 import { toast } from "react-toastify";
 import api from "../../config/axios";
+import { useDispatch } from "react-redux";
+import { login } from "../../redux/features/userSlice";
 
 function LoginPage() {
-  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
   const handleLoginGoogle = () => {
     const auth = getAuth();
@@ -39,22 +40,28 @@ function LoginPage() {
       });
   };
 
+  // luu vao redux: useDispatch()
+
+  // lay du liu: useSelector()
+
+  const dispatch = useDispatch();
+
   const handleLogin = async (values) => {
     try {
-      setSubmitting(true);
       const response = await api.post("login", values);
 
       const { role, token } = response.data;
-
+      dispatch(login(response.data));
       localStorage.setItem("token", token);
       if (role === "ADMIN") {
         navigate("/dashboard");
+      } else {
+        navigate("/");
       }
-      toast.success("Successfully login account!");
-      console.log(response);
+      toast.success("Login successfully!");
+      console.log(response.data);
     } catch (err) {
       toast.error(err.response.data);
-      setSubmitting(false);
     }
   };
   return (
@@ -65,7 +72,6 @@ function LoginPage() {
             span: 24,
           }}
           onFinish={handleLogin}
-          confirmLoading={submitting}
         >
           <h1>Login</h1>
 
@@ -108,9 +114,10 @@ function LoginPage() {
               block
             >
               <img
-                src="https://upload.wikimedia.org/wikipedia/commons/4/4f/Google_%22G%22_Logo.svg"
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/480px-Google_%22G%22_logo.svg.png"
                 alt="Google icon"
                 className="google-icon"
+                width={20}
               />
               Sign in with Google
             </Button>

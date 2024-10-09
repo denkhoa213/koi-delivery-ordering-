@@ -1,25 +1,22 @@
-import React, { useState } from "react";
-import AuthenTemplate from "../../Components/LoginRegister";
+import React from "react";
+import AuthenTemplate from "../../Components/login-register";
 import { FaLock, FaPhone, FaUser, FaUserEdit } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Checkbox, Form, Input } from "antd";
+import { Button, Form, Input } from "antd";
 import { IoMdMail } from "react-icons/io";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 
 function RegisterPage() {
-  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
   const handleRegister = async (values) => {
     try {
-      setSubmitting(true);
       values.role = "CUSTOMER";
       const response = await api.post("register", values);
       toast.success("Successfully register new account!");
       navigate("/login");
     } catch (err) {
       toast.error(err.response.data);
-      setSubmitting(false);
     }
   };
   return (
@@ -30,7 +27,6 @@ function RegisterPage() {
             span: 24,
           }}
           onFinish={handleRegister}
-          confirmLoading={submitting}
         >
           <h1>Register</h1>
 

@@ -1,130 +1,56 @@
 import React, { useState } from "react";
-import "./index.css";
+import "./index.scss";
+import { Card, Col, Row } from "antd";
 
-function FormService() {
-  const [activeTab, setActiveTab] = useState("tra-cuu");
-  const [subTab, setSubTab] = useState("van-don");
-
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-    setSubTab("van-don"); // Default sub-tab for "Tra cứu"
-  };
-
-  const handleSubTabClick = (subTab) => {
-    setSubTab(subTab);
-  };
-
-  // Sample service cards
+function ServiceList() {
   const services = [
     {
       id: 1,
-      title: "Chuyển phát nhanh",
-      description: "Dịch vụ giao hàng nhanh trong nước và quốc tế.",
-      image: "/fast-delivery.png",
+      title: "Dịch vụ vận chuyển Koi",
+      description: "Dịch vụ chuyên vận chuyển cá Koi an toàn, nhanh chóng.",
+      image:
+        "https://plus.unsplash.com/premium_photo-1723672584731-52b5f1a67543?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8a29pfGVufDB8fDB8fHww",
     },
     {
       id: 2,
-      title: "Chuyển hàng cồng kềnh",
-      description: "Dịch vụ chuyên chở hàng hóa cồng kềnh và nặng.",
-      image: "/heavy-delivery.png",
+      title: "Dịch vụ chăm sóc Koi",
+      description:
+        "Cung cấp dịch vụ chăm sóc cá Koi với các chuyên gia hàng đầu.",
+      image:
+        "https://plus.unsplash.com/premium_photo-1723672584731-52b5f1a67543?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8a29pfGVufDB8fDB8fHww",
     },
     {
       id: 3,
-      title: "Giao hàng tiết kiệm",
-      description: "Giao hàng với chi phí tiết kiệm và thời gian linh hoạt.",
-      image: "/economy-delivery.png",
+      title: "Dịch vụ bảo hành Koi",
+      description: "Bảo hành cá Koi, đảm bảo sức khỏe và sinh trưởng.",
+      image:
+        "https://plus.unsplash.com/premium_photo-1723672584731-52b5f1a67543?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8a29pfGVufDB8fDB8fHww",
     },
   ];
 
   return (
-    <div className="container">
-      {/* Main Tabs */}
-      <div className="main-tabs">
-        <button
-          className={activeTab === "tra-cuu" ? "active" : ""}
-          onClick={() => handleTabClick("tra-cuu")}
-        >
-          Tra cứu
-        </button>
-        <button
-          className={activeTab === "dich-vu" ? "active" : ""}
-          onClick={() => handleTabClick("dich-vu")}
-        >
-          Dịch vụ
-        </button>
+    <>
+      <div className="services-list" style={{ padding: "20px" }}>
+        <h2>Danh sách dịch vụ</h2>
+        <Row gutter={16}>
+          {services.map((service) => (
+            <Col key={service.id} xs={24} sm={12} md={8}>
+              <Card
+                hoverable
+                cover={<img alt={service.title} src={service.image} />}
+                style={{ marginBottom: "20px" }}
+              >
+                <Card.Meta
+                  title={service.title}
+                  description={service.description}
+                />
+              </Card>
+            </Col>
+          ))}
+        </Row>
       </div>
-
-      {/* Tra cứu Section */}
-      {activeTab === "tra-cuu" && (
-        <div className="tra-cuu-section">
-          {/* Sub Tabs */}
-          <div className="sub-tabs">
-            <button
-              className={subTab === "van-don" ? "active" : ""}
-              onClick={() => handleSubTabClick("van-don")}
-            >
-              Tra cứu vận đơn
-            </button>
-            <button
-              className={subTab === "uoc-tinh-phi" ? "active" : ""}
-              onClick={() => handleSubTabClick("uoc-tinh-phi")}
-            >
-              Ước tính cước phí
-            </button>
-            <button
-              className={subTab === "faq" ? "active" : ""}
-              onClick={() => handleSubTabClick("faq")}
-            >
-              Câu hỏi thường gặp
-            </button>
-          </div>
-
-          {/* Form based on Sub Tab */}
-          {subTab === "van-don" && (
-            <div className="form">
-              <h4>Tra cứu vận đơn</h4>
-              <input type="text" placeholder="Mã phiếu gửi (VD: 12345)" />
-              <button>Tra cứu</button>
-            </div>
-          )}
-
-          {subTab === "uoc-tinh-phi" && (
-            <div className="form">
-              <h4>Ước tính cước phí</h4>
-              <input type="text" placeholder="Gửi từ" />
-              <input type="text" placeholder="Gửi đến" />
-              <input type="number" placeholder="Số lượng" />
-              <input type="text" placeholder="Số tiền" />
-              <button>Ước tính</button>
-            </div>
-          )}
-
-          {subTab === "faq" && (
-            <div className="form">
-              <h4>Câu hỏi thường gặp</h4>
-              <p>Các câu hỏi phổ biến liên quan đến dịch vụ của chúng tôi.</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Dịch vụ Section */}
-      {activeTab === "dich-vu" && (
-        <div className="service-section">
-          <h4>Danh sách dịch vụ</h4>
-          <div className="service-cards">
-            {services.map((service) => (
-              <div key={service.id} className="card">
-                <img src={service.image} alt={service.title} />
-                <h5>{service.title}</h5>
-                <p>{service.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   );
 }
 
-export default FormService;
+export default ServiceList;
