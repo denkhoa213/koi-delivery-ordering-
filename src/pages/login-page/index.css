@@ -1,0 +1,32 @@
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+
+.wrapper .remember-forgot {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 20px;
+}
+
+.wrapper .forgot-password {
+  color: #1890ff;
+  text-decoration: none;
+  margin-left: auto; 
+}
+
+.wrapper .forgot-password:hover {
+  text-decoration: underline;
+}
+
+.wrapper .register-link {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.wrapper .register-link p {
+  margin: 0;
+}
