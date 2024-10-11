@@ -1,0 +1,107 @@
+.service-detail {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+  
+    &:hover {
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+    }
+  
+    .detail-card {
+      border-radius: 10px;
+      overflow: hidden;
+      
+      img {
+        width: 100%;
+        height: auto;
+        border-bottom: 2px solid #e0e0e0;
+      }
+  
+      .description {
+        font-size: 18px;
+        color: #333;
+        margin: 15px 0;
+        line-height: 1.6;
+      }
+  
+      .details {
+        font-size: 16px;
+        color: #666;
+        margin: 10px 0;
+        line-height: 1.6;
+      }
+  
+      h3 {
+        margin-top: 20px;
+        font-size: 22px;
+        color: #444;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 10px;
+        font-weight: bold;
+      }
+  
+      .features-list {
+        list-style-type: none;
+        padding: 0;
+  
+        li {
+          background: #f9f9f9;
+          margin: 5px 0;
+          padding: 15px;
+          border-radius: 5px;
+          font-size: 15px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+      }
+  
+      .rating {
+        display: flex;
+        align-items: center;
+        margin: 15px 0;
+  
+        h4 {
+          margin-right: 10px;
+        }
+  
+        .rating-value {
+          margin-left: 5px;
+          font-weight: bold;
+          color: #ff4d4f; // Màu đỏ cho giá trị đánh giá
+        }
+      }
+  
+      .button-group {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+  
+        .back-button {
+          flex-grow: 1;
+          margin-right: 10px;
+          background-color: #f0f0f0;
+          border: none;
+          color: #333;
+  
+          &:hover {
+            background-color: #e0e0e0;
+          }
+        }
+  
+        .order-button {
+          flex-grow: 1;
+          background-color: #ff4d4f; // Màu đỏ cho nút đặt dịch vụ
+          border: none;
+          color: white;
+  
+          &:hover {
+            background-color: #d52c2f; // Màu sáng hơn khi hover
+          }
+        }
+      }
+    }
+  }
+  

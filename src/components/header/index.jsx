@@ -10,6 +10,20 @@ import { AiFillHome, AiOutlineLogin, AiOutlineLogout } from "react-icons/ai";
 const { Search } = Input;
 
 const Header = () => {
+  const services = [
+    {
+      id: 1,
+      name: "Vận chuyển hàng không",
+    },
+    {
+      id: 2,
+      name: "Vận chuyển đường biển",
+    },
+    {
+      id: 3,
+      name: "Vận chuyển đường bộ",
+    },
+  ];
   const user = useSelector((store) => store.user);
   const dispath = useDispatch();
   return (
@@ -59,8 +73,11 @@ const Header = () => {
             Dịch vụ <DownOutlined />
           </Button>
           <div className="dropdown-menu">
-            <a href="#option1">Dịch vụ 1</a>
-            <a href="#option2">Dịch vụ 2</a>
+            {services.map((service) => (
+              <Link key={service.id} to={`/services/${service.id}`}>
+                {service.name}
+              </Link>
+            ))}
           </div>
         </div>
 

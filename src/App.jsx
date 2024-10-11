@@ -19,6 +19,8 @@ import HealthCheckForm from "./components/check";
 import About from "./components/about";
 import Contact from "./components/contact";
 import Support from "./components/support";
+import ServiceList from "./components/list-service";
+import ServiceDetail from "./components/detail-service";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
@@ -51,6 +53,14 @@ function App() {
         {
           path: "contact",
           element: <Contact />,
+        },
+        {
+          path: "services",
+          element: <ServiceList />,
+        },
+        {
+          path: "services/:id",
+          element: <ServiceDetail />,
         },
       ],
     },
