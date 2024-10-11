@@ -68,7 +68,7 @@ const Header = () => {
           <Link to="/about">Giới thiệu</Link>
         </Button>
         <Button type="link">
-          <Link to="/sp">Hổ trợ</Link>
+          <Link to="/support">Hổ trợ</Link>
         </Button>
         <Button type="link">
           <Link to="/contact">Liên hệ</Link>

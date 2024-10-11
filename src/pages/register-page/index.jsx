@@ -1,5 +1,5 @@
 import React from "react";
-import AuthenTemplate from "../../Components/login-register";
+import AuthenTemplate from "../../components/login-register";
 import { FaLock, FaPhone, FaUser, FaUserEdit } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Form, Input } from "antd";

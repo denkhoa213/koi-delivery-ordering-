@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import AuthenTemplate from "../../Components/login-register";
+import AuthenTemplate from "../../components/login-register";
 import { FaLock, FaPhone } from "react-icons/fa";
 import "./index.css";
 import { Link, useNavigate } from "react-router-dom";

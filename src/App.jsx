@@ -17,8 +17,8 @@ import Layout from "./components/layout";
 import OrderTransportation from "./components/order-form";
 import HealthCheckForm from "./components/check";
 import About from "./components/about";
-import Support from "./components/support";
 import Contact from "./components/contact";
+import Support from "./components/support";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {

@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import api from "../../config/axios";
 import "./index.scss";
 
-import Banner from "../../Components/Banner";
+import Banner from "../../components/banner";
 import NewsSection from "../../components/news";
-import ServiceList from "../../components/ServiceCard";
+import ServiceList from "../../components/list-service";
 
 function HomePage() {
   // const [services, setServices] = useState([]);
