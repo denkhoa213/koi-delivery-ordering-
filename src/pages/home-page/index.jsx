@@ -5,7 +5,8 @@ import "./index.scss";
 
 import Banner from "../../components/banner";
 import NewsSection from "../../components/news";
-import ServiceList from "../../components/list-service";
+import ServiceList from "../../components/list-service/service-delivery";
+import TransportManagement from "../../components/list-service/service-health";
 
 function HomePage() {
   // const [services, setServices] = useState([]);
@@ -26,6 +27,7 @@ function HomePage() {
     <>
       <Banner />
       <ServiceList />
+      <TransportManagement />
       <NewsSection />
     </>
   );

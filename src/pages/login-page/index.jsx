@@ -1,6 +1,5 @@
-import React, { useState } from "react";
 import AuthenTemplate from "../../components/login-register";
-import { FaLock, FaPhone } from "react-icons/fa";
+import { FaLock } from "react-icons/fa";
 import "./index.css";
 import { Link, useNavigate } from "react-router-dom";
 import { googleProvider } from "../../config/firebase";
@@ -11,9 +10,11 @@ import { toast } from "react-toastify";
 import api from "../../config/axios";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/features/userSlice";
+import { MailOutlined } from "@ant-design/icons";
+import { useState } from "react";
 
 function LoginPage() {
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const handleLoginGoogle = () => {
     const auth = getAuth();
     signInWithPopup(auth, googleProvider)
@@ -44,26 +45,36 @@ function LoginPage() {
 
   // lay du liu: useSelector()
 
+  const navigate = useNavigate();
+
   const dispatch = useDispatch();
 
   const handleLogin = async (values) => {
     try {
-      const response = await api.post("login", values);
+      setLoading(true);
 
-      const { role, token } = response.data;
-      dispatch(login(response.data));
-      localStorage.setItem("token", token);
+      const response = await api.post("auth/login", values);
+      console.log(response);
+
+      const { token, role } = response.data.result;
+      localStorage.setItem("token", token); // Lưu token
+
+      dispatch(login(response.data.result));
       if (role === "ADMIN") {
-        navigate("/dashboard");
+        navigate("/dashboard-admin");
       } else {
         navigate("/");
       }
-      toast.success("Login successfully!");
-      console.log(response.data);
-    } catch (err) {
-      toast.error(err.response.data);
+      toast.success(response.data.message);
+    } catch (error) {
+      toast.error(
+        "Đăng nhập thất bại: " + error.response?.data?.message || error.message
+      );
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
     <AuthenTemplate>
       <div className="wrapper">
@@ -76,12 +87,10 @@ function LoginPage() {
           <h1>Login</h1>
 
           <Form.Item
-            name="phone"
-            rules={[
-              { required: true, message: "Please enter your phone or email!" },
-            ]}
+            name="email"
+            rules={[{ required: true, message: "Please enter your email!" }]}
           >
-            <Input prefix={<FaPhone />} placeholder="Phone" />
+            <Input prefix={<MailOutlined />} placeholder="Email" />
           </Form.Item>
 
           <Form.Item
@@ -101,7 +110,7 @@ function LoginPage() {
           </div>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" block>
+            <Button type="primary" htmlType="submit" block loading={loading}>
               Login
             </Button>
           </Form.Item>

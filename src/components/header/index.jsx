@@ -1,10 +1,9 @@
 import React from "react";
-import { Input, Button } from "antd";
-import { DownOutlined } from "@ant-design/icons";
+import { Input, Button, Space, Avatar } from "antd";
+import { DownOutlined, UserOutlined } from "@ant-design/icons";
 import "./index.scss";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { store } from "../../redux/store";
 import { logout } from "../../redux/features/userSlice";
 import { AiFillHome, AiOutlineLogin, AiOutlineLogout } from "react-icons/ai";
 const { Search } = Input;
@@ -27,7 +26,7 @@ const Header = () => {
         </div>
         <div className="nav-links">
           <Button type="link" icon={<AiFillHome fontSize={18} />}>
-            <Link to="">Trang chủ</Link>
+            <Link to="/">Trang chủ</Link>
           </Button>
 
           <div>
@@ -39,7 +38,10 @@ const Header = () => {
               </>
             ) : (
               <div>
-                <span>{user?.email}</span>
+                <Space wrap size={16}>
+                  <Avatar icon={<UserOutlined />} />
+                </Space>
+
                 <Button
                   type="link"
                   icon={<AiOutlineLogout fontSize={18} />}

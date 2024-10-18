@@ -6,21 +6,20 @@ import {
 import HomePage from "./pages/home-page";
 import LoginPage from "./pages/login-page";
 import RegisterPage from "./pages/register-page";
-import ManageCategory from "./pages/dashboard/admin/manage-category";
-import Dashboard from "./components/dashboard";
-import ManageServiceGroup from "./pages/dashboard/admin/manage-store-group";
-import ManageStore from "./pages/dashboard/admin/manage-store";
 import Test from "./pages/test/test";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Layout from "./components/layout";
-import OrderTransportation from "./components/order-form";
 import HealthCheckForm from "./components/check";
 import About from "./components/about";
 import Contact from "./components/contact";
 import Support from "./components/support";
-import ServiceList from "./components/list-service";
 import ServiceDetail from "./components/detail-service";
+import ServiceList from "./components/list-service/service-delivery";
+import Dashboard from "./components/dashboard/dashboard-admin";
+import ManageHealthService from "./pages/dashboard/admin/manage-health-service";
+import OrderForm from "./components/order-form";
+import FishProfileForm from "./pages/test/test";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
@@ -66,7 +65,7 @@ function App() {
     },
     {
       path: "test",
-      element: <Test />,
+      element: <FishProfileForm />,
     },
 
     {
@@ -78,7 +77,7 @@ function App() {
       element: <RegisterPage />,
     },
     {
-      path: "/dashboard",
+      path: "/dashboard-admin",
       element: (
         <ProtectRouterAuth>
           <Dashboard />
@@ -86,22 +85,14 @@ function App() {
       ),
       children: [
         {
-          path: "category",
-          element: <ManageCategory />,
-        },
-        {
-          path: "store",
-          element: <ManageStore />,
-        },
-        {
-          path: "service-group",
-          element: <ManageServiceGroup />,
+          path: "health-service-category",
+          element: <ManageHealthService />,
         },
       ],
     },
     {
       path: "form",
-      element: <OrderTransportation />,
+      element: <OrderForm />,
     },
     {
       path: "check",

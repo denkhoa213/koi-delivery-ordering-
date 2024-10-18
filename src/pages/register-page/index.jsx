@@ -1,6 +1,6 @@
 import React from "react";
 import AuthenTemplate from "../../components/login-register";
-import { FaLock, FaPhone, FaUser, FaUserEdit } from "react-icons/fa";
+import { FaLock, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Form, Input } from "antd";
 import { IoMdMail } from "react-icons/io";
@@ -11,8 +11,7 @@ function RegisterPage() {
   const navigate = useNavigate();
   const handleRegister = async (values) => {
     try {
-      values.role = "CUSTOMER";
-      const response = await api.post("register", values);
+      const response = await api.post("auth/register", values);
       toast.success("Successfully register new account!");
       navigate("/login");
     } catch (err) {
@@ -31,7 +30,7 @@ function RegisterPage() {
           <h1>Register</h1>
 
           <Form.Item
-            name="username"
+            name="name"
             rules={[
               { required: true, message: "Please enter your username!" },
               { min: 3, message: "Username must be at least 3 characters!" },
@@ -42,6 +41,16 @@ function RegisterPage() {
             ]}
           >
             <Input prefix={<FaUser />} placeholder="Username" />
+          </Form.Item>
+
+          <Form.Item
+            name="email"
+            rules={[
+              { required: true, message: "Please enter your email!" },
+              { type: "email", message: "Please enter a valid email!" },
+            ]}
+          >
+            <Input prefix={<IoMdMail />} placeholder="Email" />
           </Form.Item>
 
           <Form.Item
@@ -58,62 +67,6 @@ function RegisterPage() {
           >
             <Input.Password prefix={<FaLock />} placeholder="Password" />
           </Form.Item>
-
-          <Form.Item
-            name="confirmPassword"
-            dependencies={["password"]}
-            hasFeedback
-            rules={[
-              { required: true, message: "Please confirm your password!" },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || getFieldValue("password") === value) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error("Passwords do not match!"));
-                },
-              }),
-            ]}
-          >
-            <Input.Password
-              prefix={<FaLock />}
-              placeholder="Re-enter Password"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="fullname"
-            rules={[
-              { required: true, message: "Please enter your fullname!" },
-              { min: 3, message: "Fullname must be at least 3 characters!" },
-            ]}
-          >
-            <Input prefix={<FaUserEdit />} placeholder="Fullname" />
-          </Form.Item>
-
-          <Form.Item
-            name="email"
-            rules={[
-              { required: true, message: "Please enter your email!" },
-              { type: "email", message: "Please enter a valid email!" },
-            ]}
-          >
-            <Input prefix={<IoMdMail />} placeholder="Email" />
-          </Form.Item>
-
-          <Form.Item
-            name="phone"
-            rules={[
-              { required: true, message: "Please enter your phone number!" },
-              {
-                pattern: /^[0-9]{10,15}$/,
-                message: "Please enter a valid phone number (10-15 digits)!",
-              },
-            ]}
-          >
-            <Input prefix={<FaPhone />} placeholder="Phone Number" />
-          </Form.Item>
-
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
               Register

@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  DesktopOutlined,
-  FileOutlined,
-  PieChartOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+import { PieChartOutlined } from "@ant-design/icons";
 import { Breadcrumb, Layout, Menu, theme } from "antd";
 import { Link, Outlet } from "react-router-dom";
 const { Header, Content, Footer, Sider } = Layout;
@@ -14,11 +8,15 @@ function getItem(label, key, icon, children) {
     key,
     icon,
     children,
-    label: <Link to={`/dashboard/${key}`}>{label}</Link>,
+    label: <Link to={`/dashboard-admin/${key}`}>{label}</Link>,
   };
 }
 const items = [
-  getItem("Manage Category", "category", <PieChartOutlined />),
+  getItem(
+    "Manage Health Service Category",
+    "health-service-category",
+    <PieChartOutlined />
+  ),
   getItem("Manage Store", "store", <PieChartOutlined />),
   getItem("Manage Service Group", "service-group", <PieChartOutlined />),
 ];

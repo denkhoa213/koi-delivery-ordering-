@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
-import { Card, Button, Rate } from "antd";
+import { Card, Button, Rate, Table } from "antd";
 import "./index.scss"; // Tạo file SCSS cho styling
 
 const services = [
@@ -19,6 +19,20 @@ const services = [
       "Theo dõi đơn hàng trực tuyến.",
     ],
     rating: 4.5,
+    pricing: [
+      {
+        type: "Hàng nhẹ (dưới 10kg)",
+        price: "$100/đơn",
+      },
+      {
+        type: "Hàng trung (10kg - 50kg)",
+        price: "$250/đơn",
+      },
+      {
+        type: "Hàng nặng (trên 50kg)",
+        price: "$500/đơn",
+      },
+    ],
   },
   {
     id: 2,
@@ -34,6 +48,20 @@ const services = [
       "Đảm bảo an toàn và chất lượng trong quá trình vận chuyển.",
     ],
     rating: 4.0,
+    pricing: [
+      {
+        type: "Hàng nhẹ (dưới 50kg)",
+        price: "$200/đơn",
+      },
+      {
+        type: "Hàng trung (50kg - 200kg)",
+        price: "$500/đơn",
+      },
+      {
+        type: "Hàng nặng (trên 200kg)",
+        price: "$1,000/đơn",
+      },
+    ],
   },
   {
     id: 3,
@@ -49,6 +77,20 @@ const services = [
       "Theo dõi đơn hàng dễ dàng.",
     ],
     rating: 4.7,
+    pricing: [
+      {
+        type: "Hàng nhẹ (dưới 30kg)",
+        price: "$50/đơn",
+      },
+      {
+        type: "Hàng trung (30kg - 100kg)",
+        price: "$150/đơn",
+      },
+      {
+        type: "Hàng nặng (trên 100kg)",
+        price: "$300/đơn",
+      },
+    ],
   },
 ];
 
@@ -58,6 +100,19 @@ const ServiceDetail = () => {
   if (!service) {
     return <h2>Dịch vụ không tồn tại!</h2>;
   }
+
+  const columns = [
+    {
+      title: "Loại hàng",
+      dataIndex: "type",
+      key: "type",
+    },
+    {
+      title: "Giá (USD)",
+      dataIndex: "price",
+      key: "price",
+    },
+  ];
 
   return (
     <div className="service-detail">
@@ -76,6 +131,14 @@ const ServiceDetail = () => {
             <li key={index}>{feature}</li>
           ))}
         </ul>
+
+        <h3>Bảng giá dịch vụ</h3>
+        <Table
+          columns={columns}
+          dataSource={service.pricing}
+          pagination={false}
+          rowKey="type"
+        />
 
         <div className="rating">
           <h4>Đánh giá dịch vụ:</h4>

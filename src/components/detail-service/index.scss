@@ -1,107 +1,143 @@
 .service-detail {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  background-color: #f8f9fa;
+
+  .detail-card {
     max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #ffffff;
+    width: 100%;
     border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease;
-  
-    &:hover {
-      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 600px; /* Đặt chiều cao tối thiểu để tất cả card đều nhau */
+
+    .ant-card-cover img {
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      object-fit: cover;
+      width: 100%;
+      height: 300px;
     }
-  
-    .detail-card {
-      border-radius: 10px;
-      overflow: hidden;
-      
-      img {
-        width: 100%;
-        height: auto;
-        border-bottom: 2px solid #e0e0e0;
-      }
-  
-      .description {
-        font-size: 18px;
-        color: #333;
-        margin: 15px 0;
-        line-height: 1.6;
-      }
-  
-      .details {
-        font-size: 16px;
-        color: #666;
-        margin: 10px 0;
-        line-height: 1.6;
-      }
-  
-      h3 {
-        margin-top: 20px;
-        font-size: 22px;
+
+    .ant-card-head-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .description {
+      font-size: 1.2rem;
+      color: #555;
+      margin: 15px 0;
+    }
+
+    .details {
+      font-size: 1.1rem;
+      color: #777;
+      margin-bottom: 20px;
+      flex-grow: 1; /* Cho phép phần nội dung này chiếm không gian lớn hơn để các card đều nhau */
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    .features-list {
+      list-style-type: none;
+      padding: 0;
+
+      li {
+        font-size: 1.1rem;
         color: #444;
-        border-bottom: 2px solid #e0e0e0;
-        padding-bottom: 10px;
-        font-weight: bold;
-      }
-  
-      .features-list {
-        list-style-type: none;
-        padding: 0;
-  
-        li {
-          background: #f9f9f9;
-          margin: 5px 0;
-          padding: 15px;
-          border-radius: 5px;
-          font-size: 15px;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-      }
-  
-      .rating {
-        display: flex;
-        align-items: center;
-        margin: 15px 0;
-  
-        h4 {
-          margin-right: 10px;
-        }
-  
-        .rating-value {
-          margin-left: 5px;
+        margin-bottom: 10px;
+        padding-left: 15px;
+        position: relative;
+
+        &::before {
+          content: '✓';
+          color: #28a745;
           font-weight: bold;
-          color: #ff4d4f; // Màu đỏ cho giá trị đánh giá
+          position: absolute;
+          left: 0;
+          top: 0;
         }
       }
-  
-      .button-group {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 20px;
-  
-        .back-button {
-          flex-grow: 1;
-          margin-right: 10px;
-          background-color: #f0f0f0;
-          border: none;
-          color: #333;
-  
-          &:hover {
-            background-color: #e0e0e0;
-          }
-        }
-  
-        .order-button {
-          flex-grow: 1;
-          background-color: #ff4d4f; // Màu đỏ cho nút đặt dịch vụ
-          border: none;
+    }
+
+    .ant-table {
+      margin-top: 20px;
+
+      .ant-table-thead > tr > th {
+        background-color: #007bff;
+        color: white;
+        font-size: 1.1rem;
+      }
+
+      .ant-table-tbody > tr > td {
+        font-size: 1rem;
+        color: #555;
+      }
+    }
+
+    .rating {
+      display: flex;
+      align-items: center;
+      margin-top: 20px;
+
+      h4 {
+        margin-right: 10px;
+        font-size: 1.2rem;
+        font-weight: 500;
+      }
+
+      .ant-rate {
+        margin-right: 10px;
+      }
+
+      .rating-value {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #f39c12;
+      }
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+
+      .back-button {
+        background-color: #6c757d;
+        border-color: #6c757d;
+
+        a {
           color: white;
-  
-          &:hover {
-            background-color: #d52c2f; // Màu sáng hơn khi hover
-          }
+        }
+
+        &:hover {
+          background-color: #5a6268;
+          border-color: #5a6268;
+        }
+      }
+
+      .order-button {
+        background-color: #dc3545;
+        border-color: #dc3545;
+
+        &:hover {
+          background-color: #c82333;
+          border-color: #bd2130;
         }
       }
     }
   }
-  
+}

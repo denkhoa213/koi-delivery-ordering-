@@ -1,16 +1,16 @@
-import { Button, Form, Input, Modal, Popconfirm, Table } from "antd";
 import { useEffect, useState } from "react";
-
 import { toast } from "react-toastify";
-import api from "../../config/axios";
+import api from "../../../../config/axios";
+import { Button, Form, Input, Modal, Popconfirm, Select, Table } from "antd";
 
-function CRUDTemplate({ column, formItems, path }) {
+function CRUDTemplate({ columns, formItem, path }) {
   const [datas, setDatas] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   const tableColumn = [
-    ...column,
+    ...columns,
     {
       title: "Action",
       dataIndex: "id",
@@ -29,7 +29,7 @@ function CRUDTemplate({ column, formItems, path }) {
 
           <Popconfirm
             title="Delete"
-            description="Delete?"
+            description=" Do you want to delete this category?"
             onConfirm={() => handleDelete(id)}
           >
             <Button type="primary" danger>
@@ -40,131 +40,73 @@ function CRUDTemplate({ column, formItems, path }) {
       ),
     },
   ];
-
   //GET
-  const fetchData = async () => {
+  const fecthData = async () => {
     try {
       const response = await api.get(path);
-      setDatas(response.data);
+      setDatas(response.data.result);
     } catch (err) {
       toast.error(err.response.data);
     }
   };
-
-  //CREATE or UPDATE
+  //CREATE OR UPDATE
   const handleSubmit = async (values) => {
     console.log(values);
     try {
       setLoading(true);
 
       if (values.id) {
-        // => update
-        const response = await api.put(`{path}/${values.id}`, values);
+        // => Update
+        const response = await api.put(`${path}/${values.id}`, values);
       } else {
-        // => create
+        // => Create
         const response = await api.post(path, values);
       }
+
       toast.success("Successfully saved!");
-      fetchData();
+      fecthData();
       form.resetFields();
       setShowModal(false);
-    } catch (err) {
-      toast.error(err.response.data);
+    } catch (error) {
+      toast.error(error.response.data);
     } finally {
       setLoading(false);
     }
   };
-
   //DELETE
   const handleDelete = async (id) => {
     try {
-      await api.delete(`{path}/${id}`);
-      toast.success("Successfully deleted!");
-      fetchData();
-    } catch (err) {
-      toast.error(err.response.data);
+      await api.put(`${path}/${id}`);
+      toast.success("Successfully delete!");
+      fecthData();
+    } catch (error) {
+      toast.error(error.response.data);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fecthData();
   }, []);
-
-  //   const column = [
-  //     {
-  //       title: "ID",
-  //       dataIndex: "id",
-  //       key: "id",
-  //     },
-  //     {
-  //       title: "Name",
-  //       dataIndex: "name",
-  //       key: "name",
-  //     },
-  //     {
-  //       title: "Description",
-  //       dataIndex: "description",
-  //       key: "description",
-  //     },
-  //     {
-  //       title: "Action",
-  //       dataIndex: "id",
-  //       key: "id",
-  //       render: (id, category) => (
-  //         <>
-  //           <Button
-  //             type="primary"
-  //             onClick={() => {
-  //               setShowModal(true);
-  //               form.setFieldsValue(category);
-  //             }}
-  //           >
-  //             Edit
-  //           </Button>
-
-  //           <Popconfirm
-  //             title="Delete"
-  //             description="Delete?"
-  //             onConfirm={() => handleDelete(id)}
-  //           >
-  //             <Button type="primary" danger>
-  //               Delete
-  //             </Button>
-  //           </Popconfirm>
-  //         </>
-  //       ),
-  //     },
-  //   ];
 
   return (
     <div>
       <Button onClick={() => setShowModal(true)}>Add</Button>
-      <Table dataSource={datas} columns={tableColumn}></Table>
-
+      <Table dataSource={datas} columns={tableColumn} />
       <Modal
         open={showModal}
         onCancel={() => setShowModal(false)}
-        title="Category"
         onOk={() => form.submit()}
+        title="HealServiceCategory"
         confirmLoading={loading}
       >
-        <Form form={form} labelCol={{ span: 24 }} onFinish={handleSubmit}>
-          {formItems}
-          {/* <Form.Item name="id" hidden>
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="name"
-            label="Name"
-            rules={[
-              { required: true, message: "Please input category's name" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item name="description" label="Description">
-            <Input.TextArea />
-          </Form.Item> */}
+        <Form
+          form={form}
+          labelCol={{
+            span: 24,
+          }}
+          onFinish={handleSubmit}
+        >
+          {formItem}
         </Form>
       </Modal>
     </div>
