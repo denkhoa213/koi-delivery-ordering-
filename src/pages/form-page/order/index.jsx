@@ -1,6 +1,6 @@
 import { Button, Form, Input, InputNumber, Select, Checkbox } from "antd";
 import { Option } from "antd/es/mentions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../../config/axios";
@@ -9,10 +9,24 @@ import FormLayout from "../../../components/layout/layout-form";
 function OrderForm() {
   const [isPlaneDelivery, setIsPlaneDelivery] = useState(false);
   const navigate = useNavigate();
+  const [deliveryMethod, setDeliveryMethod] = useState([]);
   const [form] = Form.useForm();
 
+  const fetchDelivery = async () => {
+    try {
+      const response = await api.get("/delivery-method/view-all");
+      setDeliveryMethod(response.data.result);
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
   const handleDeliveryMethodChange = (value) => {
-    setIsPlaneDelivery(value === "Plane");
+    // Kiểm tra xem phương thức vận chuyển được chọn có phải là "Plane"
+    const selectedDelivery = deliveryMethod.find(
+      (delivery) => delivery.id === value
+    );
+    setIsPlaneDelivery(selectedDelivery?.delivery_name === "Plane");
   };
 
   const handleSubmitOrder = async (values) => {
@@ -36,27 +50,32 @@ function OrderForm() {
     }
   };
 
+  useEffect(() => {
+    fetchDelivery();
+  }, []);
   return (
     <FormLayout>
       <Form form={form} onFinish={handleSubmitOrder} layout="vertical">
         <Form.Item
-          label="Phương Thức Giao Hàng"
-          name="deliveryMethod"
+          name="type"
+          label="Phương thức vận chuyển!"
           rules={[
             {
               required: true,
-              message: "Vui lòng chọn phương thức giao hàng!",
+              message: "Vui lòng chọn phương thức vận chuyển!",
             },
           ]}
         >
           <Select
-            placeholder="Chọn phương thức giao hàng"
+            placeholder="Chọn phương thức vận chuyển!"
+            loading={!deliveryMethod.length}
             onChange={handleDeliveryMethodChange}
           >
-            <Option value="Van">Van</Option>
-            <Option value="Plane">Plane</Option>
-            <Option value="Boat">Boat</Option>
-            <Option value="Train">Train</Option>
+            {deliveryMethod.map((delivery) => (
+              <Option key={delivery.id} value={delivery.id}>
+                {delivery.delivery_name}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
 

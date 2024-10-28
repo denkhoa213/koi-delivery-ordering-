@@ -23,6 +23,8 @@ import CustomsDeclarationForm from "./pages/form-page/declaration";
 import FishProfileForm from "./pages/form-page/fishProfile";
 import HealthService from "./pages/form-page/healthService";
 import CertificateForm from "./pages/form-page/certificate";
+import ManageFishCategory from "./pages/dashboard/admin/manage-fish-categories";
+import ManageDelivery from "./pages/dashboard/admin/manage-delivery";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
@@ -84,12 +86,20 @@ function App() {
       ),
       children: [
         {
+          path: "manage-user",
+          element: <ManageHealthService />,
+        },
+        {
           path: "health-service-category",
           element: <ManageHealthService />,
         },
         {
-          path: "manage-user",
-          element: <ManageHealthService />,
+          path: "fish-category",
+          element: <ManageFishCategory />,
+        },
+        {
+          path: "manage-delivery",
+          element: <ManageDelivery />,
         },
       ],
     },

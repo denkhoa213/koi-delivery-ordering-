@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Input, Select, Button, Upload, Checkbox } from "antd";
 import { toast } from "react-toastify";
 import uploadFile from "../../../utils/file"; //
@@ -15,24 +15,16 @@ const FishProfileForm = () => {
   const [fileList, setFileList] = useState([]);
   const [hasCertificate, setHasCertificate] = useState(false);
   const [form] = Form.useForm();
+  const [fishCategories, setFishCategories] = useState([]);
 
-  const fishCategories = [
-    {
-      id: 1,
-      fish_category_name: "Type A",
-      fish_category_description: "Super A",
-    },
-    {
-      id: 2,
-      fish_category_name: "Type B",
-      fish_category_description: "Super B",
-    },
-    {
-      id: 3,
-      fish_category_name: "Type C",
-      fish_category_description: "Super C",
-    },
-  ];
+  const fetchFishCategories = async () => {
+    try {
+      const response = await api.get("fish-category/view-all");
+      setFishCategories(response.data.result || []);
+    } catch (error) {
+      toast.error(error);
+    }
+  };
 
   const handleSubmitFishProfile = async (values) => {
     const orderId = localStorage.getItem("orderId");
@@ -73,6 +65,9 @@ const FishProfileForm = () => {
     setFileList(info.fileList);
   };
 
+  useEffect(() => {
+    fetchFishCategories();
+  }, []);
   return (
     <FormLayout>
       <Form onFinish={handleSubmitFishProfile} form={form} layout="vertical">
@@ -97,10 +92,10 @@ const FishProfileForm = () => {
           label="Loại cá"
           rules={[{ required: true, message: "Vui lòng chọn loại cá!" }]}
         >
-          <Select placeholder="Chọn loại cá">
+          <Select placeholder="Chọn loại cá" loading={!fishCategories.length}>
             {fishCategories.map((category) => (
-              <Option key={category.id} value={category.fish_category_name}>
-                {category.fish_category_description}
+              <Option key={category.id} value={category.id}>
+                {category.fish_category_name}
               </Option>
             ))}
           </Select>

@@ -12,13 +12,15 @@ function getItem(label, key, icon, children) {
   };
 }
 const items = [
+  getItem("Manage Users", "manage-user", <PieChartOutlined />),
   getItem(
     "Manage Health Service Category",
     "health-service-category",
     <PieChartOutlined />
   ),
-  getItem("Manage Users", "manage-user", <PieChartOutlined />),
-  getItem("Manage Service Group", "service-group", <PieChartOutlined />),
+
+  getItem("Manage Fish Categories", "fish-category", <PieChartOutlined />),
+  getItem("Manage Delivery", "manage-delivery", <PieChartOutlined />),
 ];
 const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);

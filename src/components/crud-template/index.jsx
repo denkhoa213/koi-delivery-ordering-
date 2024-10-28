@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import api from "../../../../config/axios";
-import { Button, Form, Input, Modal, Popconfirm, Select, Table } from "antd";
+import { Button, Form, Modal, Popconfirm, Space, Table } from "antd";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import api from "../../config/axios";
 
 function CRUDTemplate({ columns, formItem, path }) {
   const [datas, setDatas] = useState([]);
@@ -16,9 +17,10 @@ function CRUDTemplate({ columns, formItem, path }) {
       dataIndex: "id",
       key: "id",
       render: (id, category) => (
-        <>
+        <Space size="middle">
           <Button
             type="primary"
+            icon={<EditOutlined />}
             onClick={() => {
               setShowModal(true);
               form.setFieldsValue(category);
@@ -29,21 +31,21 @@ function CRUDTemplate({ columns, formItem, path }) {
 
           <Popconfirm
             title="Delete"
-            description=" Do you want to delete this category?"
+            description="Do you want to delete this category?"
             onConfirm={() => handleDelete(id)}
           >
-            <Button type="primary" danger>
+            <Button type="primary" danger icon={<DeleteOutlined />}>
               Delete
             </Button>
           </Popconfirm>
-        </>
+        </Space>
       ),
     },
   ];
   //GET
   const fecthData = async () => {
     try {
-      const response = await api.get(path);
+      const response = await api.get(`${path}/view-all`);
       setDatas(response.data.result);
     } catch (err) {
       toast.error(err.response.data);
@@ -57,10 +59,11 @@ function CRUDTemplate({ columns, formItem, path }) {
 
       if (values.id) {
         // => Update
-        const response = await api.put(`${path}/${values.id}`, values);
+        const response = await api.put(`${path}/update/${values.id}`, values);
+        console.log(response.data);
       } else {
         // => Create
-        const response = await api.post(path, values);
+        const response = await api.post(`${path}/create`, values);
       }
 
       toast.success("Successfully saved!");
@@ -76,7 +79,7 @@ function CRUDTemplate({ columns, formItem, path }) {
   //DELETE
   const handleDelete = async (id) => {
     try {
-      await api.put(`${path}/${id}`);
+      await api.delete(`${path}/delete/${id}`);
       toast.success("Successfully delete!");
       fecthData();
     } catch (error) {
@@ -90,7 +93,14 @@ function CRUDTemplate({ columns, formItem, path }) {
 
   return (
     <div>
-      <Button onClick={() => setShowModal(true)}>Add</Button>
+      <Button
+        type="primary"
+        icon={<PlusOutlined />}
+        onClick={() => setShowModal(true)}
+        style={{ marginBottom: "16px" }}
+      >
+        Add New Service
+      </Button>
       <Table dataSource={datas} columns={tableColumn} />
       <Modal
         open={showModal}

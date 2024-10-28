@@ -5,16 +5,16 @@ import { Button, Form, Input, Modal, Popconfirm, Table, Space } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
 function ManageHealthService() {
-  const [datas, setDatas] = useState([]);
+  const [healthService, setHealthService] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
   //GET
-  const fetchData = async () => {
+  const fetchHealthService = async () => {
     try {
       const response = await api.get("heal-service-category/view-all");
-      setDatas(response.data.result);
+      setHealthService(response.data.result);
     } catch (err) {
       toast.error(err.response.data);
     }
@@ -34,7 +34,7 @@ function ManageHealthService() {
       }
 
       toast.success("Successfully saved!");
-      fetchData();
+      fetchHealthService();
       form.resetFields();
       setShowModal(false);
     } catch (error) {
@@ -49,14 +49,14 @@ function ManageHealthService() {
     try {
       await api.put(`heal-service-category/delete/${id}`);
       toast.success("Successfully deleted!");
-      fetchData();
+      fetchHealthService();
     } catch (error) {
       toast.error(error.response.data);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchHealthService();
   }, []);
 
   const columns = [
@@ -139,7 +139,7 @@ function ManageHealthService() {
       >
         Add New Service
       </Button>
-      <Table dataSource={datas} columns={columns} rowKey="id" />
+      <Table dataSource={healthService} columns={columns} rowKey="id" />
 
       <Modal
         open={showModal}
