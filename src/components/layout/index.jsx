@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../header";
-import { Footer } from "antd/es/layout/layout";
+
 import { Outlet } from "react-router-dom";
 import AppFooter from "../footer";
 

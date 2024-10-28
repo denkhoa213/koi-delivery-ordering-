@@ -6,7 +6,6 @@ import {
 import HomePage from "./pages/home-page";
 import LoginPage from "./pages/login-page";
 import RegisterPage from "./pages/register-page";
-import Test from "./pages/test/test";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Layout from "./components/layout";
@@ -18,8 +17,12 @@ import ServiceDetail from "./components/detail-service";
 import ServiceList from "./components/list-service/service-delivery";
 import Dashboard from "./components/dashboard/dashboard-admin";
 import ManageHealthService from "./pages/dashboard/admin/manage-health-service";
-import OrderForm from "./components/order-form";
-import FishProfileForm from "./pages/test/test";
+import FormLayout from "./components/layout/layout-form";
+import OrderForm from "./pages/form-page/order";
+import CustomsDeclarationForm from "./pages/form-page/declaration";
+import FishProfileForm from "./pages/form-page/fishProfile";
+import HealthService from "./pages/form-page/healthService";
+import CertificateForm from "./pages/form-page/certificate";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
@@ -63,10 +66,6 @@ function App() {
         },
       ],
     },
-    {
-      path: "test",
-      element: <FishProfileForm />,
-    },
 
     {
       path: "login",
@@ -88,12 +87,39 @@ function App() {
           path: "health-service-category",
           element: <ManageHealthService />,
         },
+        {
+          path: "manage-user",
+          element: <ManageHealthService />,
+        },
       ],
     },
     {
-      path: "form",
-      element: <OrderForm />,
+      path: "/",
+      element: <FormLayout />,
+      children: [
+        {
+          path: "form-order",
+          element: <OrderForm />,
+        },
+        {
+          path: "fish-profile/:orderId",
+          element: <FishProfileForm />,
+        },
+        {
+          path: "certificate",
+          element: <CertificateForm />,
+        },
+        {
+          path: "health-service",
+          element: <HealthService />,
+        },
+        {
+          path: "form-declaration",
+          element: <CustomsDeclarationForm />,
+        },
+      ],
     },
+
     {
       path: "check",
       element: <HealthCheckForm />,

@@ -17,7 +17,7 @@ const items = [
     "health-service-category",
     <PieChartOutlined />
   ),
-  getItem("Manage Store", "store", <PieChartOutlined />),
+  getItem("Manage Users", "manage-user", <PieChartOutlined />),
   getItem("Manage Service Group", "service-group", <PieChartOutlined />),
 ];
 const Dashboard = () => {

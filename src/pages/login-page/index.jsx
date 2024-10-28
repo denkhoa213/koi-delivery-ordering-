@@ -15,6 +15,9 @@ import { useState } from "react";
 
 function LoginPage() {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const dispatch = useDispatch();
   const handleLoginGoogle = () => {
     const auth = getAuth();
     signInWithPopup(auth, googleProvider)
@@ -45,19 +48,18 @@ function LoginPage() {
 
   // lay du liu: useSelector()
 
-  const navigate = useNavigate();
-
-  const dispatch = useDispatch();
-
   const handleLogin = async (values) => {
     try {
       setLoading(true);
+      console.log("Login values:", values); // Kiểm tra thông tin gửi đi
 
       const response = await api.post("auth/login", values);
-      console.log(response);
+
+      console.log("Response:", response);
 
       const { token, role } = response.data.result;
-      localStorage.setItem("token", token); // Lưu token
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", role);
 
       dispatch(login(response.data.result));
       if (role === "ADMIN") {
@@ -68,8 +70,10 @@ function LoginPage() {
       toast.success(response.data.message);
     } catch (error) {
       toast.error(
-        "Đăng nhập thất bại: " + error.response?.data?.message || error.message
+        "Đăng nhập thất bại: " +
+          (error.response?.data?.message || error.message)
       );
+      console.log(error);
     } finally {
       setLoading(false);
     }
