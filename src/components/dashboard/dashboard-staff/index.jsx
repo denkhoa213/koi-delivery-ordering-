@@ -8,22 +8,14 @@ function getItem(label, key, icon, children) {
     key,
     icon,
     children,
-    label: <Link to={`/dashboard-admin/${key}`}>{label}</Link>,
+    label: <Link to={`/dashboard-staff/${key}`}>{label}</Link>,
   };
 }
 const items = [
   getItem("Overview", "over-view", <PieChartOutlined />),
-  getItem("Manage Users", "manage-user", <PieChartOutlined />),
-  getItem(
-    "Manage Health Service Category",
-    "health-service-category",
-    <PieChartOutlined />
-  ),
-
-  getItem("Manage Fish Categories", "fish-category", <PieChartOutlined />),
-  getItem("Manage Delivery", "manage-delivery", <PieChartOutlined />),
+  getItem("Check Health", "check-health-fish", <PieChartOutlined />),
 ];
-const Dashboard = () => {
+const DashboardStaff = () => {
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -90,4 +82,4 @@ const Dashboard = () => {
     </Layout>
   );
 };
-export default Dashboard;
+export default DashboardStaff;

@@ -1,19 +1,43 @@
 import React from "react";
-import { Input, Button, Space, Avatar } from "antd";
+import { Input, Button, Space, Avatar, Dropdown, Menu } from "antd";
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
-import "./index.scss";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
 import { AiFillHome, AiOutlineLogin, AiOutlineLogout } from "react-icons/ai";
+import "./index.scss";
+
 const { Search } = Input;
 
 const Header = () => {
   const user = useSelector((store) => store.user);
-  const dispath = useDispatch();
+  const dispatch = useDispatch();
+
+  const serviceMenu = (
+    <Menu>
+      <Menu.Item key="1">
+        <Link to="/services">Dịch vụ vận chuyển</Link>
+      </Menu.Item>
+      <Menu.Item key="2">
+        <Link to="#">Dịch vụ chăm sóc cá</Link>
+      </Menu.Item>
+    </Menu>
+  );
+
+  const moreMenu = (
+    <Menu>
+      <Menu.Item key="1">
+        <a href="#option1">Option 1</a>
+      </Menu.Item>
+      <Menu.Item key="2">
+        <a href="#option2">Option 2</a>
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
-    <>
-      <header className="header">
+    <header className="header">
+      <div className="header-left">
         <div className="logo">
           <img src="/path-to-your-logo.png" alt="Logo" />
         </div>
@@ -24,69 +48,57 @@ const Header = () => {
             style={{ width: 570 }}
           />
         </div>
-        <div className="nav-links">
-          <Button type="link" icon={<AiFillHome fontSize={18} />}>
-            <Link to="/">Trang chủ</Link>
+      </div>
+
+      <div className="header-right">
+        <Button type="link" icon={<AiFillHome fontSize={18} />}>
+          <Link to="/">Trang chủ</Link>
+        </Button>
+
+        {user ? (
+          <Space>
+            <Avatar icon={<UserOutlined />} />
+            <Button
+              type="link"
+              icon={<AiOutlineLogout fontSize={18} />}
+              onClick={() => dispatch(logout())}
+            >
+              Logout
+            </Button>
+          </Space>
+        ) : (
+          <Button type="link" icon={<AiOutlineLogin fontSize={18} />}>
+            <Link to="/login">Đăng nhập</Link>
           </Button>
+        )}
+      </div>
 
-          <div>
-            {user == null ? (
-              <>
-                <Button type="link" icon={<AiOutlineLogin fontSize={18} />}>
-                  <Link to="/login">Đăng nhập</Link>
-                </Button>
-              </>
-            ) : (
-              <div>
-                <Space wrap size={16}>
-                  <Avatar icon={<UserOutlined />} />
-                </Space>
-
-                <Button
-                  type="link"
-                  icon={<AiOutlineLogout fontSize={18} />}
-                  onClick={() => dispath(logout())}
-                >
-                  Logout
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
-
-      <nav className="nav-links">
-        <div className="nav-dropdown">
-          <Button type="link" className="nav-button dropdown-toggle">
+      <nav className="nav">
+        <Dropdown overlay={serviceMenu}>
+          <Button type="link" className="nav-button">
             Dịch vụ <DownOutlined />
           </Button>
-          <div className="dropdown-menu">
-            <Link to="/services">Dịch vụ vận chuyển</Link>
-            <Link to="#">Dịch vụ chăm sóc cá </Link>
-          </div>
-        </div>
+        </Dropdown>
 
         <Button type="link">
           <Link to="/about">Giới thiệu</Link>
         </Button>
+
         <Button type="link">
           <Link to="/support">Hổ trợ</Link>
         </Button>
+
         <Button type="link">
           <Link to="/contact">Liên hệ</Link>
         </Button>
 
-        <div className="nav-dropdown">
-          <Button type="link" className="nav-button dropdown-toggle">
+        <Dropdown overlay={moreMenu}>
+          <Button type="link" className="nav-button">
             More <DownOutlined />
           </Button>
-          <div className="dropdown-menu">
-            <a href="#option1">Option 1</a>
-            <a href="#option2">Option 2</a>
-          </div>
-        </div>
+        </Dropdown>
       </nav>
-    </>
+    </header>
   );
 };
 

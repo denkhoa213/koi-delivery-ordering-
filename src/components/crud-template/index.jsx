@@ -79,7 +79,7 @@ function CRUDTemplate({ columns, formItem, path }) {
   //DELETE
   const handleDelete = async (id) => {
     try {
-      await api.delete(`${path}/delete/${id}`);
+      await api.put(`${path}/delete/${id}`);
       toast.success("Successfully delete!");
       fecthData();
     } catch (error) {

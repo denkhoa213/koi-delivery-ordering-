@@ -22,32 +22,38 @@ function HealthService() {
   const handleSubmitServices = async (values) => {
     const selectedServices = values.selectedServices;
     const orderId = localStorage.getItem("orderId");
-    console.log("Current Order ID:", orderId);
+
     if (!orderId) {
       toast.error("Không tìm thấy đơn hàng! vui lòng đặt hàng trước.");
       navigate("/form-order");
       return;
     }
+
     if (!Array.isArray(selectedServices) || selectedServices.length === 0) {
       toast.error("Vui lòng chọn ít nhất một dịch vụ!");
       return;
     }
 
     try {
+      // Gửi yêu cầu với mỗi dịch vụ đã chọn
       for (const serviceId of selectedServices) {
-        await api.post(`/health-service-order/create/${orderId}/${serviceId}`);
+        const payload = {
+          orderId: parseInt(orderId, 10),
+          healthServiceCategoryId: serviceId,
+        };
+        await api.post("/health-service-order/create", payload);
       }
+
       toast.success("Dịch vụ đã được thêm thành công!");
       navigate("/");
     } catch (error) {
       console.error("Service submission error:", error);
-      if (error.response && error.response.data) {
-        toast.error(error.response.data);
-      } else {
-        toast.error("Có lỗi xảy ra. Vui lòng thử lại.");
-      }
+      const errorMessage =
+        error.response?.data?.message || "Có lỗi xảy ra. Vui lòng thử lại.";
+      toast.error(errorMessage);
     }
   };
+
   useEffect(() => {
     // Gọi hàm fetchServices khi component được mount
     fetchServices();
@@ -70,8 +76,9 @@ function HealthService() {
             {services.map((service) => (
               <Select.Option key={service.id} value={service.id}>
                 <div>
-                  <strong>{service.serviceName}</strong>
+                  <strong> {service.serviceName}</strong>
                   <p style={{ margin: 0 }}>{service.serviceDescription}</p>
+                  <p style={{ margin: 0 }}> Price: {service.price}</p>
                 </div>
               </Select.Option>
             ))}

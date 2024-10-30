@@ -64,6 +64,10 @@ function LoginPage() {
       dispatch(login(response.data.result));
       if (role === "ADMIN") {
         navigate("/dashboard-admin");
+      } else if (role === "MANAGER") {
+        navigate("/dashboard-manager");
+      } else if (role === "STAFF") {
+        navigate("/dashboard-staff");
       } else {
         navigate("/");
       }

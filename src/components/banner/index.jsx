@@ -1,30 +1,30 @@
 import React from "react";
-import { Carousel } from "antd";
+import { Button, Col, Row, Typography } from "antd";
+
+import "./index.scss";
+import { Link } from "react-router-dom";
 
 const Banner = () => {
-  const images = [
-    "https://images.unsplash.com/photo-1455849318743-b2233052fcff?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://plus.unsplash.com/premium_photo-1717629832671-6d410f1409a6?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1636690619068-eb3849be82d1?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://plus.unsplash.com/premium_photo-1717698797872-93fc5fa9552a?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  ];
-
+  const { Title, Paragraph } = Typography;
   return (
-    <Carousel autoplay>
-      {images.map((image, index) => (
-        <div key={index}>
-          <img
-            src={image}
-            alt={`Slide ${index + 1}`}
-            style={{
-              width: "100%",
-              height: "500px", // Bạn có thể điều chỉnh chiều cao theo nhu cầu
-              objectFit: "cover", // Đảm bảo hình ảnh được cắt và không bị méo
-            }}
-          />
-        </div>
-      ))}
-    </Carousel>
+    <div className="banner">
+      <Row justify="center" align="middle" style={{ height: "100vh" }}>
+        <Col span={12} style={{ textAlign: "center", color: "white" }}>
+          <Title level={1}>Giao Hàng Koi Nhanh Chóng</Title>
+          <Paragraph style={{ color: "#fff" }}>
+            Khám phá dịch vụ giao hàng cá Koi tiện lợi và nhanh chóng! Chúng tôi
+            cung cấp cá Koi chất lượng cao từ các trang trại uy tín. Đặt hàng dễ
+            dàng và nhận cá Koi tận nhà với sự chăm sóc chu đáo và bảo đảm an
+            toàn.
+          </Paragraph>
+          <Link to="form-order">
+            <Button type="primary" size="large">
+              Đặt Hàng Ngay
+            </Button>
+          </Link>
+        </Col>
+      </Row>
+    </div>
   );
 };
 

@@ -14,22 +14,34 @@ import About from "./components/about";
 import Contact from "./components/contact";
 import Support from "./components/support";
 import ServiceDetail from "./components/detail-service";
-import ServiceList from "./components/list-service/service-delivery";
 import Dashboard from "./components/dashboard/dashboard-admin";
 import ManageHealthService from "./pages/dashboard/admin/manage-health-service";
 import FormLayout from "./components/layout/layout-form";
 import OrderForm from "./pages/form-page/order";
-import CustomsDeclarationForm from "./pages/form-page/declaration";
+
 import FishProfileForm from "./pages/form-page/fishProfile";
 import HealthService from "./pages/form-page/healthService";
 import CertificateForm from "./pages/form-page/certificate";
 import ManageFishCategory from "./pages/dashboard/admin/manage-fish-categories";
-import ManageDelivery from "./pages/dashboard/admin/manage-delivery";
+import DeliveryServiceList from "./components/list-service/service-delivery";
+import HealthServiceList from "./components/list-service/service-health";
+import ManageDelivery from "./pages/dashboard/admin/manage-delivery-method";
+
+import CustomsDeclarationForm from "./pages/form-page/declaration";
+import DashboardStaff from "./components/dashboard/dashboard-staff";
+import DashboardManager from "./components/dashboard/dashboard-manager";
+import OrderDetail from "./pages/form-page/orderDetail";
+import ManageOrder from "./pages/dashboard/manager/manage-order";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
     const user = useSelector((store) => store.user);
-    if (user && user?.role === "ADMIN") {
+    if (
+      user &&
+      (user.role === "ADMIN" ||
+        user.role === "STAFF" ||
+        user.role === "MANAGER")
+    ) {
       return children;
     }
     toast.error("You are not allowed to access this!");
@@ -60,7 +72,11 @@ function App() {
         },
         {
           path: "services",
-          element: <ServiceList />,
+          element: <DeliveryServiceList />,
+        },
+        {
+          path: "health-services",
+          element: <HealthServiceList />,
         },
         {
           path: "services/:id",
@@ -104,6 +120,34 @@ function App() {
       ],
     },
     {
+      path: "/dashboard-manager",
+      element: (
+        <ProtectRouterAuth>
+          <DashboardManager />
+        </ProtectRouterAuth>
+      ),
+      children: [
+        {
+          path: "manage-order",
+          element: <ManageOrder />,
+        },
+      ],
+    },
+    {
+      path: "/dashboard-staff",
+      element: (
+        <ProtectRouterAuth>
+          <DashboardStaff />
+        </ProtectRouterAuth>
+      ),
+      children: [
+        {
+          path: "check-health-fish",
+          element: <ManageDelivery />,
+        },
+      ],
+    },
+    {
       path: "/",
       element: <FormLayout />,
       children: [
@@ -116,6 +160,10 @@ function App() {
           element: <FishProfileForm />,
         },
         {
+          path: "form-order-detail/:orderId",
+          element: <OrderDetail />,
+        },
+        {
           path: "certificate",
           element: <CertificateForm />,
         },
@@ -124,7 +172,7 @@ function App() {
           element: <HealthService />,
         },
         {
-          path: "form-declaration",
+          path: "form-declaration/:orderId",
           element: <CustomsDeclarationForm />,
         },
       ],

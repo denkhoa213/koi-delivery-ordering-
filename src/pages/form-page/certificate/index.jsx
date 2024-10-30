@@ -34,7 +34,10 @@ const CertificateForm = () => {
     values.orderId = orderId;
 
     try {
-      const response = await api.post("api/v1/certificates/create", values);
+      const response = await api.post(
+        `/certificates/create/${values.orderId}`,
+        values
+      );
       toast.success("Tạo chứng chỉ thành công!");
       navigate("/health-service");
     } catch (error) {

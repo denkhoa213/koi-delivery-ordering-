@@ -21,6 +21,7 @@ const FishProfileForm = () => {
     try {
       const response = await api.get("fish-category/view-all");
       setFishCategories(response.data.result || []);
+      console.log("Fish Categories Data:", response.data.result);
     } catch (error) {
       toast.error(error);
     }
@@ -40,7 +41,7 @@ const FishProfileForm = () => {
       try {
         const url = await uploadFile(file);
         values.image = url;
-        toast.success("Tải lên hình ảnh thành công!"); // Thêm thông báo thành công
+        toast.success("Tải lên hình ảnh thành công!");
       } catch (error) {
         toast.error("Lỗi khi tải lên hình ảnh");
         return;
@@ -50,17 +51,20 @@ const FishProfileForm = () => {
     values.orderId = orderId;
     try {
       const response = await api.post("fish-profile/create", values);
+      const fishProfileId = response.data.result.id;
+      localStorage.setItem("fishProfileId", fishProfileId);
       toast.success("Tạo hồ sơ cá thành công!");
       if (hasCertificate) {
-        navigate("/certificate");
+        navigate(`/certificate/${orderId}`);
       } else {
-        navigate("/health-service");
+        navigate(`/form-order-detail/${orderId}`);
       }
     } catch (error) {
       const errorMessage = error.response?.data || "Có lỗi xảy ra.";
       toast.error(errorMessage);
     }
   };
+
   const handleUploadChange = (info) => {
     setFileList(info.fileList);
   };
@@ -94,8 +98,8 @@ const FishProfileForm = () => {
         >
           <Select placeholder="Chọn loại cá" loading={!fishCategories.length}>
             {fishCategories.map((category) => (
-              <Option key={category.id} value={category.id}>
-                {category.fish_category_name}
+              <Option key={category.id} value={category.fishCategoryName}>
+                {category.fishCategoryName}
               </Option>
             ))}
           </Select>
