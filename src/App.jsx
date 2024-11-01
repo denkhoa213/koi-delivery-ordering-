@@ -164,7 +164,7 @@ function App() {
           element: <OrderDetail />,
         },
         {
-          path: "certificate",
+          path: "certificate/:orderId",
           element: <CertificateForm />,
         },
         {

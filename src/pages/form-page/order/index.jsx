@@ -21,6 +21,7 @@ function OrderForm() {
       toast.error(error);
     }
   };
+
   const handleDeliveryMethodChange = (value) => {
     setIsPlaneDelivery(value.toUpperCase() === "PLANE");
   };
@@ -50,7 +51,7 @@ function OrderForm() {
 
       const orderId = response.data.result.id;
       localStorage.setItem("orderId", orderId);
-      toast.success("Đặt hàng thành công!");
+      toast.success("Order placed successfully!");
       if (values.customsDeclaration) {
         navigate(`/form-declaration/${orderId}`);
       } else {
@@ -65,6 +66,25 @@ function OrderForm() {
   useEffect(() => {
     fetchDelivery();
   }, []);
+
+  // Tính total amout theo khoản cách
+  const distance = Form.useWatch("distance", form);
+  const vat = Form.useWatch("vat", form);
+
+  useEffect(() => {
+    if (distance && vat >= 0) {
+      const baseAmount = distance * 1000;
+      const calculatedVatAmount = (baseAmount * vat) / 100;
+      const calculatedTotalAmount = baseAmount + calculatedVatAmount;
+
+      form.setFieldsValue({
+        amount: baseAmount,
+        vatAmount: calculatedVatAmount,
+        totalAmount: calculatedTotalAmount,
+      });
+    }
+  }, [distance, vat, form]);
+
   return (
     <FormLayout>
       <Form form={form} onFinish={handleSubmitOrder} layout="vertical">
@@ -147,16 +167,9 @@ function OrderForm() {
         <Form.Item
           label="Amount"
           name="amount"
-          rules={[
-            { required: true, message: "Please enter the amount!" },
-            {
-              type: "number",
-              min: 0,
-              message: "Amount must be a positive number!",
-            },
-          ]}
+          rules={[{ required: true, message: "Please enter the amount!" }]}
         >
-          <InputNumber min={0} step={0.01} />
+          <InputNumber min={0} step={0.01} disabled />
         </Form.Item>
 
         <Form.Item
@@ -178,16 +191,9 @@ function OrderForm() {
         <Form.Item
           label="VAT Amount"
           name="vatAmount"
-          rules={[
-            { required: true, message: "Please enter the VAT amount!" },
-            {
-              type: "number",
-              min: 0,
-              message: "VAT amount must be a positive number!",
-            },
-          ]}
+          rules={[{ required: true, message: "Please enter the VAT amount!" }]}
         >
-          <InputNumber min={0} step={0.01} />
+          <InputNumber min={0} step={0.01} disabled />
         </Form.Item>
 
         <Form.Item
@@ -195,14 +201,9 @@ function OrderForm() {
           name="totalAmount"
           rules={[
             { required: true, message: "Please enter the total amount!" },
-            {
-              type: "number",
-              min: 0,
-              message: "Total amount must be a positive number!",
-            },
           ]}
         >
-          <InputNumber min={0} step={0.01} />
+          <InputNumber min={0} step={0.01} disabled />
         </Form.Item>
 
         <Form.Item>
