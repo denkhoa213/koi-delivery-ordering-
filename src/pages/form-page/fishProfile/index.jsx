@@ -73,7 +73,7 @@ const FishProfileForm = () => {
     fetchFishCategories();
   }, []);
   return (
-    <FormLayout>
+    <FormLayout title="Fish Profile">
       <Form onFinish={handleSubmitFishProfile} form={form} layout="vertical">
         <Form.Item
           name="name"

@@ -27,7 +27,7 @@ const DashboardManager = () => {
       }}
     >
       <Sider
-        width={290}
+        width={200}
         collapsible
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}

@@ -34,7 +34,7 @@ function OrderDetail() {
     }
   };
   return (
-    <FormLayout>
+    <FormLayout title="Order Detail">
       <Form onFinish={handleCreateOrderDetail} form={form} layout="vertical">
         <Form.Item
           name="quantity"

@@ -16,24 +16,14 @@ function ManageDelivery() {
       key: "createAt",
       render: (text) => <span>{new Date(text).toLocaleString()}</span>, // Format the date
     },
-    {
-      title: "Created By",
-      dataIndex: "createBy",
-      key: "createBy",
-      render: (text) => <span>{text}</span>,
-    },
+
     {
       title: "Updated At",
       dataIndex: "updateAt",
       key: "updateAt",
-      render: (text) => <span>{new Date(text).toLocaleString()}</span>, // Format the date
+      render: (text) => <span>{new Date(text).toLocaleString()}</span>,
     },
-    {
-      title: "Updated By",
-      dataIndex: "updateBy",
-      key: "updateBy",
-      render: (text) => <span>{text}</span>,
-    },
+
     {
       title: "Status",
       dataIndex: "status",

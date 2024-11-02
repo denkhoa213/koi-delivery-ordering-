@@ -45,21 +45,17 @@ function OrderForm() {
       const response = await api.post("order/create", dataToSubmit, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log(response);
-
-      console.log("Data to submit:", dataToSubmit);
 
       const orderId = response.data.result.id;
       localStorage.setItem("orderId", orderId);
-      toast.success("Order placed successfully!");
+      toast.success(response.data.message);
       if (values.customsDeclaration) {
         navigate(`/form-declaration/${orderId}`);
       } else {
         navigate(`/fish-profile/${orderId}`);
       }
-      console.log("Order ID:", response.data.result.id);
     } catch (error) {
-      toast.error(error.response.data);
+      toast.error(error.response.data.message);
     }
   };
 
@@ -86,7 +82,7 @@ function OrderForm() {
   }, [distance, vat, form]);
 
   return (
-    <FormLayout>
+    <FormLayout title="Order">
       <Form form={form} onFinish={handleSubmitOrder} layout="vertical">
         <Form.Item
           name="deliveryMethod"

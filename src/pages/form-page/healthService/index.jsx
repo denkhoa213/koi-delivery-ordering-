@@ -37,17 +37,19 @@ function HealthService() {
     try {
       // Gửi yêu cầu với mỗi dịch vụ đã chọn
       for (const serviceId of selectedServices) {
-        const payload = {
+        const values = {
           orderId: parseInt(orderId, 10),
           healthServiceCategoryId: serviceId,
         };
-        await api.post("/health-service-order/create", payload);
+        const responses = await api.post(
+          "/health-service-order/create",
+          values
+        );
+        toast.success(responses.data.message);
       }
 
-      toast.success("Dịch vụ đã được thêm thành công!");
       navigate("/");
     } catch (error) {
-      console.error("Service submission error:", error);
       const errorMessage =
         error.response?.data?.message || "Có lỗi xảy ra. Vui lòng thử lại.";
       toast.error(errorMessage);
@@ -59,7 +61,7 @@ function HealthService() {
     fetchServices();
   }, []);
   return (
-    <FormLayout>
+    <FormLayout title="Health Service">
       <Form onFinish={handleSubmitServices} form={form} layout="vertical">
         {/* Form cho chọn dịch vụ */}
         <Form.Item

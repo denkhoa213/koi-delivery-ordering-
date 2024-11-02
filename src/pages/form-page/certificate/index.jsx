@@ -16,6 +16,7 @@ const CertificateForm = () => {
     const orderId = localStorage.getItem("orderId");
     if (!orderId) {
       toast.error("Không tìm thấy đơn hàng! Vui lòng đặt hàng trước.");
+      navigate("/form-order");
       return;
     }
 
@@ -38,8 +39,8 @@ const CertificateForm = () => {
         `/certificates/create/${values.orderId}`,
         values
       );
-      toast.success("Tạo chứng chỉ thành công!");
-      navigate("/health-service");
+      toast.success(response.data.message);
+      navigate(`/fish-profile/${orderId}`);
     } catch (error) {
       const errorMessage = error.response?.data || "Có lỗi xảy ra.";
       toast.error(errorMessage);
@@ -51,7 +52,7 @@ const CertificateForm = () => {
   };
 
   return (
-    <FormLayout>
+    <FormLayout title="Certificate">
       <Form onFinish={handleSubmitCertificate} form={form} layout="vertical">
         <Form.Item
           name="certificateName"

@@ -26,15 +26,21 @@ function ManageHealthService() {
     try {
       setLoading(true);
 
+      let response;
       if (values.id) {
         // => Update
-        await api.put(`heal-service-category/update/${values.id}`, values);
+        response = await api.put(
+          `heal-service-category/update/${values.id}`,
+          values
+        );
       } else {
         // => Create
-        await api.post("heal-service-category/create", values);
+        response = await api.post("heal-service-category/create", values);
       }
 
-      toast.success("Successfully saved!");
+      if (response.data.code === 200) {
+        toast.success(response.data.message);
+      }
       fetchHealthService();
       form.resetFields();
       setShowModal(false);
@@ -48,8 +54,8 @@ function ManageHealthService() {
   //DELETE
   const handleDelete = async (id) => {
     try {
-      await api.put(`heal-service-category/delete/${id}`);
-      toast.success("Successfully deleted!");
+      const response = await api.put(`heal-service-category/delete/${id}`);
+      toast.success(response.data.message);
       fetchHealthService();
     } catch (error) {
       toast.error(error.response.data);
@@ -159,6 +165,7 @@ function ManageHealthService() {
           }}
           onFinish={handleSubmit}
           layout="vertical"
+          title="Health Service"
         >
           <Form.Item name="id" hidden>
             <Input />

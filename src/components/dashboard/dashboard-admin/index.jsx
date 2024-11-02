@@ -12,7 +12,7 @@ function getItem(label, key, icon, children) {
   };
 }
 const items = [
-  getItem("Overview", "over-view", <PieChartOutlined />),
+  getItem("Overview Total", "over-view", <PieChartOutlined />),
   getItem("Manage Users", "manage-user", <PieChartOutlined />),
   getItem(
     "Manage Health Service Category",

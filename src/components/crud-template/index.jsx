@@ -57,33 +57,37 @@ function CRUDTemplate({ columns, formItem, path }) {
     try {
       setLoading(true);
 
+      let response;
       if (values.id) {
-        // => Update
-        const response = await api.put(`${path}/update/${values.id}`, values);
-        console.log(response.data);
+        // Update
+        response = await api.put(`${path}/update/${values.id}`, values);
       } else {
-        // => Create
-        const response = await api.post(`${path}/create`, values);
+        // Create
+        response = await api.post(`${path}/create`, values);
       }
 
-      toast.success("Successfully saved!");
+      if (response.data.code === 200) {
+        toast.success(response.data.message);
+      }
+
       fecthData();
       form.resetFields();
       setShowModal(false);
     } catch (error) {
-      toast.error(error.response.data);
+      toast.error(error.response?.data || "An error occurred");
     } finally {
       setLoading(false);
     }
   };
+
   //DELETE
   const handleDelete = async (id) => {
     try {
-      await api.put(`${path}/delete/${id}`);
-      toast.success("Successfully delete!");
+      const response = await api.put(`${path}/delete/${id}`);
+      toast.success(response.data.message);
       fecthData();
     } catch (error) {
-      toast.error(error.response.data);
+      toast.error(error.response.data.message);
     }
   };
 
@@ -99,7 +103,7 @@ function CRUDTemplate({ columns, formItem, path }) {
         onClick={() => setShowModal(true)}
         style={{ marginBottom: "16px" }}
       >
-        Add New Service
+        Add
       </Button>
       <Table dataSource={datas} columns={tableColumn} />
       <Modal

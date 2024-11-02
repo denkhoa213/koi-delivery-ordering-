@@ -14,6 +14,7 @@ function getItem(label, key, icon, children) {
 const items = [
   getItem("Overview", "over-view", <PieChartOutlined />),
   getItem("Check Health", "check-health-fish", <PieChartOutlined />),
+  getItem("Manage Package", "create-package", <PieChartOutlined />),
 ];
 const DashboardStaff = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -27,7 +28,7 @@ const DashboardStaff = () => {
       }}
     >
       <Sider
-        width={290}
+        width={200}
         collapsible
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}

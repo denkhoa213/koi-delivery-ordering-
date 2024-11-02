@@ -26,12 +26,13 @@ import ManageFishCategory from "./pages/dashboard/admin/manage-fish-categories";
 import DeliveryServiceList from "./components/list-service/service-delivery";
 import HealthServiceList from "./components/list-service/service-health";
 import ManageDelivery from "./pages/dashboard/admin/manage-delivery-method";
-
 import CustomsDeclarationForm from "./pages/form-page/declaration";
 import DashboardStaff from "./components/dashboard/dashboard-staff";
 import DashboardManager from "./components/dashboard/dashboard-manager";
 import OrderDetail from "./pages/form-page/orderDetail";
 import ManageOrder from "./pages/dashboard/manager/manage-order";
+import CheckHealth from "./pages/dashboard/staff/manage-checkHealth";
+import ManagePackage from "./pages/dashboard/staff/manage-package";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
@@ -143,7 +144,11 @@ function App() {
       children: [
         {
           path: "check-health-fish",
-          element: <ManageDelivery />,
+          element: <CheckHealth />,
+        },
+        {
+          path: "create-package",
+          element: <ManagePackage />,
         },
       ],
     },

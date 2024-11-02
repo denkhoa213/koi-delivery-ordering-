@@ -1,17 +1,41 @@
 import React, { useEffect, useState } from "react";
 import api from "../../../../config/axios";
 import { toast } from "react-toastify";
-import { Table } from "antd";
+import { Button, Space, Table } from "antd";
+import { CheckOutlined } from "@ant-design/icons";
 
 function ManageOrder() {
   const [showAllOrder, setShowAllOrder] = useState([]);
 
-  const fetchOrder = async () => {
+  const fetchOrders = async () => {
     try {
-      const response = await api.get("order/get-all");
-      setShowAllOrder(response.data.result);
+      const [pendingResponse, availableResponse] = await Promise.all([
+        api.get("/order/view-order-pending"),
+        api.get("/order/view-order-available"),
+      ]);
+      const combinedOrders = [
+        ...pendingResponse.data.result,
+        ...availableResponse.data.result,
+      ];
+      setShowAllOrder(combinedOrders);
     } catch (error) {
-      toast.error(error);
+      toast.error(error.message || "Failed to fetch orders");
+    }
+  };
+
+  const handleAcceptOrder = async (orderId) => {
+    try {
+      await api.put(`/order/acceptorder/${orderId}`);
+      toast.success("Order accepted successfully!");
+
+      // Update local order status to "AVAILABLE"
+      setShowAllOrder((prevOrders) =>
+        prevOrders.map((order) =>
+          order.id === orderId ? { ...order, status: "AVAILABLE" } : order
+        )
+      );
+    } catch (error) {
+      toast.error(error.message || "Failed to accept order");
     }
   };
 
@@ -30,19 +54,19 @@ function ManageOrder() {
       title: "Order Date",
       dataIndex: "orderDate",
       key: "orderDate",
-      render: (text) => new Date(text).toLocaleString(), // Date formatting
+      render: (text) => new Date(text).toLocaleString(),
     },
     {
       title: "Estimated Delivery Date",
       dataIndex: "estimateDeliveryDate",
       key: "estimateDeliveryDate",
-      render: (text) => new Date(text).toLocaleString(), // Date formatting
+      render: (text) => new Date(text).toLocaleString(),
     },
     {
       title: "Receiving Date",
       dataIndex: "receivingDate",
       key: "receivingDate",
-      render: (text) => new Date(text).toLocaleString(), // Date formatting
+      render: (text) => new Date(text).toLocaleString(),
     },
     {
       title: "Destination",
@@ -79,15 +103,30 @@ function ManageOrder() {
         </span>
       ),
     },
+    {
+      title: "Action",
+      dataIndex: "id",
+      key: "id",
+      render: (id, order) => (
+        <Space size="middle">
+          <Button
+            type="primary"
+            icon={<CheckOutlined />}
+            onClick={() => handleAcceptOrder(order.id)}
+            disabled={order.status === "AVAILABLE"} // Disable if already accepted
+          >
+            Accept
+          </Button>
+        </Space>
+      ),
+    },
   ];
+
   useEffect(() => {
-    fetchOrder();
+    fetchOrders();
   }, []);
-  return (
-    <>
-      <Table dataSource={showAllOrder} columns={columns} />
-    </>
-  );
+
+  return <Table dataSource={showAllOrder} columns={columns} rowKey="id" />;
 }
 
 export default ManageOrder;
