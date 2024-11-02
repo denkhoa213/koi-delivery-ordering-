@@ -7,18 +7,19 @@ import { EditOutlined } from "@ant-design/icons";
 function CheckHealthAndPakage() {
   const [showModal, setShowModal] = useState(false);
   const [showOrderAvailable, setShowOrderAvailable] = useState([]);
-  const fetchOrderAvailable = async () => {
+
+  const fetchOrderAvailable = async (values) => {
     try {
-      const response = await api.get("/order/view-order-available");
+      const response = await api.get("/order/view-order-available", values);
       setShowOrderAvailable(response.data.result);
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.message);
     }
   };
 
   useEffect(() => {
     fetchOrderAvailable();
-  });
+  }, []);
   const columns = [
     {
       title: "Order Code",
@@ -84,7 +85,7 @@ function CheckHealthAndPakage() {
       title: "Action",
       dataIndex: "id",
       key: "id",
-      render: (id, category) => (
+      render: () => (
         <Space size="middle">
           <Button
             type="primary"

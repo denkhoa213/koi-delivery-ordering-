@@ -25,17 +25,16 @@ function ManageOrder() {
 
   const handleAcceptOrder = async (orderId) => {
     try {
-      await api.put(`/order/acceptorder/${orderId}`);
-      toast.success("Order accepted successfully!");
+      const response = await api.put(`/order/acceptorder/${orderId}`);
+      toast.success(response.data.message);
 
-      // Update local order status to "AVAILABLE"
       setShowAllOrder((prevOrders) =>
         prevOrders.map((order) =>
           order.id === orderId ? { ...order, status: "AVAILABLE" } : order
         )
       );
     } catch (error) {
-      toast.error(error.message || "Failed to accept order");
+      toast.error(error.response.data.message || "Failed to accept order");
     }
   };
 

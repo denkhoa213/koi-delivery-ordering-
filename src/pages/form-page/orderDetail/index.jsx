@@ -27,6 +27,7 @@ function OrderDetail() {
     console.log("Dữ liệu gửi:", values);
     try {
       const response = await api.post("order-detail/create", values);
+      toast.success(response.data.message);
       navigate("/health-service");
       console.log(response);
     } catch (error) {

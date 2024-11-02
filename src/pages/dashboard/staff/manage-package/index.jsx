@@ -1,57 +1,54 @@
-import { PlusOutlined } from "@ant-design/icons";
-import {
-  Button,
-  DatePicker,
-  Form,
-  Input,
-  Modal,
-  Select,
-  Space,
-  Table,
-} from "antd";
-import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import api from "../../../../config/axios";
-
-const { Option } = Select;
+import { UploadOutlined } from "@ant-design/icons";
+import { Button, DatePicker, Form, Input, Select, Upload } from "antd";
+import { Option } from "antd/es/mentions";
+import React, { useState } from "react";
+import CRUDTemplate from "../../../../components/crud-template";
 
 function ManagePackage() {
-  const [showModal, setShowModal] = useState(false);
-  const [showPackage, setShowPackage] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [form] = Form.useForm(); // Create form instance
+  const formItem = (
+    <>
+      <Form.Item
+        label="Package Description"
+        name="packageDescription"
+        rules={[{ required: true, message: "Please enter a description" }]}
+      >
+        <Input placeholder="Enter package description" />
+      </Form.Item>
 
-  const fetchViewAllPackage = async () => {
-    try {
-      const response = await api.get("/package/view-all");
-      setShowPackage(response.data.result);
-    } catch (error) {
-      toast.error(error.response?.data?.message || "An error occurred!");
-    }
-  };
+      <Form.Item
+        label="Package Date"
+        name="packageDate"
+        rules={[{ required: true, message: "Please select a date" }]}
+      ></Form.Item>
 
-  const handleCreatePackage = async (values) => {
-    setLoading(true);
-    try {
-      await api.post("/package/create", values);
-      toast.success("Package created successfully!");
-      form.resetFields(); // Reset form fields after submission
-      setShowModal(false); // Close modal after submission
-      fetchViewAllPackage(); // Refresh package list
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to create package!";
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
+      <Form.Item
+        label="Package Status"
+        name="packageStatus"
+        rules={[{ required: true, message: "Please select a status" }]}
+      >
+        <Select>
+          <Option value="UNPACKED">UNPACKED</Option>
+          <Option value="PACKED">PACKED</Option>
+          <Option value="PACKING">PACKING</Option>
+        </Select>
+      </Form.Item>
 
-  useEffect(() => {
-    fetchViewAllPackage();
-  }, []);
+      <Form.Item
+        label="Packaged By"
+        name="packageBy"
+        rules={[{ required: true, message: "Please enter who packaged it" }]}
+      >
+        <Input placeholder="Enter name of person who packaged it" />
+      </Form.Item>
+    </>
+  );
 
   const columns = [
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+    },
     {
       title: "Package No",
       dataIndex: "packageNo",
@@ -66,111 +63,43 @@ function ManagePackage() {
       title: "Package Date",
       dataIndex: "packageDate",
       key: "packageDate",
-      render: (text) => new Date(text).toLocaleString(),
+      render: (text) => new Date(text).toLocaleDateString(),
     },
     {
       title: "Status",
+      dataIndex: "status",
+      key: "status",
+    },
+    {
+      title: "Package Status",
       dataIndex: "packageStatus",
       key: "packageStatus",
-      render: (status) => (
-        <span style={{ color: status === "AVAILABLE" ? "green" : "red" }}>
-          {status}
-        </span>
-      ),
     },
     {
       title: "Packaged By",
-      dataIndex: "packageBy",
-      key: "packageBy",
+      dataIndex: "packagedBy",
+      key: "packagedBy",
     },
+
     {
-      title: "Action",
-      dataIndex: "id",
-      key: "action",
-      render: (id) => (
-        <Space size="middle">
-          <Button type="link">Edit</Button>
-          <Button type="link" danger>
-            Delete
-          </Button>
-        </Space>
-      ),
+      title: "Created At",
+      dataIndex: "createAt",
+      key: "createAt",
+      render: (text) => new Date(text).toLocaleDateString(),
+    },
+
+    {
+      title: "Updated At",
+      dataIndex: "updateAt",
+      key: "updateAt",
+      render: (text) => new Date(text).toLocaleDateString(),
     },
   ];
 
   return (
-    <div>
-      <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={() => setShowModal(true)}
-        style={{ marginBottom: "16px" }}
-      >
-        Add Package
-      </Button>
-
-      <Table dataSource={showPackage} columns={columns} rowKey="id" />
-
-      <Modal
-        title="Create Package"
-        open={showModal}
-        onCancel={() => setShowModal(false)}
-        onOk={() => form.submit()} // Submit the form on OK button click
-        confirmLoading={loading} // Show loading spinner on submit
-      >
-        <Form
-          form={form} // Bind form instance to the Form
-          name="packageForm"
-          layout="vertical"
-          onFinish={handleCreatePackage}
-        >
-          <Form.Item
-            label="Package Description"
-            name="packageDescription"
-            rules={[
-              { required: true, message: "Please input package description!" },
-            ]}
-          >
-            <Input.TextArea rows={4} />
-          </Form.Item>
-
-          <Form.Item
-            label="Package Date"
-            name="packageDate"
-            rules={[{ required: true, message: "Please select package date!" }]}
-          >
-            <DatePicker showTime />
-          </Form.Item>
-
-          <Form.Item
-            label="Package Status"
-            name="packageStatus"
-            rules={[
-              { required: true, message: "Please select package status!" },
-            ]}
-          >
-            <Select placeholder="Select status">
-              <Option value="UNPACKED">Unpacked</Option>
-              <Option value="PACKING">Packing</Option>
-              <Option value="PACKED">Packed</Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item
-            label="Packaged By"
-            name="packageBy"
-            rules={[
-              {
-                required: true,
-                message: "Please input who packed the package!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
+    <>
+      <CRUDTemplate formItem={formItem} columns={columns} path="package" />
+    </>
   );
 }
 
