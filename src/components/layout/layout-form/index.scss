@@ -1,46 +1,11 @@
-// Định nghĩa các biến cho các giá trị màu sắc và kích thước
-$form-max-width: 600px; // Chiều rộng tối đa cho form
-$form-margin: 0 auto; // Căn giữa form
-$form-padding: 20px; // Padding xung quanh form
-$form-border-color: #eaeaea; // Màu cho đường viền
-$form-border-radius: 8px; // Đường viền bo góc
-$form-title-font-size: 24px; // Kích thước chữ tiêu đề
-$form-title-color: #333; // Màu chữ tiêu đề
-
-.form-layout {
-  max-width: $form-max-width; // Thiết lập chiều rộng tối đa
-  margin: $form-margin; // Căn giữa form
-  padding: $form-padding; // Padding xung quanh
-  border: 1px solid $form-border-color; // Đường viền
-  border-radius: $form-border-radius; // Bo góc
-  background-color: #fff; // Màu nền trắng
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); // Đổ bóng nhẹ cho form
-
-  h2 {
-    font-size: $form-title-font-size; // Kích thước chữ tiêu đề
-    color: $form-title-color; // Màu chữ tiêu đề
-    margin-bottom: 20px; // Khoảng cách dưới tiêu đề
-    text-align: center; // Căn giữa tiêu đề
-  }
-.form-layout-title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  text-align: center;
+.form-layout-wrapper {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-  .ant-form-item {
-    margin-bottom: 16px; // Khoảng cách giữa các item trong form
-  }
-
-  .ant-btn {
-    width: 100%; // Đặt nút chiếm 100% chiều rộng
-    background-color: #1890ff; // Màu nền cho nút
-    color: #fff; // Màu chữ cho nút
-    border: none; // Bỏ đường viền
-
-    &:hover {
-      background-color: darken(#1890ff, 5%); // Tối màu khi hover
-    }
-  }
+.form-layout-title {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 20px;
 }

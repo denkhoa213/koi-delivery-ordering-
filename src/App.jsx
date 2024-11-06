@@ -29,10 +29,10 @@ import ManageDelivery from "./pages/dashboard/admin/manage-delivery-method";
 import CustomsDeclarationForm from "./pages/form-page/declaration";
 import DashboardStaff from "./components/dashboard/dashboard-staff";
 import DashboardManager from "./components/dashboard/dashboard-manager";
-import OrderDetail from "./pages/form-page/orderDetail";
 import ManageOrder from "./pages/dashboard/manager/manage-order";
 import CheckHealth from "./pages/dashboard/staff/manage-checkHealth";
 import ManagePackage from "./pages/dashboard/staff/manage-package";
+import TotalOrder from "./pages/form-page/totalDetailOrder";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
@@ -161,24 +161,25 @@ function App() {
           element: <OrderForm />,
         },
         {
-          path: "fish-profile/:orderId",
+          path: "fish-profile",
           element: <FishProfileForm />,
         },
-        {
-          path: "form-order-detail/:orderId",
-          element: <OrderDetail />,
-        },
+
         {
           path: "certificate/:orderId",
           element: <CertificateForm />,
         },
         {
-          path: "health-service",
+          path: "health-service/:orderId",
           element: <HealthService />,
         },
         {
           path: "form-declaration/:orderId",
           element: <CustomsDeclarationForm />,
+        },
+        {
+          path: "total-order",
+          element: <TotalOrder />,
         },
       ],
     },

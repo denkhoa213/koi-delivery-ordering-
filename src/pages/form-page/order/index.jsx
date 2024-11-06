@@ -1,31 +1,45 @@
-import { Button, Form, Input, InputNumber, Select, Checkbox } from "antd";
-import { Option } from "antd/es/mentions";
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Checkbox,
+  Row,
+  Col,
+  Card,
+} from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../../config/axios";
-import FormLayout from "../../../components/layout/layout-form";
 
 function OrderForm() {
   const [isPlaneDelivery, setIsPlaneDelivery] = useState(false);
   const navigate = useNavigate();
   const [deliveryMethod, setDeliveryMethod] = useState([]);
   const [form] = Form.useForm();
+  const [hasCertificate, setHasCertificate] = useState(false);
 
+  // Fetch available delivery methods
   const fetchDelivery = async () => {
     try {
       const response = await api.get("/delivery-method/view-all");
-      console.log(response.data.result); // Log dữ liệu trả về
       setDeliveryMethod(response.data.result);
     } catch (error) {
-      toast.error(error);
+      toast.error(
+        error.response?.data?.message || "Error fetching delivery methods"
+      );
     }
   };
 
+  // Handle delivery method change
   const handleDeliveryMethodChange = (value) => {
     setIsPlaneDelivery(value.toUpperCase() === "PLANE");
+    localStorage.setItem("transportMethod", value);
   };
 
+  // Submit the order form
   const handleSubmitOrder = async (values) => {
     try {
       const token = localStorage.getItem("token");
@@ -35,10 +49,6 @@ function OrderForm() {
         departure: values.departure,
         distance: values.distance,
         phone: values.phone,
-        amount: values.amount,
-        vat: values.vat,
-        vatAmount: values.vatAmount,
-        totalAmount: values.totalAmount,
         customsDeclaration: values.customsDeclaration ? "true" : "false",
       };
 
@@ -49,13 +59,18 @@ function OrderForm() {
       const orderId = response.data.result.id;
       localStorage.setItem("orderId", orderId);
       toast.success(response.data.message);
+
       if (values.customsDeclaration) {
         navigate(`/form-declaration/${orderId}`);
+      } else if (hasCertificate) {
+        navigate(`/certificate/${orderId}`);
       } else {
-        navigate(`/fish-profile/${orderId}`);
+        navigate(`/health-service/${orderId}`);
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(
+        error.response?.data?.message || "Có lỗi xảy ra khi tạo đơn hàng"
+      );
     }
   };
 
@@ -63,152 +78,130 @@ function OrderForm() {
     fetchDelivery();
   }, []);
 
-  // Tính total amout theo khoản cách
-  const distance = Form.useWatch("distance", form);
-  const vat = Form.useWatch("vat", form);
-
-  useEffect(() => {
-    if (distance && vat >= 0) {
-      const baseAmount = distance * 1000;
-      const calculatedVatAmount = (baseAmount * vat) / 100;
-      const calculatedTotalAmount = baseAmount + calculatedVatAmount;
-
-      form.setFieldsValue({
-        amount: baseAmount,
-        vatAmount: calculatedVatAmount,
-        totalAmount: calculatedTotalAmount,
-      });
-    }
-  }, [distance, vat, form]);
-
   return (
-    <FormLayout title="Order">
+    <Card title="Thông tin đơn hàng" bordered={false}>
       <Form form={form} onFinish={handleSubmitOrder} layout="vertical">
-        <Form.Item
-          name="deliveryMethod"
-          label="Delivery Method"
-          rules={[
-            {
-              required: true,
-              message: "Please select a delivery method!",
-            },
-          ]}
-        >
-          <Select
-            placeholder="Select delivery method"
-            onChange={handleDeliveryMethodChange}
-          >
-            {deliveryMethod.map((delivery) => (
-              <Select.Option
-                key={delivery.id}
-                value={delivery.deliveryMethodName}
+        <Row gutter={16}>
+          <Col span={12}>
+            {/* Phương thức giao hàng */}
+            <Form.Item
+              name="deliveryMethod"
+              label="Phương thức giao hàng"
+              rules={[
+                {
+                  required: true,
+                  message: "Vui lòng chọn phương thức giao hàng!",
+                },
+              ]}
+            >
+              <Select
+                placeholder="Chọn phương thức giao hàng"
+                onChange={handleDeliveryMethodChange}
               >
-                {delivery.deliveryMethodName}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
+                {deliveryMethod.map((delivery) => (
+                  <Select.Option
+                    key={delivery.id}
+                    value={delivery.deliveryMethodName}
+                  >
+                    {delivery.deliveryMethodName}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
 
-        {isPlaneDelivery && (
-          <Form.Item name="customsDeclaration" valuePropName="checked">
-            <Checkbox>Yêu cầu khai báo hải quan</Checkbox>
-          </Form.Item>
-        )}
+          {isPlaneDelivery && (
+            <Col span={12}>
+              <Form.Item
+                name="customsDeclaration"
+                valuePropName="checked"
+                style={{ marginTop: "25px" }}
+              >
+                <Checkbox>Yêu cầu khai báo hải quan</Checkbox>
+              </Form.Item>
+            </Col>
+          )}
+        </Row>
 
-        <Form.Item
-          label="Destination"
-          name="destination"
-          rules={[{ required: true, message: "Please enter the destination!" }]}
-        >
-          <Input />
-        </Form.Item>
+        <Row gutter={16}>
+          <Col span={12}>
+            {/* Điểm đến */}
+            <Form.Item
+              label="Điểm đến"
+              name="destination"
+              rules={[{ required: true, message: "Vui lòng nhập điểm đến!" }]}
+            >
+              <Input placeholder="Nhập điểm đến" />
+            </Form.Item>
+          </Col>
 
-        <Form.Item
-          label="Departure"
-          name="departure"
-          rules={[{ required: true, message: "Please enter the departure!" }]}
-        >
-          <Input />
-        </Form.Item>
+          <Col span={12}>
+            {/* Điểm khởi hành */}
+            <Form.Item
+              label="Điểm khởi hành"
+              name="departure"
+              rules={[
+                { required: true, message: "Vui lòng nhập điểm khởi hành!" },
+              ]}
+            >
+              <Input placeholder="Nhập điểm khởi hành" />
+            </Form.Item>
+          </Col>
+        </Row>
 
-        <Form.Item
-          label="Distance"
-          name="distance"
-          rules={[
-            { required: true, message: "Please enter the distance!" },
-            {
-              type: "number",
-              min: 0,
-              message: "Distance must be a positive number!",
-            },
-          ]}
-        >
-          <InputNumber min={0} />
-        </Form.Item>
+        <Row gutter={16}>
+          <Col span={12}>
+            {/* Khoảng cách */}
+            <Form.Item
+              label="Khoảng cách (km)"
+              name="distance"
+              rules={[
+                { required: true, message: "Vui lòng nhập khoảng cách!" },
+                {
+                  type: "number",
+                  min: 0,
+                  message: "Khoảng cách phải là số dương!",
+                },
+              ]}
+            >
+              <InputNumber min={0} style={{ width: "100%" }} />
+            </Form.Item>
+          </Col>
 
-        <Form.Item
-          label="Phone"
-          name="phone"
-          rules={[
-            { required: true, message: "Please enter the phone number!" },
-            {
-              pattern: /^[0-9]{10}$/,
-              message: "Phone number must be 10 digits!",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item
-          label="Amount"
-          name="amount"
-          rules={[{ required: true, message: "Please enter the amount!" }]}
-        >
-          <InputNumber min={0} step={0.01} disabled />
-        </Form.Item>
-
-        <Form.Item
-          label="VAT (%)"
-          name="vat"
-          rules={[
-            { required: true, message: "Please enter the VAT percentage!" },
-            {
-              type: "number",
-              min: 0,
-              max: 100,
-              message: "VAT must be between 0 and 100!",
-            },
-          ]}
-        >
-          <InputNumber min={0} max={100} step={0.01} />
-        </Form.Item>
-
-        <Form.Item
-          label="VAT Amount"
-          name="vatAmount"
-          rules={[{ required: true, message: "Please enter the VAT amount!" }]}
-        >
-          <InputNumber min={0} step={0.01} disabled />
-        </Form.Item>
-
-        <Form.Item
-          label="Total Amount"
-          name="totalAmount"
-          rules={[
-            { required: true, message: "Please enter the total amount!" },
-          ]}
-        >
-          <InputNumber min={0} step={0.01} disabled />
-        </Form.Item>
-
+          <Col span={12}>
+            {/* Số điện thoại */}
+            <Form.Item
+              label="Số điện thoại"
+              name="phone"
+              rules={[
+                { required: true, message: "Vui lòng nhập số điện thoại!" },
+                {
+                  pattern: /^[0-9]{10}$/,
+                  message: "Số điện thoại phải gồm 10 chữ số!",
+                },
+              ]}
+            >
+              <Input placeholder="Nhập số điện thoại" />
+            </Form.Item>
+          </Col>
+        </Row>
         <Form.Item>
-          <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
-            Đặt Hàng
+          <Checkbox
+            checked={hasCertificate}
+            onChange={(e) => setHasCertificate(e.target.checked)}
+          >
+            Có chứng chỉ
+          </Checkbox>
+        </Form.Item>
+
+        {/* Nút xác nhận đơn hàng */}
+        <Form.Item style={{ textAlign: "right" }}>
+          <Button type="primary" htmlType="submit" style={{ width: "auto" }}>
+            Xác nhận thông tin đơn hàng
           </Button>
         </Form.Item>
       </Form>
-    </FormLayout>
+    </Card>
   );
 }
 
