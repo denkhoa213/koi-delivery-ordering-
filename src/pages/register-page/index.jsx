@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import AuthenTemplate from "../../components/login-register";
 import { FaLock, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
@@ -9,13 +9,16 @@ import { toast } from "react-toastify";
 
 function RegisterPage() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const handleRegister = async (values) => {
     try {
-      const response = await api.post("auth/register", values);
-      toast.success("Successfully register new account!");
+      const response = await api.post("/auth/register", values);
+      toast.success(response.data.message);
       navigate("/login");
     } catch (err) {
       toast.error(err.response.data);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -68,7 +71,7 @@ function RegisterPage() {
             <Input.Password prefix={<FaLock />} placeholder="Password" />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" block>
+            <Button type="primary" htmlType="submit" block loading={loading}>
               Register
             </Button>
           </Form.Item>

@@ -137,7 +137,44 @@ const FishProfileForm = () => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="Tải lên hình ảnh">
+                <Form.Item
+                  label="Tải lên hình ảnh"
+                  name="image"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng tải lên hình ảnh!",
+                    },
+                    {
+                      validator: (_, value) => {
+                        if (!fileList.length) {
+                          return Promise.reject(
+                            "Bạn cần tải lên ít nhất một hình ảnh!"
+                          );
+                        }
+                        // Kiểm tra định dạng và kích thước (ví dụ: file nhỏ hơn 5MB)
+                        const isImage = fileList.every((file) =>
+                          ["image/jpeg", "image/png", "image/jpg"].includes(
+                            file.type
+                          )
+                        );
+                        const isSmallEnough = fileList.every(
+                          (file) => file.size / 1024 / 1024 < 5
+                        );
+
+                        if (!isImage) {
+                          return Promise.reject(
+                            "Chỉ được tải lên file hình ảnh (JPEG, PNG)!"
+                          );
+                        }
+                        if (!isSmallEnough) {
+                          return Promise.reject("Hình ảnh phải nhỏ hơn 5MB!");
+                        }
+                        return Promise.resolve();
+                      },
+                    },
+                  ]}
+                >
                   <Upload
                     fileList={fileList}
                     onChange={handleUploadChange}
