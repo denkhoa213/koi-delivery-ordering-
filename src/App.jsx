@@ -167,19 +167,35 @@ function App() {
 
         {
           path: "certificate/:orderId",
-          element: <CertificateForm />,
+          element: (
+            <ProtectRouterAuth>
+              <CertificateForm />
+            </ProtectRouterAuth>
+          ),
         },
         {
           path: "health-service/:orderId",
-          element: <HealthService />,
+          element: (
+            <ProtectRouterAuth>
+              <HealthService />
+            </ProtectRouterAuth>
+          ),
         },
         {
           path: "form-declaration/:orderId",
-          element: <CustomsDeclarationForm />,
+          element: (
+            <ProtectRouterAuth>
+              <CustomsDeclarationForm />
+            </ProtectRouterAuth>
+          ),
         },
         {
           path: "total-order",
-          element: <TotalOrder />,
+          element: (
+            <ProtectRouterAuth>
+              <TotalOrder />
+            </ProtectRouterAuth>
+          ),
         },
       ],
     },

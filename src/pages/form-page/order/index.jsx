@@ -83,7 +83,7 @@ function OrderForm() {
       <Form form={form} onFinish={handleSubmitOrder} layout="vertical">
         <Row gutter={16}>
           <Col span={12}>
-            {/* Phương thức giao hàng */}
+            {/* Delivery Method */}
             <Form.Item
               name="deliveryMethod"
               label="Phương thức giao hàng"
@@ -125,7 +125,7 @@ function OrderForm() {
 
         <Row gutter={16}>
           <Col span={12}>
-            {/* Điểm đến */}
+            {/* Destination */}
             <Form.Item
               label="Điểm đến"
               name="destination"
@@ -136,7 +136,7 @@ function OrderForm() {
           </Col>
 
           <Col span={12}>
-            {/* Điểm khởi hành */}
+            {/* Departure */}
             <Form.Item
               label="Điểm khởi hành"
               name="departure"
@@ -151,16 +151,19 @@ function OrderForm() {
 
         <Row gutter={16}>
           <Col span={12}>
-            {/* Khoảng cách */}
+            {/* Distance */}
             <Form.Item
               label="Khoảng cách (km)"
               name="distance"
               rules={[
                 { required: true, message: "Vui lòng nhập khoảng cách!" },
                 {
-                  type: "number",
-                  min: 0,
-                  message: "Khoảng cách phải là số dương!",
+                  validator: (_, value) => {
+                    if (value === undefined || value < 0) {
+                      return Promise.reject("Khoảng cách phải là số dương!");
+                    }
+                    return Promise.resolve();
+                  },
                 },
               ]}
             >
@@ -169,7 +172,7 @@ function OrderForm() {
           </Col>
 
           <Col span={12}>
-            {/* Số điện thoại */}
+            {/* Phone Number */}
             <Form.Item
               label="Số điện thoại"
               name="phone"
@@ -185,6 +188,8 @@ function OrderForm() {
             </Form.Item>
           </Col>
         </Row>
+
+        {/* Certificate Checkbox */}
         <Form.Item>
           <Checkbox
             checked={hasCertificate}
@@ -194,7 +199,7 @@ function OrderForm() {
           </Checkbox>
         </Form.Item>
 
-        {/* Nút xác nhận đơn hàng */}
+        {/* Submit Button */}
         <Form.Item style={{ textAlign: "right" }}>
           <Button type="primary" htmlType="submit" style={{ width: "auto" }}>
             Xác nhận thông tin đơn hàng
