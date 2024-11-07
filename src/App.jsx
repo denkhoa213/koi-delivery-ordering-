@@ -166,11 +166,7 @@ function App() {
         },
         {
           path: "fish-profile",
-          element: (
-            <ProtectRouterAuth>
-              <FishProfileForm />
-            </ProtectRouterAuth>
-          ),
+          element: <FishProfileForm />,
         },
 
         {
