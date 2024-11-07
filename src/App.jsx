@@ -158,11 +158,19 @@ function App() {
       children: [
         {
           path: "form-order",
-          element: <OrderForm />,
+          element: (
+            <ProtectRouterAuth>
+              <OrderForm />
+            </ProtectRouterAuth>
+          ),
         },
         {
           path: "fish-profile",
-          element: <FishProfileForm />,
+          element: (
+            <ProtectRouterAuth>
+              <FishProfileForm />
+            </ProtectRouterAuth>
+          ),
         },
 
         {
