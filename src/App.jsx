@@ -41,7 +41,8 @@ function App() {
       user &&
       (user.role === "ADMIN" ||
         user.role === "STAFF" ||
-        user.role === "MANAGER")
+        user.role === "MANAGER" ||
+        user.role === "CUSTOMER")
     ) {
       return children;
     }
@@ -158,11 +159,7 @@ function App() {
       children: [
         {
           path: "form-order",
-          element: (
-            <ProtectRouterAuth>
-              <OrderForm />
-            </ProtectRouterAuth>
-          ),
+          element: <OrderForm />,
         },
         {
           path: "fish-profile",
@@ -171,35 +168,19 @@ function App() {
 
         {
           path: "certificate/:orderId",
-          element: (
-            <ProtectRouterAuth>
-              <CertificateForm />
-            </ProtectRouterAuth>
-          ),
+          element: <CertificateForm />,
         },
         {
           path: "health-service/:orderId",
-          element: (
-            <ProtectRouterAuth>
-              <HealthService />
-            </ProtectRouterAuth>
-          ),
+          element: <HealthService />,
         },
         {
           path: "form-declaration/:orderId",
-          element: (
-            <ProtectRouterAuth>
-              <CustomsDeclarationForm />
-            </ProtectRouterAuth>
-          ),
+          element: <CustomsDeclarationForm />,
         },
         {
           path: "total-order",
-          element: (
-            <ProtectRouterAuth>
-              <TotalOrder />
-            </ProtectRouterAuth>
-          ),
+          element: <TotalOrder />,
         },
       ],
     },
