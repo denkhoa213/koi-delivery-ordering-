@@ -15,6 +15,7 @@ const items = [
   getItem("Overview", "over-view", <PieChartOutlined />),
   getItem("Check Health", "check-health-fish", <PieChartOutlined />),
   getItem("Manage Package", "create-package", <PieChartOutlined />),
+  getItem("Manage Handover Document","create-handover-documents", <PieChartOutlined />),
 ];
 const DashboardStaff = () => {
   const [collapsed, setCollapsed] = useState(false);

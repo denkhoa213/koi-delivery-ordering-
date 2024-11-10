@@ -32,6 +32,7 @@ import DashboardManager from "./components/dashboard/dashboard-manager";
 import ManageOrder from "./pages/dashboard/manager/manage-order";
 import CheckHealth from "./pages/dashboard/staff/manage-checkHealth";
 import ManagePackage from "./pages/dashboard/staff/manage-package";
+import ManageHandoverDocuments from "./pages/dashboard/staff/manage-handoverDocument";
 import TotalOrder from "./pages/form-page/totalDetailOrder";
 
 function App() {
@@ -150,6 +151,10 @@ function App() {
         {
           path: "create-package",
           element: <ManagePackage />,
+        },
+        {
+          path: "create-handover-documents",
+          element: <ManageHandoverDocuments />,
         },
       ],
     },
