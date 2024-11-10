@@ -34,6 +34,7 @@ import CheckHealth from "./pages/dashboard/staff/manage-checkHealth";
 import ManagePackage from "./pages/dashboard/staff/manage-package";
 import ManageHandoverDocuments from "./pages/dashboard/staff/manage-handoverDocument";
 import TotalOrder from "./pages/form-page/totalDetailOrder";
+import ProfileCustomer from "./pages/profile-customer";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
@@ -194,6 +195,11 @@ function App() {
       path: "check",
       element: <HealthCheckForm />,
     },
+
+    {
+      path: "profile-cus",
+      element: <ProfileCustomer />,
+    }
   ]);
 
   return <RouterProvider router={router} />;
