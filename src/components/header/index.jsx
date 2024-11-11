@@ -1,7 +1,7 @@
 import React from "react";
 import { Input, Button, Space, Avatar, Dropdown, Menu } from "antd";
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
 import { AiFillHome, AiOutlineLogin, AiOutlineLogout } from "react-icons/ai";
@@ -12,6 +12,11 @@ const { Search } = Input;
 const Header = () => {
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleAvatarClick = () => {
+    navigate("/profile-cus");
+  };
 
   const serviceMenu = (
     <Menu>
@@ -57,7 +62,11 @@ const Header = () => {
 
         {user ? (
           <Space>
-            <Avatar icon={<UserOutlined />} />
+            <Avatar
+              icon={<UserOutlined />}
+              onClick={handleAvatarClick}
+              style={{ cursor: "pointer" }}
+            />
             <Button
               type="link"
               icon={<AiOutlineLogout fontSize={18} />}
