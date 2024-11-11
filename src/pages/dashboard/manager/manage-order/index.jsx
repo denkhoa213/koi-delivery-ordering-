@@ -25,7 +25,7 @@ function ManageOrder() {
 
   const handleAcceptOrder = async (orderId) => {
     try {
-      const response = await api.put(`/order/acceptorder/${orderId}`);
+      const response = await api.put(`/order/accept-order/${orderId}`);
       toast.success(response.data.message);
 
       setShowAllOrder((prevOrders) =>

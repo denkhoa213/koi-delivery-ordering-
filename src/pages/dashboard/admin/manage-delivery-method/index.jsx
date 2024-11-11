@@ -34,6 +34,12 @@ function ManageDelivery() {
         </span>
       ),
     },
+    {
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
+      render: (price) => <span>{price.toLocaleString()} VND</span>, // Format the price
+    },
   ];
 
   const formItem = (
@@ -49,6 +55,19 @@ function ManageDelivery() {
         ]}
       >
         <Input placeholder="Nhập tên phương tiện vận chuyển" />
+      </Form.Item>
+      <Form.Item
+        name="price"
+        label="Giá"
+        rules={[
+          { required: true, message: "Vui lòng nhập giá!" },
+          {
+            pattern: /^[0-9]+(\.[0-9]{1,2})?$/,
+            message: "Giá phải là một số hợp lệ với tối đa 2 chữ số thập phân!",
+          },
+        ]}
+      >
+        <Input placeholder="Nhập giá" />
       </Form.Item>
     </>
   );

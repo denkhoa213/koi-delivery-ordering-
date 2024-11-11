@@ -39,7 +39,7 @@ const CertificateForm = () => {
         values
       );
       toast.success(response.data.message);
-      navigate(`/health-service/${orderId}`);
+      navigate(`/total-order`);
     } catch (error) {
       const errorMessage = error.response?.data || "Có lỗi xảy ra.";
       toast.error(errorMessage);

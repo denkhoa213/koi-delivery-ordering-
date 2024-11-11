@@ -41,7 +41,9 @@ const FishProfileForm = () => {
       const response = await api.post("fish-profile/create", values);
       const fishProfileId = response.data.result.id;
       localStorage.setItem("fishProfileId", fishProfileId);
-      toast.success("Tạo hồ sơ cá thành công!");
+      if (response.data.code === 200) {
+        toast.success(response.data.message);
+      }
       navigate(`/form-order`);
     } catch (error) {
       const errorMessage = error.response?.data || "Có lỗi xảy ra.";

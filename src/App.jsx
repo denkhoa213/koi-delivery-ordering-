@@ -33,6 +33,8 @@ import ManageOrder from "./pages/dashboard/manager/manage-order";
 import CheckHealth from "./pages/dashboard/staff/manage-checkHealth";
 import ManagePackage from "./pages/dashboard/staff/manage-package";
 import TotalOrder from "./pages/form-page/totalDetailOrder";
+import OverViewTotal from "./pages/dashboard/admin/over-view";
+import HandoverForm from "./pages/dashboard/staff/handOver";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
@@ -119,6 +121,10 @@ function App() {
           path: "manage-delivery",
           element: <ManageDelivery />,
         },
+        {
+          path: "over-view",
+          element: <OverViewTotal />,
+        },
       ],
     },
     {
@@ -150,6 +156,10 @@ function App() {
         {
           path: "create-package",
           element: <ManagePackage />,
+        },
+        {
+          path: "hand-over",
+          element: <HandoverForm />,
         },
       ],
     },

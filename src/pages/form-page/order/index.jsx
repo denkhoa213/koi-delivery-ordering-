@@ -19,7 +19,6 @@ function OrderForm() {
   const navigate = useNavigate();
   const [deliveryMethod, setDeliveryMethod] = useState([]);
   const [form] = Form.useForm();
-  const [hasCertificate, setHasCertificate] = useState(false);
 
   // Fetch available delivery methods
   const fetchDelivery = async () => {
@@ -57,13 +56,13 @@ function OrderForm() {
       });
 
       const orderId = response.data.result.id;
+      const createBy = response.data.result.createBy; // Lấy createBy từ phản hồi
       localStorage.setItem("orderId", orderId);
+      localStorage.setItem("createBy", createBy); // Lưu createBy vào localStorage
       toast.success(response.data.message);
 
       if (values.customsDeclaration) {
         navigate(`/form-declaration/${orderId}`);
-      } else if (hasCertificate) {
-        navigate(`/certificate/${orderId}`);
       } else {
         navigate(`/health-service/${orderId}`);
       }
@@ -188,16 +187,6 @@ function OrderForm() {
             </Form.Item>
           </Col>
         </Row>
-
-        {/* Certificate Checkbox */}
-        <Form.Item>
-          <Checkbox
-            checked={hasCertificate}
-            onChange={(e) => setHasCertificate(e.target.checked)}
-          >
-            Có chứng chỉ
-          </Checkbox>
-        </Form.Item>
 
         {/* Submit Button */}
         <Form.Item style={{ textAlign: "right" }}>
