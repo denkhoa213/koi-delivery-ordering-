@@ -56,14 +56,14 @@ const AppFooter = () => {
             Thông Tin Liên Hệ
           </Title>
           <Text style={{ color: "#d9d9d9" }}>
-            Địa chỉ: 123 Đường Koi, Phường Cá, Quận Hồ Cá, TP. Cá Koi
+            Địa chỉ: Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Hồ Chí Minh 700000
           </Text>
           <br />
           <Text style={{ color: "#d9d9d9" }}>
             Email: support@koidelivery.com
           </Text>
           <br />
-          <Text style={{ color: "#d9d9d9" }}>SĐT: (123) 456-7890</Text>
+          <Text style={{ color: "#d9d9d9" }}>SĐT: 0966 073 734</Text>
         </Col>
 
         <Col xs={24} sm={12} md={6}>

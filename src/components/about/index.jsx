@@ -66,7 +66,7 @@ const About = () => {
       <Paragraph>
         Nếu bạn có bất kỳ câu hỏi hoặc cần hỗ trợ, vui lòng liên hệ với chúng
         tôi qua email: <strong>support@koidelivery.com</strong> hoặc gọi điện
-        thoại đến số: <strong>(123) 456-7890</strong>.
+        thoại đến số: <strong>0966 073 734</strong>.
       </Paragraph>
       <Button
         type="primary"
