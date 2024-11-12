@@ -1,249 +1,306 @@
-import React, { useEffect, useState } from "react";
-import api from "../../../../config/axios";
+import React, { useState, useEffect } from "react";
+import { Button, Input, Form, Select, Row, Col, Card, Table } from "antd";
 import { toast } from "react-toastify";
-import { Button, Modal, Space, Table, Form, Input, Select } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import api from "../../../../config/axios";
 
-function CheckHealthAndPakage() {
-  const [showModal, setShowModal] = useState(false);
-  const [showOrderAvailable, setShowOrderAvailable] = useState([]);
-  const [form] = Form.useForm(); // Form instance
+const { TextArea } = Input;
 
-  // Fetch orders
-  const fetchOrderAvailable = async () => {
-    try {
-      const response = await api.get("/order/view-order-available");
-      setShowOrderAvailable(response.data.result);
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Lỗi khi tải đơn hàng.");
-    }
-  };
-
-  // Handle form submit for health check
-  const handleSubmit = async (values) => {
-    // Lấy giá trị từ localStorage
-    const orderDetailId = localStorage.getItem("orderDetailId");
-    const packageId = localStorage.getItem("packageId");
-
-    // Kiểm tra xem orderDetailId và packageId có tồn tại hay không
-    if (!orderDetailId || !packageId) {
-      toast.error("Thông tin đơn hàng hoặc gói hàng không hợp lệ.");
-      return;
-    }
-
-    // Chuyển giá trị sang kiểu số nếu cần
-    const orderDetailIdInt = parseInt(orderDetailId);
-    const packageIdInt = parseInt(packageId);
-
-    if (isNaN(orderDetailIdInt) || isNaN(packageIdInt)) {
-      toast.error("Thông tin đơn hàng hoặc gói hàng không hợp lệ.");
-      return;
-    }
-
-    try {
-      const response = await api.post(
-        `/checking-koi-health/create/${orderDetailIdInt}/${packageIdInt}`,
-        {
-          healthStatus: values.healthStatus,
-          healthStatusDescription: values.healthStatusDescription,
-          weight: values.weight,
-          type: values.type,
-          color: values.color,
-          age: values.age,
-        }
-      );
-
-      if (response.data.code === 0) {
-        toast.success("Kiểm tra Koi thành công!");
-        setShowModal(false); // Đóng modal
-        form.resetFields(); // Reset các trường trong form
-        fetchOrderAvailable(); // Tải lại danh sách đơn hàng sau khi kiểm tra sức khỏe
-      } else {
-        toast.error("Lỗi khi kiểm tra sức khỏe cá Koi.");
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Có lỗi xảy ra.");
-    }
-  };
-
-  // Open modal when "Check" button is clicked
-  const handleCheckClick = (order) => {
-    // Lưu thông tin đơn hàng vào localStorage khi nhấn Check
-    localStorage.setItem("orderDetailId", order.orderDetailId);
-    localStorage.setItem("packageId", order.packageId);
-
-    setShowModal(true); // Show modal
-  };
+const CheckHealth = () => {
+  const [orders, setOrders] = useState([]);
+  const [packages, setPackages] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [healthData, setHealthData] = useState([]);
+  const [form] = Form.useForm();
 
   useEffect(() => {
-    fetchOrderAvailable();
+    fetchOrders();
+    fetchPackages();
   }, []);
 
-  // Columns for the table
+  const fetchOrders = async () => {
+    try {
+      const response = await api.get("/order/view-order-available");
+      setOrders(response.data.result);
+    } catch (error) {
+      toast.error(error.message || "Lỗi khi tải đơn hàng!");
+    }
+  };
+
+  const fetchPackages = async () => {
+    try {
+      const response = await api.get("/package/view-all");
+      setPackages(response.data.result);
+    } catch (error) {
+      toast.error(error.message || "Lỗi khi tải gói hàng!");
+    }
+  };
+
+  const fetchHealthDataByOrderDetailId = async (orderDetailId) => {
+    try {
+      const response = await api.get(
+        `/checking-koi-health/view-by-order-detail-id/${orderDetailId}`
+      );
+      console.log(response.data.result); // Kiểm tra dữ liệu trả về
+      setHealthData(response.data.result);
+    } catch (error) {
+      toast.error(error.message || "Lỗi khi tải dữ liệu sức khỏe!");
+    }
+  };
+
+  const handleSelectOrder = (orderId) => {
+    const selected = orders.find((order) => order.id === orderId);
+    setSelectedOrder(selected);
+    form.setFieldsValue({
+      orderDetailId: selected.id,
+      packageId: selected.packageId,
+    });
+    fetchHealthDataByOrderDetailId(selected.id);
+  };
+
+  const handleCreateCheckHealth = async (values) => {
+    try {
+      const response = await api.post("/checking-koi-health/create", values);
+      if (response.data.code === 200) {
+        toast.success(response.data.message);
+        fetchHealthDataByOrderDetailId(values.orderDetailId);
+      } else {
+        throw new Error(response.data.message || "Lỗi khi tạo kiểm tra!");
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleDeleteCheckHealth = async (id) => {
+    try {
+      const response = await api.put(`/checking-koi-health/delete/${id}`);
+      if (response.data.code === 200) {
+        toast.success(response.data.message);
+        fetchHealthDataByOrderDetailId(selectedOrder.id);
+      } else {
+        throw new Error(response.data.message || "Lỗi khi xóa!");
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   const columns = [
     {
-      title: "Order Code",
-      dataIndex: "orderCode",
-      key: "orderCode",
-    },
-    {
-      title: "Delivery Method",
-      dataIndex: "deliveryMethod",
-      key: "deliveryMethod",
-    },
-    {
-      title: "Order Date",
-      dataIndex: "orderDate",
-      key: "orderDate",
-      render: (text) => new Date(text).toLocaleDateString(),
-    },
-    {
-      title: "Destination",
-      dataIndex: "destination",
-      key: "destination",
-    },
-    {
-      title: "Departure",
-      dataIndex: "departure",
-      key: "departure",
-    },
-    {
-      title: "Distance",
-      dataIndex: "distance",
-      key: "distance",
-    },
-    {
-      title: "Phone",
-      dataIndex: "phone",
-      key: "phone",
-    },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      key: "amount",
-      render: (amount) => amount.toFixed(2),
-    },
-    {
-      title: "VAT",
-      dataIndex: "vat",
-      key: "vat",
-      render: (vat) => `${vat}%`,
-    },
-    {
-      title: "VAT Amount",
-      dataIndex: "vatAmount",
-      key: "vatAmount",
-      render: (vatAmount) => vatAmount.toFixed(2),
-    },
-    {
-      title: "Total Amount",
-      dataIndex: "totalAmount",
-      key: "totalAmount",
-      render: (totalAmount) => totalAmount.toFixed(2),
-    },
-    {
-      title: "Health Status",
-      dataIndex: "healthStatus",
-      key: "healthStatus",
-      render: (text) => (
-        <span>
-          {text === "HEALTHY"
-            ? "Khỏe Mạnh"
-            : text === "SICK"
-            ? "Bệnh"
-            : text === "DEAD"
-            ? "Chết"
-            : "Chưa Kiểm Tra"}
-        </span>
-      ),
-    },
-    {
-      title: "Action",
+      title: "ID",
       dataIndex: "id",
       key: "id",
-      render: (text, record) => (
-        <Space size="middle">
+    },
+    {
+      title: "Tình Trạng Sức Khỏe",
+      dataIndex: "healthStatus",
+      key: "healthStatus",
+    },
+    {
+      title: "Mô Tả Tình Trạng Sức Khỏe",
+      dataIndex: "healthStatusDescription",
+      key: "healthStatusDescription",
+    },
+    {
+      title: "Cân Nặng (kg)",
+      dataIndex: "weight",
+      key: "weight",
+    },
+    {
+      title: "Màu Sắc",
+      dataIndex: "color",
+      key: "color",
+    },
+    {
+      title: "Tuổi",
+      dataIndex: "age",
+      key: "age",
+    },
+    {
+      title: "Hành Động",
+      key: "action",
+      render: (_, record) => (
+        <>
           <Button
             type="primary"
-            icon={<EditOutlined />}
-            onClick={() => handleCheckClick(record)}
+            onClick={() => form.setFieldsValue(record)}
+            style={{
+              marginRight: "8px",
+              backgroundColor: "#3498db",
+              borderColor: "#3498db",
+            }}
           >
-            Check
+            Cập Nhật
           </Button>
-        </Space>
+          <Button
+            type="danger"
+            onClick={() => handleDeleteCheckHealth(record.id)}
+            style={{
+              backgroundColor: "#e74c3c",
+              borderColor: "#e74c3c",
+            }}
+          >
+            Xóa
+          </Button>
+        </>
       ),
     },
   ];
 
   return (
-    <div>
-      <Table dataSource={showOrderAvailable} columns={columns} rowKey="id" />
-      <Modal
-        title="Kiểm Tra Sức Khỏe Cá Koi"
-        open={showModal}
-        onCancel={() => setShowModal(false)}
-        onOk={() => form.submit()}
-        okText="Lưu"
-        cancelText="Hủy"
+    <div style={{ padding: "30px", backgroundColor: "#f9fafb" }}>
+      <h1
+        style={{ textAlign: "center", color: "#34495e", marginBottom: "30px" }}
       >
-        <Form form={form} onFinish={handleSubmit} layout="vertical">
-          <Form.Item
-            name="healthStatus"
-            label="Tình Trạng Sức Khỏe"
-            rules={[
-              { required: true, message: "Vui lòng chọn tình trạng sức khỏe" },
-            ]}
-          >
-            <Select>
-              <Select.Option value="HEALTHY">Khỏe Mạnh</Select.Option>
-            </Select>
-          </Form.Item>
+        Kiểm Tra Sức Khỏe Koi
+      </h1>
 
-          <Form.Item
-            name="healthStatusDescription"
-            label="Mô Tả Tình Trạng"
-            rules={[
-              { required: true, message: "Vui lòng nhập mô tả tình trạng" },
-            ]}
+      <Form
+        layout="vertical"
+        style={{ marginBottom: "25px", maxWidth: "600px", margin: "0 auto" }}
+      >
+        <Form.Item label="Chọn Đơn Hàng">
+          <Select
+            onChange={handleSelectOrder}
+            placeholder="Chọn một đơn hàng"
+            style={{ width: "100%", borderRadius: "5px" }}
           >
-            <Input.TextArea rows={4} />
-          </Form.Item>
+            {orders.map((order) => (
+              <Select.Option key={order.id} value={order.id}>
+                {`Đơn hàng #${order.id}`}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+      </Form>
 
-          <Form.Item
-            name="weight"
-            label="Cân Nặng (kg)"
-            rules={[{ required: true, message: "Vui lòng nhập cân nặng" }]}
+      {selectedOrder && (
+        <Card
+          title="Thông Tin Kiểm Tra Sức Khỏe"
+          style={{
+            marginBottom: "30px",
+            borderRadius: "10px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            backgroundColor: "#ffffff",
+            padding: "20px",
+          }}
+        >
+          <Form
+            form={form}
+            onFinish={handleCreateCheckHealth}
+            layout="vertical"
           >
-            <Input type="number" min={0} />
-          </Form.Item>
+            <Form.Item name="orderDetailId" hidden>
+              <Input type="number" value={selectedOrder.id} disabled />
+            </Form.Item>
 
-          <Form.Item
-            name="type"
-            label="Loại"
-            rules={[{ required: true, message: "Vui lòng nhập loại cá" }]}
-          >
-            <Input />
-          </Form.Item>
+            <Form.Item
+              name="packageId"
+              label="Chọn Gói"
+              rules={[{ required: true }]}
+            >
+              <Select placeholder="Chọn gói" style={{ borderRadius: "5px" }}>
+                {packages.map((pkg) => (
+                  <Select.Option key={pkg.id} value={pkg.id}>
+                    {`${pkg.packageNo} - ${pkg.packageDescription}`}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
 
-          <Form.Item
-            name="color"
-            label="Màu Sắc"
-            rules={[{ required: true, message: "Vui lòng nhập màu sắc" }]}
-          >
-            <Input />
-          </Form.Item>
+            <Form.Item
+              name="healthStatus"
+              label="Tình Trạng Sức Khỏe"
+              rules={[{ required: true }]}
+            >
+              <Select
+                placeholder="Chọn tình trạng sức khỏe"
+                style={{ borderRadius: "5px" }}
+              >
+                <Select.Option value="HEALTHY">HEALTHY</Select.Option>
+                <Select.Option value="ILLNESS">ILLNESS</Select.Option>
+                <Select.Option value="WEAKNESS">WEAKNESS</Select.Option>
+              </Select>
+            </Form.Item>
 
-          <Form.Item
-            name="age"
-            label="Tuổi"
-            rules={[{ required: true, message: "Vui lòng nhập tuổi cá" }]}
-          >
-            <Input type="number" min={0} />
-          </Form.Item>
-        </Form>
-      </Modal>
+            <Form.Item
+              name="healthStatusDescription"
+              label="Mô Tả Tình Trạng Sức Khỏe"
+              rules={[{ required: true }]}
+            >
+              <TextArea rows={4} style={{ borderRadius: "5px" }} />
+            </Form.Item>
+
+            <Row gutter={20}>
+              <Col span={8}>
+                <Form.Item
+                  name="weight"
+                  label="Cân Nặng"
+                  rules={[{ required: true }]}
+                >
+                  <Input type="number" style={{ borderRadius: "5px" }} />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  name="type"
+                  label="Loại"
+                  rules={[{ required: true }]}
+                >
+                  <Input style={{ borderRadius: "5px" }} />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  name="color"
+                  label="Màu Sắc"
+                  rules={[{ required: true }]}
+                >
+                  <Input style={{ borderRadius: "5px" }} />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Form.Item name="age" label="Tuổi" rules={[{ required: true }]}>
+              <Input type="number" style={{ borderRadius: "5px" }} />
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={{
+                  width: "100%",
+                  backgroundColor: "#1abc9c",
+                  borderColor: "#1abc9c",
+                  borderRadius: "5px",
+                  transition: "background-color 0.3s ease",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#16a085")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#1abc9c")
+                }
+              >
+                Tạo Kiểm Tra
+              </Button>
+            </Form.Item>
+          </Form>
+
+          {healthData.length > 0 && (
+            <Table
+              columns={columns}
+              dataSource={healthData}
+              rowKey="id"
+              pagination={false}
+              bordered
+            />
+          )}
+        </Card>
+      )}
     </div>
   );
-}
+};
 
-export default CheckHealthAndPakage;
+export default CheckHealth;

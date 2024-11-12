@@ -33,6 +33,8 @@ import ManageOrder from "./pages/dashboard/manager/manage-order";
 import CheckHealth from "./pages/dashboard/staff/manage-checkHealth";
 import ManagePackage from "./pages/dashboard/staff/manage-package";
 import TotalOrder from "./pages/form-page/totalDetailOrder";
+import OverViewTotal from "./pages/dashboard/admin/over-view";
+import HandoverForm from "./pages/dashboard/staff/handOver";
 import ProfileCustomer from "./pages/profile-customer";
 import OrderSuccess from "./pages/order-success";
 
@@ -121,6 +123,10 @@ function App() {
           path: "manage-delivery",
           element: <ManageDelivery />,
         },
+        {
+          path: "over-view",
+          element: <OverViewTotal />,
+        },
       ],
     },
     {
@@ -152,6 +158,10 @@ function App() {
         {
           path: "create-package",
           element: <ManagePackage />,
+        },
+        {
+          path: "hand-over",
+          element: <HandoverForm />,
         },
       ],
     },

@@ -20,9 +20,7 @@ import { useNavigate } from "react-router-dom";
 const CustomsDeclarationForm = () => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
-  const [selectedOption, setSelectedOption] = useState("customs"); // Track user selection
   const navigate = useNavigate();
-
   const handleSubmit = async (values) => {
     const orderId = localStorage.getItem("orderId");
     if (!orderId) {
@@ -50,17 +48,11 @@ const CustomsDeclarationForm = () => {
         values
       );
 
-      // Check the user's selection and navigate accordingly
-      if (selectedOption === "customsAndCertificate") {
-        // If both customs declaration and certificate are selected
-        navigate(`/certificate/${orderId}`);
-      } else if (selectedOption === "customs") {
-        // If only customs declaration is selected
+      if (response.data.code === 200) {
         navigate(`/health-service/${orderId}`);
-      }
 
-      toast.success(response.data.message);
-      console.log("Customs Declaration ID:", response.data.result.id);
+        toast.success(response.data.message);
+      }
     } catch (error) {
       toast.error(error.response.data.message);
     }
@@ -68,11 +60,6 @@ const CustomsDeclarationForm = () => {
 
   const handleUploadChange = (info) => {
     setFileList(info.fileList);
-  };
-
-  // Handle radio button change
-  const handleOptionChange = (e) => {
-    setSelectedOption(e.target.value);
   };
 
   return (
@@ -188,20 +175,6 @@ const CustomsDeclarationForm = () => {
               >
                 <Button icon={<UploadOutlined />}>Tải lên hình ảnh</Button>
               </Upload>
-            </Form.Item>
-          </Col>
-        </Row>
-
-        {/* User Option */}
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item label="Chọn loại dịch vụ" name="optionSelection">
-              <Radio.Group value={selectedOption} onChange={handleOptionChange}>
-                <Radio value="customs">Khai báo hải quan</Radio>
-                <Radio value="customsAndCertificate">
-                  Khai báo hải quan và chứng chỉ
-                </Radio>
-              </Radio.Group>
             </Form.Item>
           </Col>
         </Row>

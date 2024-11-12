@@ -15,7 +15,7 @@ const Header = () => {
   const navigate = useNavigate();
 
   const handleAvatarClick = () => {
-    navigate('/profile-cus');
+    navigate("/profile-cus");
   };
 
   const serviceMenu = (
@@ -62,7 +62,11 @@ const Header = () => {
 
         {user ? (
           <Space>
-            <Avatar icon={<UserOutlined />} onClick={handleAvatarClick} style={{ cursor: 'pointer' }} />
+            <Avatar
+              icon={<UserOutlined />}
+              onClick={handleAvatarClick}
+              style={{ cursor: "pointer" }}
+            />
             <Button
               type="link"
               icon={<AiOutlineLogout fontSize={18} />}

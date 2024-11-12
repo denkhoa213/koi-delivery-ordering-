@@ -57,11 +57,17 @@ function LoginPage() {
 
       console.log("Response:", response);
 
-      const { token, role } = response.data.result;
+      // Lấy token, role và id từ response
+      const { token, role, id } = response.data.result;
+
+      // Lưu token, role và userId (id) vào localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("role", role);
+      localStorage.setItem("userId", id); // Lưu id dưới dạng userId
 
       dispatch(login(response.data.result));
+
+      // Điều hướng theo role của người dùng
       if (role === "ADMIN") {
         navigate("/dashboard-admin");
       } else if (role === "MANAGER") {
@@ -71,6 +77,7 @@ function LoginPage() {
       } else {
         navigate("/");
       }
+
       toast.success(response.data.message);
     } catch (error) {
       toast.error(

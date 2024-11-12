@@ -2,12 +2,22 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../../config/axios";
 import { useNavigate } from "react-router-dom";
-import { Button, Form, Select, InputNumber, Col, Row, Card } from "antd";
+import {
+  Button,
+  Form,
+  Select,
+  InputNumber,
+  Col,
+  Row,
+  Card,
+  Checkbox,
+} from "antd";
 
 function HealthService() {
   const navigate = useNavigate();
   const [services, setServices] = useState([]);
   const [form] = Form.useForm();
+  const [hasCertificate, setHasCertificate] = useState(false);
 
   const fetchServices = async () => {
     try {
@@ -48,8 +58,15 @@ function HealthService() {
         }
       }
 
-      toast.success("Đặt hàng thành công!");
-      navigate("/total-order");
+      if (hasCertificate) {
+        navigate(`/certificate/${orderId}`);
+      } else {
+        navigate("/total-order");
+      }
+
+      if (response.data.code === 200) {
+        toast.success(response.data.message);
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || "Có lỗi xảy ra.");
     }
@@ -73,20 +90,6 @@ function HealthService() {
               <InputNumber
                 min={1}
                 placeholder="Nhập số lượng"
-                style={{ width: "100%" }}
-              />
-            </Form.Item>
-          </Col>
-
-          <Col span={12}>
-            <Form.Item
-              name="unitPrice"
-              label="Đơn giá"
-              rules={[{ required: true, message: "Vui lòng nhập đơn giá!" }]}
-            >
-              <InputNumber
-                min={0}
-                placeholder="Nhập đơn giá"
                 style={{ width: "100%" }}
               />
             </Form.Item>
@@ -124,6 +127,15 @@ function HealthService() {
             </Form.Item>
           </Col>
         </Row>
+
+        <Form.Item>
+          <Checkbox
+            checked={hasCertificate}
+            onChange={(e) => setHasCertificate(e.target.checked)}
+          >
+            Có chứng chỉ
+          </Checkbox>
+        </Form.Item>
 
         {/* Submit Button */}
         <Form.Item style={{ textAlign: "right" }}>
