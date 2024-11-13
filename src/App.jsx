@@ -35,8 +35,10 @@ import ManagePackage from "./pages/dashboard/staff/manage-package";
 import TotalOrder from "./pages/form-page/totalDetailOrder";
 import OverViewTotal from "./pages/dashboard/admin/over-view";
 import HandoverForm from "./pages/dashboard/staff/handOver";
-import ProfileCustomer from "./pages/profile-customer";
+import ProfileCustomer from "./pages/customer-page";
 import OrderSuccess from "./pages/order-success";
+import Header from "./components/header";
+import AppFooter from "./components/footer";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
@@ -203,8 +205,14 @@ function App() {
     },
 
     {
-      path: "profile-cus",
-      element: <ProfileCustomer />,
+      path: "customer-page",
+      element:
+        <>
+          <Header />,
+          <ProfileCustomer />,
+          <AppFooter />
+        </>
+
     },
 
     {

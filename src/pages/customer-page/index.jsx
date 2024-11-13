@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Layout, Menu, Card, Col, Row, Typography, Input, Button, Tabs, message, Form } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import api from '../../config/axios';
+import { List } from 'antd';
+//import { CardTitle } from 'react-bootstrap';
 
 
 const { Sider, Content } = Layout;
 const { Title } = Typography;
 const { TabPane } = Tabs;
 
-const ProfileCustomer = () => {
+const CustomerPage = () => {
     const [selectedKey, setSelectedKey] = useState('1');
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -16,6 +18,10 @@ const ProfileCustomer = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [orders, setOrders] = useState([]);
+    const [loadingOrders, setLoadingOrders] = useState(true);
+    const [errorOrders, setErrorOrders] = useState(null);
+    const [selectedOrder, setSelectedOrder] = useState(null);
     const [form] = Form.useForm();
 
     const fetchCustomerProfile = async () => {
@@ -40,6 +46,10 @@ const ProfileCustomer = () => {
     const handleMenuClick = (key) => {
         setSelectedKey(key);
     };
+
+    const handleOrderClick = (order) => {
+        setSelectedOrder(order);
+    }
 
     const handleChangePassword = async () => {
         if (newPassword !== confirmPassword) {
@@ -88,6 +98,24 @@ const ProfileCustomer = () => {
         }
     };
 
+    const fetchCustomerOrders = async () => {
+        try {
+            const response = await api.get('/order/get-by-customer');
+            if (response.data.code === 200) {
+                setOrders(response.data.result);
+            } else {
+                message.error(response.data.message);
+                setErrorOrders(response.data.message);
+            }
+        } catch (error) {
+            message.error("Đã xảy ra lỗi khi lấy danh sách đơn hàng!");
+            setErrorOrders("Đã xảy ra lỗi khi lấy danh sách đơn hàng!");
+            console.error("Error", error);
+        } finally {
+            setLoadingOrders(false);
+        }
+    }
+
     const onFinish = (values) => {
         setLoading(true);
         updateProfile(values);
@@ -97,6 +125,7 @@ const ProfileCustomer = () => {
 
     useEffect(() => {
         fetchCustomerProfile();
+        fetchCustomerOrders();
     }, []);
 
     if (loading) return <div>Loading...</div>;
@@ -218,10 +247,45 @@ const ProfileCustomer = () => {
                             </Tabs>
                         </Card>
                     )}
+                    {selectedKey === '2' && (
+                        <Card title="Danh sách đơn hàng" style={{ width: '100%', maxWidth: 600, borderRadius: '10px', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)' }}>
+                            {loadingOrders ? (
+                                <div>Loading orders...</div>
+                            ) : errorOrders ? (
+                                <div>{errorOrders}</div>
+                            ) : (
+                                <List
+                                    itemLayout="horizontal"
+                                    dataSource={orders}
+                                    renderItem={order => (
+                                        <List.Item onClick={() => handleOrderClick(order)}>
+                                            <List.Item.Meta
+                                                title={`Đơn hàng: ${order.orderCode}`}
+                                                description={`Ngày đặt: ${new Date(order.orderDate).toLocaleDateString()} - Tổng tiền: ${order.totalAmount} VNĐ`}
+                                            />
+                                        </List.Item>
+                                    )}
+                                />
+                            )
+                            }
+                            {selectedOrder && (
+                                <Card style={{ marginTop: 30 }}>
+                                    <Title level={3}>Thông tin chi tiết đơn hàng</Title>
+                                    <p>ID: {selectedOrder.id}</p>
+                                    <p>Tên đơn hàng: {selectedOrder.orderCode}</p>
+                                    <p>Phương thức vận chuyển: {selectedOrder.deliveryMethod}</p>
+                                    <p>Giá: {selectedOrder.totalAmount}</p>
+                                    <p>Điểm gửi: {selectedOrder.departure}</p>
+                                    <p>Điểm nhận: {selectedOrder.destination}</p>
+                                    <p>Trạng thái: {selectedOrder.status}</p>
+                                </Card>
+                            )}
+                        </Card>
+                    )}
                 </Content>
             </Layout>
         </Layout>
     );
 };
 
-export default ProfileCustomer;
+export default CustomerPage;
