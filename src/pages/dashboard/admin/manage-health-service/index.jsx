@@ -40,6 +40,8 @@ function ManageHealthService() {
 
       if (response.data.code === 200) {
         toast.success(response.data.message);
+      } else {
+        toast.error(response.data.message);
       }
       fetchHealthService();
       form.resetFields();

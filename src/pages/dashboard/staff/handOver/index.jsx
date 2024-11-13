@@ -10,16 +10,17 @@ import {
   Card,
   Table,
 } from "antd";
-import api from "../../../../config/axios"; // Axios config để gọi API
+import api from "../../../../config/axios";
+import { toast } from "react-toastify";
 
 const { TextArea } = Input;
 
 const HandoverForm = () => {
   const [form] = Form.useForm();
-  const [packages, setPackages] = useState([]); // State lưu trữ danh sách gói
-  const [orders, setOrders] = useState([]); // State lưu trữ danh sách đơn hàng
-  const [selectedPackageId, setSelectedPackageId] = useState(null); // State để lưu packageId đã chọn
-  const [handoverDocuments, setHandoverDocuments] = useState([]); // State lưu trữ biên bản bàn giao
+  const [packages, setPackages] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [selectedPackageId, setSelectedPackageId] = useState(null);
+  const [handoverDocuments, setHandoverDocuments] = useState([]);
 
   useEffect(() => {
     fetchPackages();
@@ -30,27 +31,24 @@ const HandoverForm = () => {
     }
   }, []);
 
-  // Fetch gói hàng từ API
   const fetchPackages = async () => {
     try {
       const response = await api.get("/package/view-all");
       setPackages(response.data.result);
     } catch (error) {
-      message.error("Lỗi khi tải gói hàng!");
+      toast.error(error.response.data.message);
     }
   };
 
-  // Fetch đơn hàng có sẵn từ API
   const fetchOrders = async () => {
     try {
       const response = await api.get("/order/view-order-available");
       setOrders(response.data.result);
     } catch (error) {
-      message.error("Lỗi khi tải đơn hàng!");
+      toast.error(error.response.data.message);
     }
   };
 
-  // Fetch biên bản bàn giao từ API theo orderId
   const fetchHandoverDocuments = async (orderId) => {
     try {
       const response = await api.get(
@@ -58,11 +56,10 @@ const HandoverForm = () => {
       );
       setHandoverDocuments(response.data.result || []);
     } catch (error) {
-      message.error("Lỗi khi tải biên bản bàn giao!");
+      toast.error(error.response.data.message);
     }
   };
 
-  // Handle việc tạo handover
   const handleCreateHandover = async (values) => {
     const userId = localStorage.getItem("createBy");
 
@@ -84,18 +81,54 @@ const HandoverForm = () => {
         handoverDescription: values.handoverDescription,
       });
 
-      if (response.data.code === 200) {
-        message.success("Handover created successfully!");
+      console.log(response.data);
+
+      if (response.data.code === 200 && response.data.result.id !== 0) {
+        const handoverDocumentId = response.data.result.id;
+        localStorage.setItem("handoverDocumentId", handoverDocumentId);
+
+        toast.success("Handover created successfully!");
         form.resetFields();
       } else {
-        message.error(response.data.message || "Lỗi khi tạo handover!");
+        toast.error(response.data.message || "Lỗi khi tạo handover!");
       }
     } catch (error) {
-      message.error("Lỗi khi tạo handover!");
+      toast.error("Lỗi khi tạo handover!");
     }
   };
 
-  // Cấu hình các cột trong bảng (đã thêm các trường mới)
+  const deleteHandoverDocument = async (id) => {
+    try {
+      const response = await api.put(`/handover-documents/delete/${id}`);
+      if (response.data.code === 200) {
+        toast.success("Xóa biên bản bàn giao thành công!");
+        fetchHandoverDocuments(form.getFieldValue("orderId"));
+      } else {
+        toast.error(response.data.message || "Lỗi khi xóa biên bản bàn giao!");
+      }
+    } catch (error) {
+      toast.error("Lỗi khi xóa biên bản bàn giao!");
+    }
+  };
+
+  const updateHandoverDocument = async (id, updatedDescription) => {
+    try {
+      const response = await api.put(`/handover-documents/update/${id}`, {
+        handoverDescription: updatedDescription,
+      });
+      if (response.data.code === 200) {
+        toast.success("Cập nhật biên bản bàn giao thành công!");
+        fetchHandoverDocuments(form.getFieldValue("orderId"));
+      } else {
+        toast.error(
+          response.data.message || "Lỗi khi cập nhật biên bản bàn giao!"
+        );
+      }
+    } catch (error) {
+      toast.error("Lỗi khi cập nhật biên bản bàn giao!");
+    }
+  };
+
   const columns = [
     {
       title: "Mã Biên Bản",
@@ -129,15 +162,35 @@ const HandoverForm = () => {
       render: (text) => text.toLocaleString(),
     },
     {
-      title: "Ngày Bàn Giao",
-      dataIndex: "handoverDate",
-      key: "handoverDate",
-      render: (text) => new Date(text).toLocaleString(),
-    },
-    {
-      title: "Người Tạo",
-      dataIndex: "createdBy",
-      key: "createdBy",
+      title: "Hành Động",
+      key: "action",
+      render: (_, record) => (
+        <div>
+          {/* Nút Cập Nhật */}
+          <Button
+            type="link"
+            onClick={() => {
+              const updatedDescription = prompt(
+                "Nhập mô tả mới:",
+                record.handoverDescription
+              );
+              if (updatedDescription) {
+                updateHandoverDocument(record.id, updatedDescription);
+              }
+            }}
+          >
+            Cập Nhật
+          </Button>
+          {/* Nút Xóa */}
+          <Button
+            type="link"
+            danger
+            onClick={() => deleteHandoverDocument(record.id)}
+          >
+            Xóa
+          </Button>
+        </div>
+      ),
     },
   ];
 

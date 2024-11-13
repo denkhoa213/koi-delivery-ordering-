@@ -58,6 +58,25 @@ function HealthService() {
         }
       }
 
+      // Create invoice
+      try {
+        const response = await api.post(`/invoice/create/${orderId}`);
+        const invoiceId = response.data.result.id;
+        localStorage.setItem("invoiceId", invoiceId);
+        toast.success(response.data.message);
+
+        if (response.data.code === 200) {
+          toast.success(response.data.message);
+        } else {
+          toast.error("Lỗi khi tạo hóa đơn.");
+        }
+      } catch (invoiceError) {
+        toast.error(
+          invoiceError.response?.data?.message || "Có lỗi khi tạo hóa đơn."
+        );
+      }
+
+      // Navigate based on certificate status
       if (hasCertificate) {
         navigate(`/certificate/${orderId}`);
       } else {
