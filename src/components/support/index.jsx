@@ -61,7 +61,7 @@ const Support = () => {
             Email: <strong>support@koidelivery.com</strong>
           </Paragraph>
           <Paragraph>
-            Điện thoại: <strong>(123) 456-7890</strong>
+            Điện thoại: <strong>0966 073 734</strong>
           </Paragraph>
           <Paragraph>
             Bạn cũng có thể gửi câu hỏi hoặc yêu cầu hỗ trợ trực tiếp qua trang{" "}

@@ -34,10 +34,14 @@ import CheckHealth from "./pages/dashboard/staff/manage-checkHealth";
 import ManagePackage from "./pages/dashboard/staff/manage-package";
 import TotalOrder from "./pages/form-page/totalDetailOrder";
 
-import ProfileCustomer from "./pages/profile-customer";
 import HealthcareHistoryManager from "./pages/dashboard/staff/manage-health-history";
 import HandoverForm from "./pages/dashboard/staff/handOver";
 import OverViewTotal from "./pages/dashboard/admin/over-view";
+
+import OrderSuccess from "./pages/order-success";
+import Header from "./components/header";
+import AppFooter from "./components/footer";
+import CustomerPage from "./pages/customer-page";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
@@ -208,8 +212,19 @@ function App() {
     },
 
     {
-      path: "profile-cus",
-      element: <ProfileCustomer />,
+      path: "customer-page",
+      element: (
+        <>
+          <Header />,
+          <CustomerPage />,
+          <AppFooter />
+        </>
+      ),
+    },
+
+    {
+      path: "order-success",
+      element: <OrderSuccess />,
     },
   ]);
 

@@ -15,7 +15,7 @@ const Header = () => {
   const navigate = useNavigate();
 
   const handleAvatarClick = () => {
-    navigate("/profile-cus");
+    navigate("/customer-page");
   };
 
   const serviceMenu = (
@@ -44,7 +44,7 @@ const Header = () => {
     <header className="header">
       <div className="header-left">
         <div className="logo">
-          <img src="/path-to-your-logo.png" alt="Logo" />
+          <img src="https://gudlogo.com/wp-content/uploads/2019/05/logo-ca-Koi-23.png" alt="Logo" />
         </div>
         <div className="search-bar">
           <Search
