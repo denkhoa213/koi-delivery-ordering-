@@ -33,12 +33,15 @@ import ManageOrder from "./pages/dashboard/manager/manage-order";
 import CheckHealth from "./pages/dashboard/staff/manage-checkHealth";
 import ManagePackage from "./pages/dashboard/staff/manage-package";
 import TotalOrder from "./pages/form-page/totalDetailOrder";
-import OverViewTotal from "./pages/dashboard/admin/over-view";
+
+import HealthcareHistoryManager from "./pages/dashboard/staff/manage-health-history";
 import HandoverForm from "./pages/dashboard/staff/handOver";
-import ProfileCustomer from "./pages/customer-page";
+import OverViewTotal from "./pages/dashboard/admin/over-view";
+
 import OrderSuccess from "./pages/order-success";
 import Header from "./components/header";
 import AppFooter from "./components/footer";
+import CustomerPage from "./pages/customer-page";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
@@ -165,6 +168,10 @@ function App() {
           path: "hand-over",
           element: <HandoverForm />,
         },
+        {
+          path: "manage-health-care-history",
+          element: <HealthcareHistoryManager />,
+        },
       ],
     },
     {
@@ -206,13 +213,13 @@ function App() {
 
     {
       path: "customer-page",
-      element:
+      element: (
         <>
           <Header />,
-          <ProfileCustomer />,
+          <CustomerPage />,
           <AppFooter />
         </>
-
+      ),
     },
 
     {

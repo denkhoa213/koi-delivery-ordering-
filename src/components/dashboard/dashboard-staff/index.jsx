@@ -14,8 +14,13 @@ function getItem(label, key, icon, children) {
 const items = [
   getItem("Overview", "over-view", <PieChartOutlined />),
   getItem("Check Health", "check-health-fish", <PieChartOutlined />),
-
+  getItem("Manage Package", "create-package", <PieChartOutlined />),
   getItem("HandOver", "hand-over", <PieChartOutlined />),
+  getItem(
+    "Health Care History",
+    "manage-health-care-history",
+    <PieChartOutlined />
+  ),
 ];
 const DashboardStaff = () => {
   const [collapsed, setCollapsed] = useState(false);

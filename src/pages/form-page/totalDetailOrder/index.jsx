@@ -49,13 +49,12 @@ function TotalOrder() {
     }
     if (paymentMethod === "before") {
       try {
-        const response = await api.post('/payos/create?orderId=' + orderId);
+        const response = await api.post("/payos/create?orderId=" + orderId);
         console.log("Response:", response);
 
         //const { checkoutUrl } = response.data.checkoutUrl;
 
         window.open(response.data.checkoutUrl);
-
       } catch {
         toast.error("Có lỗi xảy ra khi gọi đơn thanh toán!");
       }
@@ -69,7 +68,6 @@ function TotalOrder() {
   if (loading) {
     return <Spin size="large" tip="Đang tải..." />;
   }
-
 
   return (
     <Card title="Thông tin tổng đơn hàng" bordered={false}>
@@ -111,7 +109,10 @@ function TotalOrder() {
           <Row gutter={16} style={{ marginTop: 20 }}>
             <Col span={24}>
               <Text>Phương Thức Thanh Toán:</Text>
-              <Radio.Group onChange={(e) => setPaymentMethod(e.target.value)} value={paymentMethod}>
+              <Radio.Group
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                value={paymentMethod}
+              >
                 <Radio value="before">Thanh Toán Trước (VNP)</Radio>
                 <Radio value="after">Thanh Toán Sau (Tiền Mặt)</Radio>
               </Radio.Group>
