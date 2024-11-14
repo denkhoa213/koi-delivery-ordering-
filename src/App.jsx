@@ -42,15 +42,16 @@ import OrderSuccess from "./pages/order-success";
 import Header from "./components/header";
 import AppFooter from "./components/footer";
 import CustomerPage from "./pages/customer-page";
+import ManageUser from "./pages/dashboard/admin/manage-users";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
     const user = useSelector((store) => store.user);
     if (
       user &&
-      (user.role === "ADMIN" ||
-        user.role === "STAFF" ||
-        user.role === "MANAGER" ||
+      (user.role === "MANAGER" ||
+        user.role === "SALE_STAFF" ||
+        user.role === "DELIVERY_STAFF" ||
         user.role === "CUSTOMER")
     ) {
       return children;
@@ -114,7 +115,7 @@ function App() {
       children: [
         {
           path: "manage-user",
-          element: <ManageHealthService />,
+          element: <ManageUser />,
         },
         {
           path: "health-service-category",
@@ -145,6 +146,18 @@ function App() {
         {
           path: "manage-order",
           element: <ManageOrder />,
+        },
+        {
+          path: "health-service-category",
+          element: <ManageHealthService />,
+        },
+        {
+          path: "fish-category",
+          element: <ManageFishCategory />,
+        },
+        {
+          path: "manage-delivery",
+          element: <ManageDelivery />,
         },
       ],
     },

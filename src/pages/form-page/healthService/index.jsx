@@ -45,7 +45,7 @@ function HealthService() {
         orderId: parseInt(orderId, 10),
         fishProfileId: parseInt(fishProfileId, 10),
       });
-      const orderDetailId = response.data.result.orderDetailId;
+      const orderDetailId = response.data.result.id;
       localStorage.setItem("orderDetailId", orderDetailId);
 
       // Submit selected services

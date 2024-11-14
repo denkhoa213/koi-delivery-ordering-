@@ -14,15 +14,12 @@ import {
 } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import api from "../../config/axios";
-import { List } from "antd";
-import { toast } from "react-toastify";
-//import { CardTitle } from 'react-bootstrap';
 
 const { Sider, Content } = Layout;
 const { Title } = Typography;
 const { TabPane } = Tabs;
 
-const CustomerPage = () => {
+const ProfileCustomer = () => {
   const [selectedKey, setSelectedKey] = useState("1");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -30,12 +27,7 @@ const CustomerPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [orders, setOrders] = useState([]);
-  const [loadingOrders, setLoadingOrders] = useState(true);
-  const [errorOrders, setErrorOrders] = useState(null);
-  const [selectedOrder, setSelectedOrder] = useState(null);
   const [form] = Form.useForm();
-  const [viewOrderStatus, setViewOrderStatus] = useState(null);
 
   const fetchCustomerProfile = async () => {
     try {
@@ -57,10 +49,6 @@ const CustomerPage = () => {
 
   const handleMenuClick = (key) => {
     setSelectedKey(key);
-  };
-
-  const handleOrderClick = (order) => {
-    setSelectedOrder(order);
   };
 
   const handleChangePassword = async () => {
@@ -110,46 +98,6 @@ const CustomerPage = () => {
     }
   };
 
-  const fetchViewOrderStatus = async () => {
-    const invoiceId = localStorage.getItem("invoiceId");
-    if (!invoiceId) {
-      toast.error("Không tìm thấy mã đơn hàng!");
-      return;
-    }
-
-    try {
-      const response = await api.get(
-        `/healthcare-delivery-histories/view-by-invoice/${invoiceId}`
-      );
-      if (response.data.code === 200) {
-        setViewOrderStatus(response.data.result);
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error) {
-      toast.error("Có lỗi xảy ra khi tải trạng thái đơn hàng!");
-      console.error(error);
-    }
-  };
-
-  const fetchCustomerOrders = async () => {
-    try {
-      const response = await api.get("/order/get-by-customer");
-      if (response.data.code === 200) {
-        setOrders(response.data.result);
-      } else {
-        message.error(response.data.message);
-        setErrorOrders(response.data.message);
-      }
-    } catch (error) {
-      message.error("Đã xảy ra lỗi khi lấy danh sách đơn hàng!");
-      setErrorOrders("Đã xảy ra lỗi khi lấy danh sách đơn hàng!");
-      console.error("Error", error);
-    } finally {
-      setLoadingOrders(false);
-    }
-  };
-
   const onFinish = (values) => {
     setLoading(true);
     updateProfile(values);
@@ -158,8 +106,6 @@ const CustomerPage = () => {
 
   useEffect(() => {
     fetchCustomerProfile();
-    fetchCustomerOrders();
-    fetchViewOrderStatus();
   }, []);
 
   if (loading) return <div>Loading...</div>;
@@ -349,77 +295,10 @@ const CustomerPage = () => {
               </Tabs>
             </Card>
           )}
-          {selectedKey === "2" && (
-            <Card
-              title="Danh sách đơn hàng"
-              style={{
-                width: "100%",
-                maxWidth: 600,
-                borderRadius: "10px",
-                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-              }}
-            >
-              {loadingOrders ? (
-                <div>Loading orders...</div>
-              ) : errorOrders ? (
-                <div>{errorOrders}</div>
-              ) : (
-                <List
-                  itemLayout="horizontal"
-                  dataSource={orders}
-                  renderItem={(order) => (
-                    <List.Item onClick={() => handleOrderClick(order)}>
-                      <List.Item.Meta
-                        title={`Đơn hàng: ${order.orderCode}`}
-                        description={`Ngày đặt: ${new Date(
-                          order.orderDate
-                        ).toLocaleDateString()} - Tổng tiền: ${
-                          order.totalAmount
-                        } VNĐ`}
-                      />
-                    </List.Item>
-                  )}
-                />
-              )}
-              {selectedOrder && (
-                <Card style={{ marginTop: 30 }}>
-                  <Title level={3}>Thông tin chi tiết đơn hàng</Title>
-                  <p>ID: {selectedOrder.id}</p>
-                  <p>Tên đơn hàng: {selectedOrder.orderCode}</p>
-                  <p>Phương thức vận chuyển: {selectedOrder.deliveryMethod}</p>
-                  <p>Giá: {selectedOrder.totalAmount}</p>
-                  <p>Điểm gửi: {selectedOrder.departure}</p>
-                  <p>Điểm nhận: {selectedOrder.destination}</p>
-                  <p>Trạng thái: {selectedOrder.status}</p>
-                </Card>
-              )}
-              {viewOrderStatus && (
-                <Card style={{ marginTop: 30 }}>
-                  <Title level={3}>Trạng Thái Đơn Hàng</Title>
-
-                  <p>
-                    <strong>Delivery Status:</strong>{" "}
-                    {viewOrderStatus[0].deliveryStatus}
-                  </p>
-                  <p>
-                    <strong>Đường đi:</strong> {viewOrderStatus[0].route}
-                  </p>
-                  <p>
-                    <strong>Mô tả về sức khỏe:</strong>{" "}
-                    {viewOrderStatus[0].healthDescription}
-                  </p>
-                  <p>
-                    <strong>Mô tả về ăn uống:</strong>{" "}
-                    {viewOrderStatus[0].eatingDescription}
-                  </p>
-                </Card>
-              )}
-            </Card>
-          )}
         </Content>
       </Layout>
     </Layout>
   );
 };
 
-export default CustomerPage;
+export default ProfileCustomer;

@@ -17,7 +17,7 @@ const Banner = () => {
             dàng và nhận cá Koi tận nhà với sự chăm sóc chu đáo và bảo đảm an
             toàn.
           </Paragraph>
-          <Link to="fish-profile">
+          <Link to="form-order">
             <Button type="primary" size="large">
               Đặt Hàng Ngay
             </Button>

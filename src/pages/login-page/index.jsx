@@ -68,11 +68,9 @@ function LoginPage() {
       dispatch(login(response.data.result));
 
       // Điều hướng theo role của người dùng
-      if (role === "ADMIN") {
+      if (role === "MANAGER") {
         navigate("/dashboard-admin");
-      } else if (role === "MANAGER") {
-        navigate("/dashboard-manager");
-      } else if (role === "STAFF") {
+      } else if (role === "SALE_STAFF") {
         navigate("/dashboard-staff");
       } else {
         navigate("/");
@@ -127,23 +125,6 @@ function LoginPage() {
           <Form.Item>
             <Button type="primary" htmlType="submit" block loading={loading}>
               Login
-            </Button>
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              type="default"
-              className="google-btn"
-              onClick={handleLoginGoogle}
-              block
-            >
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/480px-Google_%22G%22_logo.svg.png"
-                alt="Google icon"
-                className="google-icon"
-                width={20}
-              />
-              Sign in with Google
             </Button>
           </Form.Item>
 

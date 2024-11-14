@@ -29,22 +29,25 @@ const Header = () => {
     </Menu>
   );
 
-  const moreMenu = (
-    <Menu>
-      <Menu.Item key="1">
-        <a href="#option1">Option 1</a>
-      </Menu.Item>
-      <Menu.Item key="2">
-        <a href="#option2">Option 2</a>
-      </Menu.Item>
-    </Menu>
-  );
+  // const moreMenu = (
+  //   <Menu>
+  //     <Menu.Item key="1">
+  //       <a href="#option1">Option 1</a>
+  //     </Menu.Item>
+  //     <Menu.Item key="2">
+  //       <a href="#option2">Option 2</a>
+  //     </Menu.Item>
+  //   </Menu>
+  // );
 
   return (
     <header className="header">
       <div className="header-left">
         <div className="logo">
-          <img src="https://gudlogo.com/wp-content/uploads/2019/05/logo-ca-Koi-23.png" alt="Logo" />
+          <img
+            src="https://gudlogo.com/wp-content/uploads/2019/05/logo-ca-Koi-23.png"
+            alt="Logo"
+          />
         </div>
         <div className="search-bar">
           <Search
@@ -101,11 +104,11 @@ const Header = () => {
           <Link to="/contact">Liên hệ</Link>
         </Button>
 
-        <Dropdown overlay={moreMenu}>
+        {/* <Dropdown overlay={moreMenu}>
           <Button type="link" className="nav-button">
             More <DownOutlined />
           </Button>
-        </Dropdown>
+        </Dropdown> */}
       </nav>
     </header>
   );

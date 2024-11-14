@@ -1,14 +1,4 @@
-import {
-  Button,
-  Form,
-  Input,
-  InputNumber,
-  Select,
-  Checkbox,
-  Row,
-  Col,
-  Card,
-} from "antd";
+import { Button, Form, Input, Checkbox, Row, Col, Card, Select } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -16,6 +6,7 @@ import api from "../../../config/axios";
 
 function OrderForm() {
   const [isPlaneDelivery, setIsPlaneDelivery] = useState(false);
+  const [selectedDelivery, setSelectedDelivery] = useState(null);
   const navigate = useNavigate();
   const [deliveryMethod, setDeliveryMethod] = useState([]);
   const [form] = Form.useForm();
@@ -34,6 +25,8 @@ function OrderForm() {
 
   // Handle delivery method change
   const handleDeliveryMethodChange = (value) => {
+    const selected = deliveryMethod.find((delivery) => delivery.name === value);
+    setSelectedDelivery(selected);
     setIsPlaneDelivery(value.toUpperCase() === "PLANE");
     localStorage.setItem("transportMethod", value);
   };
@@ -103,11 +96,8 @@ function OrderForm() {
                   onChange={handleDeliveryMethodChange}
                 >
                   {deliveryMethod.map((delivery) => (
-                    <Select.Option
-                      key={delivery.id}
-                      value={delivery.deliveryMethodName}
-                    >
-                      {delivery.deliveryMethodName}
+                    <Select.Option key={delivery.id} value={delivery.name}>
+                      {delivery.name}
                     </Select.Option>
                   ))}
                 </Select>
@@ -126,6 +116,21 @@ function OrderForm() {
               </Col>
             )}
           </Row>
+
+          {selectedDelivery && (
+            <Row gutter={16}>
+              <Col span={24}>
+                <div style={{ marginTop: "10px" }}>
+                  <p>
+                    <strong>Mô tả:</strong> {selectedDelivery.description}
+                  </p>
+                  <p>
+                    <strong>Giá:</strong> {selectedDelivery.price} VND/1KM
+                  </p>
+                </div>
+              </Col>
+            </Row>
+          )}
 
           <Row gutter={16}>
             <Col span={12}>

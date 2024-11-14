@@ -6,24 +6,23 @@ function ManageDelivery() {
   const columns = [
     {
       title: "Delivery Method Name",
-      dataIndex: "deliveryMethodName",
-      key: "deliveryMethodName",
+      dataIndex: "name",
+      key: "name",
+      render: (text) => <span>{text}</span>,
+    },
+
+    {
+      title: "Description ",
+      dataIndex: "description",
+      key: "description",
       render: (text) => <span>{text}</span>,
     },
     {
-      title: "Created At",
-      dataIndex: "createAt",
-      key: "createAt",
-      render: (text) => <span>{new Date(text).toLocaleString()}</span>, // Format the date
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
+      render: (price) => <span>{price.toLocaleString()} VND</span>, // Format the price
     },
-
-    {
-      title: "Updated At",
-      dataIndex: "updateAt",
-      key: "updateAt",
-      render: (text) => <span>{new Date(text).toLocaleString()}</span>,
-    },
-
     {
       title: "Status",
       dataIndex: "status",
@@ -34,12 +33,6 @@ function ManageDelivery() {
         </span>
       ),
     },
-    {
-      title: "Price",
-      dataIndex: "price",
-      key: "price",
-      render: (price) => <span>{price.toLocaleString()} VND</span>, // Format the price
-    },
   ];
 
   const formItem = (
@@ -48,13 +41,25 @@ function ManageDelivery() {
         <Input />
       </Form.Item>
       <Form.Item
-        name="deliveryMethodName"
+        name="name"
         label="Phương tiện vận chuyển"
         rules={[
           { required: true, message: "Vui lòng nhập phương tiện vận chuyển!" },
         ]}
       >
         <Input placeholder="Nhập tên phương tiện vận chuyển" />
+      </Form.Item>
+      <Form.Item
+        name="description"
+        label="Mô tả"
+        rules={[
+          {
+            required: true,
+            message: "Vui lòng nhập mô tả phương tiện vận chuyển!",
+          },
+        ]}
+      >
+        <Input placeholder="Nhập mô tả phương tiện vận chuyển" />
       </Form.Item>
       <Form.Item
         name="price"

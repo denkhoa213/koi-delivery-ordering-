@@ -81,8 +81,6 @@ const HandoverForm = () => {
         handoverDescription: values.handoverDescription,
       });
 
-      console.log(response.data);
-
       if (response.data.code === 200 && response.data.result.id !== 0) {
         const handoverDocumentId = response.data.result.id;
         localStorage.setItem("handoverDocumentId", handoverDocumentId);
