@@ -1,21 +1,9 @@
-import React, { useEffect, useState } from "react";
-import {
-  Layout,
-  Menu,
-  Card,
-  Col,
-  Row,
-  Typography,
-  Input,
-  Button,
-  Tabs,
-  message,
-  Form,
-} from "antd";
-import { UserOutlined } from "@ant-design/icons";
-import api from "../../config/axios";
-import { List } from "antd";
-import { toast } from "react-toastify";
+import React, { useEffect, useState } from 'react';
+import { Layout, Menu, Card, Col, Row, Typography, Input, Button, Tabs, message, Form } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
+import api from '../../config/axios';
+import { List } from 'antd';
+//import HealthService from '../form-page/healthService';
 //import { CardTitle } from 'react-bootstrap';
 
 const { Sider, Content } = Layout;
@@ -23,24 +11,30 @@ const { Title } = Typography;
 const { TabPane } = Tabs;
 
 const CustomerPage = () => {
-  const [selectedKey, setSelectedKey] = useState("1");
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
+  const [selectedKey, setSelectedKey] = useState('1');
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [errorOrders, setErrorOrders] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  //const [invoiceDetails, setInvoiceDetails] = useState(null);
+
   const [form] = Form.useForm();
-  const [viewOrderStatus, setViewOrderStatus] = useState(null);
+
+  const handleMenuClick = (key) => {
+    setSelectedKey(key);
+  };
 
   const fetchCustomerProfile = async () => {
     try {
-      const response = await api.get("/customer/get-profile");
-      if (response.data.code === 200) {
+      const response = await api.get('/customer/view-profile');
+      if (response.data.code === 200
+      ) {
         setCustomer(response.data.result);
       } else {
         message.error(response.data.message);
@@ -53,15 +47,7 @@ const CustomerPage = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleMenuClick = (key) => {
-    setSelectedKey(key);
-  };
-
-  const handleOrderClick = (order) => {
-    setSelectedOrder(order);
-  };
+  }
 
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
@@ -70,23 +56,24 @@ const CustomerPage = () => {
     }
 
     try {
-      const response = await api.put("/auth/change-password", {
+
+      const response = await api.put('/auth/change-password', {
         oldPassword,
         newPassword,
-        confirmPassword,
+        confirmPassword
       });
+
 
       // Thông báo thành công nếu API trả về status 200
       if (response.status === 200) {
         message.success("Mật khẩu đã được cập nhật thành công!");
-        setOldPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
       }
     } catch (error) {
       // Hiển thị chi tiết lỗi nếu có
-      const errorMessage =
-        error.response?.data?.message || "Đã xảy ra lỗi phía server!";
+      const errorMessage = error.response?.data?.message || "Đã xảy ra lỗi phía server!";
       message.error(errorMessage);
       console.error("Error:", error);
     }
@@ -94,7 +81,7 @@ const CustomerPage = () => {
 
   const updateProfile = async (values) => {
     try {
-      const response = await api.put("/customer/update-profile", values);
+      const response = await api.put('/customer/update-profile', values);
       if (response.status === 200) {
         message.success("Cập nhật hồ sơ thành công!");
         // Optionally, you can fetch the updated profile again
@@ -103,38 +90,15 @@ const CustomerPage = () => {
         message.error(response.data.message);
       }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Đã xảy ra lỗi khi cập nhật hồ sơ!";
+      const errorMessage = error.response?.data?.message || "Đã xảy ra lỗi khi cập nhật hồ sơ!";
       message.error(errorMessage);
       console.error("Error:", error);
     }
   };
 
-  const fetchViewOrderStatus = async () => {
-    const invoiceId = localStorage.getItem("invoiceId");
-    if (!invoiceId) {
-      toast.error("Không tìm thấy mã đơn hàng!");
-      return;
-    }
-
-    try {
-      const response = await api.get(
-        `/healthcare-delivery-histories/view-by-invoice/${invoiceId}`
-      );
-      if (response.data.code === 200) {
-        setViewOrderStatus(response.data.result);
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error) {
-      toast.error("Có lỗi xảy ra khi tải trạng thái đơn hàng!");
-      console.error(error);
-    }
-  };
-
   const fetchCustomerOrders = async () => {
     try {
-      const response = await api.get("/order/get-by-customer");
+      const response = await api.get('/order/view-by-customer');
       if (response.data.code === 200) {
         setOrders(response.data.result);
       } else {
@@ -148,7 +112,28 @@ const CustomerPage = () => {
     } finally {
       setLoadingOrders(false);
     }
-  };
+  }
+
+  const handleOrderClick = (order) => {
+    setSelectedOrder(order);
+  }
+
+  // const fetchInvoiceDetails = async (invoiceId) => {
+  //   try {
+  //     const response = await api.get(`/healthcare-delivery-histories/view-by-invoice/${invoiceId}`);
+  //     if (response.data.code === 200) {
+  //       setInvoiceDetails(response.data.result);
+  //     } else {
+  //       message.error(response.data.message);
+  //     }
+  //   } catch (error) {
+  //     message.error("Đã xảy ra lỗi khi lấy thông tin hóa đơn!");
+  //     console.error("Error", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
 
   const onFinish = (values) => {
     setLoading(true);
@@ -156,157 +141,93 @@ const CustomerPage = () => {
     setLoading(false);
   };
 
+
   useEffect(() => {
     fetchCustomerProfile();
     fetchCustomerOrders();
-    fetchViewOrderStatus();
   }, []);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <Sider width={200} style={{ background: "#fff" }}>
+    <Layout style={{ minHeight: '100vh' }}>
+      <Sider width={200} style={{ background: '#fff' }}>
         <Menu
           mode="inline"
           selectedKeys={[selectedKey]}
-          style={{ height: "100%", borderRight: 0 }}
+          style={{ height: '100%', borderRight: 0 }}
         >
-          <Menu.Item
-            key="1"
-            icon={<UserOutlined />}
-            onClick={() => handleMenuClick("1")}
-          >
+          <Menu.Item key="1" icon={<UserOutlined />} onClick={() => handleMenuClick('1')}>
             Hồ sơ của tôi
           </Menu.Item>
-          <Menu.Item
-            key="2"
-            icon={
-              <img
-                src="https://down-vn.img.susercontent.com/file/f0049e9df4e536bc3e7f140d071e9078"
-                alt="Custom Icon"
-                style={{ width: "20px", height: "20px" }}
-              />
-            }
-            onClick={() => handleMenuClick("2")}
-          >
+          <Menu.Item key="2" icon={<img src="https://down-vn.img.susercontent.com/file/f0049e9df4e536bc3e7f140d071e9078" alt="Custom Icon" style={{ width: '20px', height: '20px' }} />} onClick={() => handleMenuClick('2')}>
             Đơn đặt hàng
           </Menu.Item>
         </Menu>
       </Sider>
-      <Layout style={{ padding: "0 24px 24px" }}>
+      <Layout style={{ padding: '0 24px 24px' }}>
         <Content
           style={{
             padding: 24,
             margin: 0,
             minHeight: 280,
-            background: "#fff",
+            background: '#fff',
           }}
         >
-          {selectedKey === "1" && customer && (
-            <Card
-              title="Hồ Sơ Của Tôi"
-              style={{
-                width: "100%",
-                maxWidth: 600,
-                borderRadius: "10px",
-                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-              }}
-            >
+          {selectedKey === '1' && customer && (
+            <Card title="Hồ Sơ Của Tôi" style={{ width: '100%', maxWidth: 600, borderRadius: '10px', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)' }}>
               <Tabs defaultActiveKey="1">
                 <TabPane tab="Thông tin cá nhân" key="1">
                   <Title level={4}>Thông tin chi tiết</Title>
                   <Row gutter={[16, 16]}>
                     <Col span={24}>
-                      <strong>Tên:</strong>{" "}
-                      <span style={{ fontSize: "16px", color: "#555" }}>
-                        {customer.name}
-                      </span>
+                      <strong>Tên:</strong> <span style={{ fontSize: '16px', color: '#555' }}>{customer.name}</span>
                     </Col>
                     <Col span={24}>
-                      <strong>Email:</strong>{" "}
-                      <span style={{ fontSize: "16px", color: "#555" }}>
-                        {customer.email}
-                      </span>
+                      <strong>Email:</strong> <span style={{ fontSize: '16px', color: '#555' }}>{customer.email}</span>
                     </Col>
                     <Col span={24}>
-                      <strong>Số điện thoại:</strong>{" "}
-                      <span style={{ fontSize: "16px", color: "#555" }}>
-                        {customer.phone}
-                      </span>
+                      <strong>Số điện thoại:</strong> <span style={{ fontSize: '16px', color: '#555' }}>{customer.phone}</span>
                     </Col>
                     <Col span={24}>
-                      <strong>Địa chỉ:</strong>{" "}
-                      <span style={{ fontSize: "16px", color: "#555" }}>
-                        {customer.address}
-                      </span>
+                      <strong>Địa chỉ:</strong> <span style={{ fontSize: '16px', color: '#555' }}>{customer.address}</span>
                     </Col>
                   </Row>
                 </TabPane>
                 <TabPane tab="Thay đổi thông tin cá nhân" key="3">
                   <Title level={4}>Cập nhật thông tin</Title>
-                  <Form
-                    form={form}
-                    layout="vertical"
-                    onFinish={onFinish}
-                    initialValues={customer}
-                  >
+                  <Form form={form} layout="vertical" onFinish={onFinish} initialValues={customer}>
                     <Form.Item
                       label="Tên"
                       name="name"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Vui lòng nhập tên của bạn!",
-                        },
-                      ]}
+                      rules={[{ required: true, message: 'Vui lòng nhập tên của bạn!' }]}
                     >
                       <Input />
                     </Form.Item>
                     <Form.Item
                       label="Email"
                       name="email"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Vui lòng nhập email của bạn!",
-                        },
-                        { type: "email", message: "Email không hợp lệ!" },
-                      ]}
+                      rules={[{ required: true, message: 'Vui lòng nhập email của bạn!' }, { type: 'email', message: 'Email không hợp lệ!' }]}
                     >
                       <Input />
                     </Form.Item>
                     <Form.Item
                       label="Số điện thoại"
                       name="phone"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Vui lòng nhập số điện thoại của bạn!",
-                        },
-                      ]}
+                      rules={[{ required: true, message: 'Vui lòng nhập số điện thoại của bạn!' }]}
                     >
                       <Input />
                     </Form.Item>
                     <Form.Item
                       label="Địa chỉ"
                       name="address"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Vui lòng nhập địa chỉ của bạn!",
-                        },
-                      ]}
+                      rules={[{ required: true, message: 'Vui lòng nhập địa chỉ của bạn!' }]}
                     >
                       <Input />
                     </Form.Item>
                     <Form.Item>
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        loading={loading}
-                      >
+                      <Button type="primary" htmlType="submit" loading={loading}>
                         Cập nhật
                       </Button>
                     </Form.Item>
@@ -336,11 +257,7 @@ const CustomerPage = () => {
                       />
                     </Col>
                     <Col span={24}>
-                      <Button
-                        type="primary"
-                        style={{ width: "100%" }}
-                        onClick={handleChangePassword}
-                      >
+                      <Button type="primary" style={{ width: '100%' }} onClick={handleChangePassword}>
                         Cập nhật mật khẩu
                       </Button>
                     </Col>
@@ -349,16 +266,8 @@ const CustomerPage = () => {
               </Tabs>
             </Card>
           )}
-          {selectedKey === "2" && (
-            <Card
-              title="Danh sách đơn hàng"
-              style={{
-                width: "100%",
-                maxWidth: 600,
-                borderRadius: "10px",
-                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-              }}
-            >
+          {selectedKey === '2' && (
+            <Card title="Danh sách đơn hàng" style={{ width: '100%', maxWidth: 600, borderRadius: '10px', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)' }}>
               {loadingOrders ? (
                 <div>Loading orders...</div>
               ) : errorOrders ? (
@@ -367,20 +276,17 @@ const CustomerPage = () => {
                 <List
                   itemLayout="horizontal"
                   dataSource={orders}
-                  renderItem={(order) => (
+                  renderItem={order => (
                     <List.Item onClick={() => handleOrderClick(order)}>
                       <List.Item.Meta
                         title={`Đơn hàng: ${order.orderCode}`}
-                        description={`Ngày đặt: ${new Date(
-                          order.orderDate
-                        ).toLocaleDateString()} - Tổng tiền: ${
-                          order.totalAmount
-                        } VNĐ`}
+                        description={`Ngày đặt: ${new Date(order.orderDate).toLocaleDateString()} - Tổng tiền: ${order.totalAmount} VNĐ`}
                       />
                     </List.Item>
                   )}
                 />
-              )}
+              )
+              }
               {selectedOrder && (
                 <Card style={{ marginTop: 30 }}>
                   <Title level={3}>Thông tin chi tiết đơn hàng</Title>
@@ -391,27 +297,7 @@ const CustomerPage = () => {
                   <p>Điểm gửi: {selectedOrder.departure}</p>
                   <p>Điểm nhận: {selectedOrder.destination}</p>
                   <p>Trạng thái: {selectedOrder.status}</p>
-                </Card>
-              )}
-              {viewOrderStatus && (
-                <Card style={{ marginTop: 30 }}>
-                  <Title level={3}>Trạng Thái Đơn Hàng</Title>
-
-                  <p>
-                    <strong>Delivery Status:</strong>{" "}
-                    {viewOrderStatus[0].deliveryStatus}
-                  </p>
-                  <p>
-                    <strong>Đường đi:</strong> {viewOrderStatus[0].route}
-                  </p>
-                  <p>
-                    <strong>Mô tả về sức khỏe:</strong>{" "}
-                    {viewOrderStatus[0].healthDescription}
-                  </p>
-                  <p>
-                    <strong>Mô tả về ăn uống:</strong>{" "}
-                    {viewOrderStatus[0].eatingDescription}
-                  </p>
+                  {/* <p>Trạng thái giao hàng: {invoiceDetails?.deliveryStatus}</p> */}
                 </Card>
               )}
             </Card>
