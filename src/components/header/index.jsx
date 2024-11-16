@@ -15,7 +15,7 @@ const Header = () => {
   const navigate = useNavigate();
 
   const handleAvatarClick = () => {
-    navigate("/customer-page");
+    navigate("/customer");
   };
 
   const serviceMenu = (

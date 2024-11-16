@@ -37,12 +37,12 @@ import TotalOrder from "./pages/form-page/totalDetailOrder";
 import HealthcareHistoryManager from "./pages/dashboard/staff/manage-health-history";
 import HandoverForm from "./pages/dashboard/staff/handOver";
 import OverViewTotal from "./pages/dashboard/admin/over-view";
-
 import OrderSuccess from "./pages/order-success";
-import Header from "./components/header";
-import AppFooter from "./components/footer";
-import CustomerPage from "./pages/customer-page";
+
 import ManageUser from "./pages/dashboard/admin/manage-users";
+import CustomerTemplate from "./components/customer-template";
+import CustomerProfile from "./pages/customer-page/customer-profile";
+import CustomerOrder from "./pages/customer-page/customer-order";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
@@ -225,20 +225,26 @@ function App() {
     },
 
     {
-      path: "customer-page",
-      element: (
-        <>
-          <Header />,
-          <CustomerPage />,
-          <AppFooter />
-        </>
-      ),
-    },
-
-    {
       path: "order-success",
       element: <OrderSuccess />,
     },
+
+    {
+      path: "customer",
+      element: <CustomerTemplate />,
+      children: [
+        {
+          path: "customer-profile",
+          element: <CustomerProfile />,
+        },
+        {
+          path: "customer-order",
+          element: <CustomerOrder />,
+        },
+
+      ]
+    },
+
   ]);
 
   return <RouterProvider router={router} />;
