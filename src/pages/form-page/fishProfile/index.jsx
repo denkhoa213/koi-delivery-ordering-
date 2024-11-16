@@ -64,8 +64,6 @@ const FishProfileForm = () => {
         setViewFishOrder(fishOrderData);
         setFishProfileId(fishProfileId);
         console.log("fishProfileId:", fishProfileId);
-      } else {
-        toast.error("Không có cá trong đơn hàng!");
       }
     } catch (error) {
       const errorMessage =

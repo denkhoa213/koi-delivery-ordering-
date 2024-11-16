@@ -1,0 +1,30 @@
+.personal-info {
+    .title {
+        margin-bottom: 20px;
+    }
+
+    .info-row {
+        display: flex; // Sử dụng Flexbox
+        justify-content: flex-start; // Căn trái cho các phần tử
+        margin-bottom: 10px;
+
+        strong {
+            width: 110px;
+        }
+
+        span {
+            font-size: 16px;
+            flex: 1;
+        }
+    }
+
+    .avatar-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .upload-button {
+            margin-top: 15px;
+        }
+    }
+}

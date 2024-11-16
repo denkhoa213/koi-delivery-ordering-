@@ -2,9 +2,6 @@ import AuthenTemplate from "../../components/login-register";
 import { FaLock } from "react-icons/fa";
 import "./index.css";
 import { Link, useNavigate } from "react-router-dom";
-import { googleProvider } from "../../config/firebase";
-import { GoogleAuthProvider } from "firebase/auth/web-extension";
-import { getAuth, signInWithPopup } from "firebase/auth";
 import { Button, Checkbox, Form, Input } from "antd";
 import { toast } from "react-toastify";
 import api from "../../config/axios";
@@ -15,34 +12,10 @@ import { useState } from "react";
 
 function LoginPage() {
   const [loading, setLoading] = useState(false);
+  const [forgotPassword, setForgotPassword] = useState(false);
+
   const navigate = useNavigate();
-
   const dispatch = useDispatch();
-  const handleLoginGoogle = () => {
-    const auth = getAuth();
-    signInWithPopup(auth, googleProvider)
-      .then((result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
-        // The signed-in user info.
-        const user = result.user;
-        // IdP data available using getAdditionalUserInfo(result)
-        // ...
-      })
-      .catch((error) => {
-        console.log(error);
-
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.customData.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
-      });
-  };
 
   // luu vao redux: useDispatch()
 
@@ -80,9 +53,26 @@ function LoginPage() {
     } catch (error) {
       toast.error(
         "Đăng nhập thất bại: " +
-          (error.response?.data?.message || error.message)
+        (error.response?.data?.message || error.message)
       );
       console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (values) => {
+    try {
+      setLoading(true);
+      const response = await api.post("/auth/forgot-password", { email: values.email });
+      if (response.data.code === 200) {
+        toast.error(response.data.message);
+        setForgotPassword(false);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      toast.error("Error: " + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }
@@ -91,49 +81,77 @@ function LoginPage() {
   return (
     <AuthenTemplate>
       <div className="wrapper">
-        <Form
-          labelCol={{
-            span: 24,
-          }}
-          onFinish={handleLogin}
-        >
-          <h1>Login</h1>
-
-          <Form.Item
-            name="email"
-            rules={[{ required: true, message: "Please enter your email!" }]}
+        {!forgotPassword ? (
+          <Form
+            labelCol={{
+              span: 24,
+            }}
+            onFinish={handleLogin}
           >
-            <Input prefix={<MailOutlined />} placeholder="Email" />
-          </Form.Item>
+            <h1>Đăng nhập</h1>
 
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: "Please enter your password!" }]}
-          >
-            <Input.Password prefix={<FaLock />} placeholder="Password" />
-          </Form.Item>
-
-          <div className="remember-forgot">
-            <Form.Item name="remember" valuePropName="checked" noStyle>
-              <Checkbox>Remember me</Checkbox>
+            <Form.Item
+              name="email"
+              rules={[
+                { required: true, message: "Vui lòng nhập email của bạn!" },
+                { type: 'email', message: 'Định dạng Email không phù hợp' }
+              ]}
+            >
+              <Input prefix={<MailOutlined />} placeholder="Email" />
             </Form.Item>
-            <a href="#" className="forgot-password">
-              Forgot password
-            </a>
-          </div>
 
-          <Form.Item>
-            <Button type="primary" htmlType="submit" block loading={loading}>
-              Login
-            </Button>
-          </Form.Item>
+            <Form.Item
+              name="password"
+              rules={[{ required: true, message: "Vui lòng nhập mật khẩu của bạn!" }]}
+            >
+              <Input.Password prefix={<FaLock />} placeholder="Password" />
+            </Form.Item>
 
-          <div className="register-link">
-            <p>
-              Don't have an account? <Link to="/register">Register</Link>
-            </p>
-          </div>
-        </Form>
+            <div className="remember-forgot">
+              <Form.Item name="remember" valuePropName="checked" noStyle>
+                <Checkbox>Ghi nhớ tài khoản</Checkbox>
+              </Form.Item>
+              <a href="#" className="forgot-password" onClick={() => setForgotPassword(true)}>
+                Quên mật khẩu
+              </a>
+            </div>
+
+            <Form.Item>
+              <Button type="primary" htmlType="submit" block loading={loading}>
+                Login
+              </Button>
+            </Form.Item>
+
+            <div className="register-link">
+              <p>
+                Bạn chưa có tài khoản? <Link to="/register">Đăng ký</Link>
+              </p>
+            </div>
+          </Form>
+        ) : (
+          <Form onFinish={handleForgotPassword}>
+            <h1>Forgot password</h1>
+
+            <Form.Item
+              name="email"
+              rule={[{ required: true, message: "Vui lòng nhập email của bạn!" }]}
+            >
+              <Input placeholder="Email" />
+            </Form.Item>
+
+            <Form.Item>
+              <Button type="primary" htmlType="submit" block loading={loading}>
+                Gửi link
+              </Button>
+            </Form.Item>
+
+            <div className="back-to-loginpage">
+              <a href="#" onClick={() => setForgotPassword(false)}>
+                Trở về trang đăng nhập
+              </a>
+            </div>
+          </Form>
+        )}
       </div>
     </AuthenTemplate>
   );
