@@ -36,6 +36,7 @@ import CheckHealth from "./pages/dashboard/delivery-staff/manage-checkHealth";
 import ManagePackage from "./pages/dashboard/delivery-staff/manage-package";
 import HealthcareHistoryManager from "./pages/dashboard/delivery-staff/manage-health-history";
 import HandoverForm from "./pages/dashboard/sale-staff/handOver";
+import Header from "./components/header";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
@@ -195,11 +196,17 @@ function App() {
 
     {
       path: "customer",
-      element: <CustomerTemplate />,
+      element: (
+        <Header />,
+        <CustomerTemplate />
+      ),
       children: [
         {
           path: "customer-profile",
-          element: <CustomerProfile />,
+          element: (
+            <Header />,
+            <CustomerProfile />
+          ),
         },
         {
           path: "customer-order",

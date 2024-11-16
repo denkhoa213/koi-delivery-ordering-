@@ -146,7 +146,7 @@ const CustomerProfile = () => {
                     }}
                 >
                     <Card title="Hồ Sơ Của Tôi" style={{ width: '100%', maxWidth: 600, borderRadius: '10px', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)' }}>
-                        <Tabs defaultActiveKey="1">
+                        <Tabs>
                             <TabPane tab="Thông tin cá nhân" key="1">
                                 <Title level={4} className="personal-info__title">Thông tin chi tiết</Title>
                                 <Row gutter={[16, 16]} className="personal-info">
