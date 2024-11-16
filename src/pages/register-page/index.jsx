@@ -40,11 +40,7 @@ function RegisterPage() {
   return (
     <AuthenTemplate>
       <div className="wrapper">
-        <Form
-          labelCol={{ span: 24 }}
-          onFinish={handleRegister}
-          autoComplete="off" // Disable autocomplete for better UX
-        >
+        <Form labelCol={{ span: 24 }} onFinish={handleRegister}>
           <h1>Register</h1>
 
           <Form.Item

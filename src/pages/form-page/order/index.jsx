@@ -1,8 +1,21 @@
-import { Button, Form, Input, Checkbox, Row, Col, Card, Select } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  Checkbox,
+  Row,
+  Col,
+  Card,
+  Select,
+  Typography,
+  Divider,
+} from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../../config/axios";
+
+const { Title, Text } = Typography;
 
 function OrderForm() {
   const [isPlaneDelivery, setIsPlaneDelivery] = useState(false);
@@ -56,7 +69,7 @@ function OrderForm() {
       if (values.customsDeclaration) {
         navigate(`/form-declaration/${orderId}`);
       } else {
-        navigate(`/health-service/${orderId}`);
+        navigate(`/fish-profile/${orderId}`);
       }
       if (response.data.code === 200) {
         toast.success(response.data.message);
@@ -76,7 +89,11 @@ function OrderForm() {
 
   return (
     <>
-      <Card title="Thông tin đơn hàng" bordered={false}>
+      <Card
+        title="Thông tin đơn hàng"
+        bordered={false}
+        style={{ maxWidth: "900px", margin: "0 auto" }}
+      >
         <Form form={form} onFinish={handleSubmitOrder} layout="vertical">
           <Row gutter={16}>
             <Col span={12}>
@@ -118,18 +135,26 @@ function OrderForm() {
           </Row>
 
           {selectedDelivery && (
-            <Row gutter={16}>
-              <Col span={24}>
-                <div style={{ marginTop: "10px" }}>
-                  <p>
-                    <strong>Mô tả:</strong> {selectedDelivery.description}
-                  </p>
-                  <p>
-                    <strong>Giá:</strong> {selectedDelivery.price} VND/1KM
-                  </p>
-                </div>
-              </Col>
-            </Row>
+            <div
+              style={{
+                padding: "10px",
+                background: "#f7f7f7",
+                borderRadius: "8px",
+              }}
+            >
+              <Title level={4}>Chi tiết phương thức giao hàng:</Title>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Text strong>Mô tả:</Text>{" "}
+                  <Text>{selectedDelivery.description}</Text>
+                </Col>
+                <Col span={12}>
+                  <Text strong>Giá:</Text>{" "}
+                  <Text>{selectedDelivery.price} VND/1KM</Text>
+                </Col>
+              </Row>
+              <Divider />
+            </div>
           )}
 
           <Row gutter={16}>

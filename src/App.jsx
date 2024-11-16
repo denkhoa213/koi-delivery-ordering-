@@ -16,12 +16,8 @@ import Support from "./components/support";
 import ServiceDetail from "./components/detail-service";
 import Dashboard from "./components/dashboard/dashboard-admin";
 import ManageHealthService from "./pages/dashboard/admin/manage-health-service";
-import FormLayout from "./components/layout/layout-form";
 import OrderForm from "./pages/form-page/order";
-
 import FishProfileForm from "./pages/form-page/fishProfile";
-import HealthService from "./pages/form-page/healthService";
-import CertificateForm from "./pages/form-page/certificate";
 import ManageFishCategory from "./pages/dashboard/admin/manage-fish-categories";
 import DeliveryServiceList from "./components/list-service/service-delivery";
 import HealthServiceList from "./components/list-service/service-health";
@@ -33,11 +29,9 @@ import ManageOrder from "./pages/dashboard/manager/manage-order";
 import CheckHealth from "./pages/dashboard/staff/manage-checkHealth";
 import ManagePackage from "./pages/dashboard/staff/manage-package";
 import TotalOrder from "./pages/form-page/totalDetailOrder";
-
 import HealthcareHistoryManager from "./pages/dashboard/staff/manage-health-history";
 import HandoverForm from "./pages/dashboard/staff/handOver";
 import OverViewTotal from "./pages/dashboard/admin/over-view";
-
 import OrderSuccess from "./pages/order-success";
 import Header from "./components/header";
 import AppFooter from "./components/footer";
@@ -187,36 +181,22 @@ function App() {
         },
       ],
     },
-    {
-      path: "/",
-      element: <FormLayout />,
-      children: [
-        {
-          path: "form-order",
-          element: <OrderForm />,
-        },
-        {
-          path: "fish-profile",
-          element: <FishProfileForm />,
-        },
 
-        {
-          path: "certificate/:orderId",
-          element: <CertificateForm />,
-        },
-        {
-          path: "health-service/:orderId",
-          element: <HealthService />,
-        },
-        {
-          path: "form-declaration/:orderId",
-          element: <CustomsDeclarationForm />,
-        },
-        {
-          path: "total-order",
-          element: <TotalOrder />,
-        },
-      ],
+    {
+      path: "form-order",
+      element: <OrderForm />,
+    },
+    {
+      path: "fish-profile/:orderId",
+      element: <FishProfileForm />,
+    },
+    {
+      path: "form-declaration/:orderId",
+      element: <CustomsDeclarationForm />,
+    },
+    {
+      path: "total-order/:orderId",
+      element: <TotalOrder />,
     },
 
     {

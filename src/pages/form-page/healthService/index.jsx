@@ -17,7 +17,6 @@ function HealthService() {
   const navigate = useNavigate();
   const [services, setServices] = useState([]);
   const [form] = Form.useForm();
-  const [hasCertificate, setHasCertificate] = useState(false);
 
   const fetchServices = async () => {
     try {
@@ -76,12 +75,7 @@ function HealthService() {
         );
       }
 
-      // Navigate based on certificate status
-      if (hasCertificate) {
-        navigate(`/certificate/${orderId}`);
-      } else {
-        navigate("/total-order");
-      }
+      navigate("/total-order");
 
       if (response.data.code === 200) {
         toast.success(response.data.message);
@@ -146,15 +140,6 @@ function HealthService() {
             </Form.Item>
           </Col>
         </Row>
-
-        <Form.Item>
-          <Checkbox
-            checked={hasCertificate}
-            onChange={(e) => setHasCertificate(e.target.checked)}
-          >
-            Có chứng chỉ
-          </Checkbox>
-        </Form.Item>
 
         {/* Submit Button */}
         <Form.Item style={{ textAlign: "right" }}>
