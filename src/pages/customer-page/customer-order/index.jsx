@@ -5,8 +5,6 @@ import { Content } from 'antd/es/layout/layout';
 import api from '../../../config/axios';
 import { toast } from 'react-toastify';
 import "./index.scss";
-//import HealthService from '../form-page/healthService';
-//import { CardTitle } from 'react-bootstrap';
 
 const { Title } = Typography;
 
@@ -16,7 +14,6 @@ const CustomerOrder = () => {
     const [loadingOrders, setLoadingOrders] = useState(true);
     const [errorOrders, setErrorOrders] = useState(null);
     const [selectedOrder, setSelectedOrder] = useState(null);
-    //const [invoiceDetails, setInvoiceDetails] = useState(null);
 
 
     const fetchCustomerOrders = async () => {
@@ -40,28 +37,6 @@ const CustomerOrder = () => {
     const handleOrderClick = (order) => {
         setSelectedOrder(order);
     }
-
-    // const fetchInvoiceDetails = async (invoiceId) => {
-    //   try {
-    //     const response = await api.get(`/healthcare-delivery-histories/view-by-invoice/${invoiceId}`);
-    //     if (response.data.code === 200) {
-    //       setInvoiceDetails(response.data.result);
-    //     } else {
-    //       message.error(response.data.message);
-    //     }
-    //   } catch (error) {
-    //     message.error("Đã xảy ra lỗi khi lấy thông tin hóa đơn!");
-    //     console.error("Error", error);
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-
-
-    // const onFinish = () => {
-    //     setLoading(true);
-    //     setLoading(false);
-    // };
 
 
     useEffect(() => {

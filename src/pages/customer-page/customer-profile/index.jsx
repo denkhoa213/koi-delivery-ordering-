@@ -17,9 +17,8 @@ const CustomerProfile = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [confirmPassword, setConfirmPassword] = useState('');
-    //const [invoiceDetails, setInvoiceDetails] = useState(null);
     const [form] = Form.useForm();
-    const maxFileSize = 10000000; // 10 MB
+    const maxFileSize = 10000000;
 
     const fetchCustomerProfile = async () => {
         try {
