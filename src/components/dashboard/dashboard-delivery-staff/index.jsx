@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { PieChartOutlined } from "@ant-design/icons";
-import { Layout, Menu, theme } from "antd";
+import { Breadcrumb, Layout, Menu, theme } from "antd";
 import { Link, Outlet } from "react-router-dom";
 import Header from "../../header";
 const { Content, Footer, Sider } = Layout;
@@ -9,22 +9,20 @@ function getItem(label, key, icon, children) {
     key,
     icon,
     children,
-    label: <Link to={`/dashboard-admin/${key}`}>{label}</Link>,
+    label: <Link to={`/dashboard-delivery-staff/${key}`}>{label}</Link>,
   };
 }
 const items = [
-  getItem("Overview Total", "over-view", <PieChartOutlined />),
-  getItem("Manage Users", "manage-user", <PieChartOutlined />),
+  getItem("Manage Order", "manage-order", <PieChartOutlined />),
+  getItem("Check Health", "check-health-fish", <PieChartOutlined />),
+  getItem("Manage Package", "create-package", <PieChartOutlined />),
   getItem(
-    "Manage Health Service Category",
-    "health-service-category",
+    "Health Care History",
+    "manage-health-care-history",
     <PieChartOutlined />
   ),
-
-  getItem("Manage Fish Categories", "fish-category", <PieChartOutlined />),
-  getItem("Manage Delivery", "manage-delivery", <PieChartOutlined />),
 ];
-const Dashboard = () => {
+const DashboardDeliveryStaff = () => {
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -38,7 +36,7 @@ const Dashboard = () => {
         }}
       >
         <Sider
-          width={290}
+          width={200}
           collapsible
           collapsed={collapsed}
           onCollapse={(value) => setCollapsed(value)}
@@ -80,4 +78,4 @@ const Dashboard = () => {
     </>
   );
 };
-export default Dashboard;
+export default DashboardDeliveryStaff;

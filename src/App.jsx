@@ -14,30 +14,28 @@ import About from "./components/about";
 import Contact from "./components/contact";
 import Support from "./components/support";
 import ServiceDetail from "./components/detail-service";
-import Dashboard from "./components/dashboard/dashboard-admin";
-import ManageHealthService from "./pages/dashboard/admin/manage-health-service";
 import OrderForm from "./pages/form-page/order";
 import FishProfileForm from "./pages/form-page/fishProfile";
-import ManageFishCategory from "./pages/dashboard/admin/manage-fish-categories";
 import DeliveryServiceList from "./components/list-service/service-delivery";
 import HealthServiceList from "./components/list-service/service-health";
-import ManageDelivery from "./pages/dashboard/admin/manage-delivery-method";
 import CustomsDeclarationForm from "./pages/form-page/declaration";
-import DashboardStaff from "./components/dashboard/dashboard-staff";
-import DashboardManager from "./components/dashboard/dashboard-manager";
-import ManageOrder from "./pages/dashboard/manager/manage-order";
-import CheckHealth from "./pages/dashboard/staff/manage-checkHealth";
-import ManagePackage from "./pages/dashboard/staff/manage-package";
 import TotalOrder from "./pages/form-page/totalDetailOrder";
-import HealthcareHistoryManager from "./pages/dashboard/staff/manage-health-history";
-import HandoverForm from "./pages/dashboard/staff/handOver";
-import OverViewTotal from "./pages/dashboard/admin/over-view";
 import OrderSuccess from "./pages/order-success";
-
-import ManageUser from "./pages/dashboard/admin/manage-users";
 import CustomerTemplate from "./components/customer-template";
 import CustomerProfile from "./pages/customer-page/customer-profile";
 import CustomerOrder from "./pages/customer-page/customer-order";
+import ManageUser from "./pages/dashboard/manager/manage-users";
+import ManageHealthService from "./pages/dashboard/manager/manage-health-service";
+import ManageFishCategory from "./pages/dashboard/manager/manage-fish-categories";
+import ManageDelivery from "./pages/dashboard/manager/manage-delivery-method";
+import OverViewTotal from "./pages/dashboard/manager/over-view";
+import DashboarManager from "./components/dashboard/dashboard-manager";
+import DashboardSaleStaff from "./components/dashboard/dashboard-sale-staff";
+import DashboardDeliveryStaff from "./components/dashboard/dashboard-delivery-staff";
+import CheckHealth from "./pages/dashboard/delivery-staff/manage-checkHealth";
+import ManagePackage from "./pages/dashboard/delivery-staff/manage-package";
+import HealthcareHistoryManager from "./pages/dashboard/delivery-staff/manage-health-history";
+import HandoverForm from "./pages/dashboard/sale-staff/handOver";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
@@ -101,10 +99,10 @@ function App() {
       element: <RegisterPage />,
     },
     {
-      path: "/dashboard-admin",
+      path: "/dashboard-manager",
       element: (
         <ProtectRouterAuth>
-          <Dashboard />
+          <DashboarManager />
         </ProtectRouterAuth>
       ),
       children: [
@@ -131,36 +129,24 @@ function App() {
       ],
     },
     {
-      path: "/dashboard-manager",
+      path: "/dashboard-sale-staff",
       element: (
         <ProtectRouterAuth>
-          <DashboardManager />
+          <DashboardSaleStaff />
         </ProtectRouterAuth>
       ),
       children: [
         {
-          path: "manage-order",
-          element: <ManageOrder />,
-        },
-        {
-          path: "health-service-category",
-          element: <ManageHealthService />,
-        },
-        {
-          path: "fish-category",
-          element: <ManageFishCategory />,
-        },
-        {
-          path: "manage-delivery",
-          element: <ManageDelivery />,
+          path: "hand-over",
+          element: <HandoverForm />,
         },
       ],
     },
     {
-      path: "/dashboard-staff",
+      path: "/dashboard-delivery-staff",
       element: (
         <ProtectRouterAuth>
-          <DashboardStaff />
+          <DashboardDeliveryStaff />
         </ProtectRouterAuth>
       ),
       children: [
@@ -172,10 +158,7 @@ function App() {
           path: "create-package",
           element: <ManagePackage />,
         },
-        {
-          path: "hand-over",
-          element: <HandoverForm />,
-        },
+
         {
           path: "manage-health-care-history",
           element: <HealthcareHistoryManager />,
@@ -222,10 +205,8 @@ function App() {
           path: "customer-order",
           element: <CustomerOrder />,
         },
-
-      ]
+      ],
     },
-
   ]);
 
   return <RouterProvider router={router} />;

@@ -24,27 +24,26 @@ function LoginPage() {
   const handleLogin = async (values) => {
     try {
       setLoading(true);
-      console.log("Login values:", values); // Kiểm tra thông tin gửi đi
+      console.log("Login values:", values);
 
       const response = await api.post("auth/login", values);
 
       console.log("Response:", response);
 
-      // Lấy token, role và id từ response
       const { token, role, id } = response.data.result;
 
-      // Lưu token, role và userId (id) vào localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("role", role);
-      localStorage.setItem("userId", id); // Lưu id dưới dạng userId
+      localStorage.setItem("userId", id);
 
       dispatch(login(response.data.result));
 
-      // Điều hướng theo role của người dùng
       if (role === "MANAGER") {
-        navigate("/dashboard-admin");
+        navigate("/dashboard-manager");
       } else if (role === "SALE_STAFF") {
-        navigate("/dashboard-staff");
+        navigate("/dashboard-sale-staff");
+      } else if (role === "DELIVERY_STAFF") {
+        navigate("/dashboard-delivery-staff");
       } else {
         navigate("/");
       }
@@ -53,7 +52,7 @@ function LoginPage() {
     } catch (error) {
       toast.error(
         "Đăng nhập thất bại: " +
-        (error.response?.data?.message || error.message)
+          (error.response?.data?.message || error.message)
       );
       console.log(error);
     } finally {
@@ -64,7 +63,9 @@ function LoginPage() {
   const handleForgotPassword = async (values) => {
     try {
       setLoading(true);
-      const response = await api.post("/auth/forgot-password", { email: values.email });
+      const response = await api.post("/auth/forgot-password", {
+        email: values.email,
+      });
       if (response.data.code === 200) {
         toast.error(response.data.message);
         setForgotPassword(false);
@@ -94,7 +95,7 @@ function LoginPage() {
               name="email"
               rules={[
                 { required: true, message: "Vui lòng nhập email của bạn!" },
-                { type: 'email', message: 'Định dạng Email không phù hợp' }
+                { type: "email", message: "Định dạng Email không phù hợp" },
               ]}
             >
               <Input prefix={<MailOutlined />} placeholder="Email" />
@@ -102,7 +103,9 @@ function LoginPage() {
 
             <Form.Item
               name="password"
-              rules={[{ required: true, message: "Vui lòng nhập mật khẩu của bạn!" }]}
+              rules={[
+                { required: true, message: "Vui lòng nhập mật khẩu của bạn!" },
+              ]}
             >
               <Input.Password prefix={<FaLock />} placeholder="Password" />
             </Form.Item>
@@ -111,7 +114,11 @@ function LoginPage() {
               <Form.Item name="remember" valuePropName="checked" noStyle>
                 <Checkbox>Ghi nhớ tài khoản</Checkbox>
               </Form.Item>
-              <a href="#" className="forgot-password" onClick={() => setForgotPassword(true)}>
+              <a
+                href="#"
+                className="forgot-password"
+                onClick={() => setForgotPassword(true)}
+              >
                 Quên mật khẩu
               </a>
             </div>
@@ -134,7 +141,9 @@ function LoginPage() {
 
             <Form.Item
               name="email"
-              rule={[{ required: true, message: "Vui lòng nhập email của bạn!" }]}
+              rule={[
+                { required: true, message: "Vui lòng nhập email của bạn!" },
+              ]}
             >
               <Input placeholder="Email" />
             </Form.Item>

@@ -150,6 +150,7 @@ function TotalOrder() {
 
         setServicesByOrder(formattedServices);
       }
+      fetchOrderTotal();
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Đã xảy ra lỗi khi lấy dịch vụ."

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { PieChartOutlined } from "@ant-design/icons";
-import { Breadcrumb, Layout, Menu, theme } from "antd";
+import { Layout, Menu, theme } from "antd";
 import { Link, Outlet } from "react-router-dom";
 import Header from "../../header";
 const { Content, Footer, Sider } = Layout;
@@ -13,7 +13,8 @@ function getItem(label, key, icon, children) {
   };
 }
 const items = [
-  getItem("Manage Order", "manage-order", <PieChartOutlined />),
+  getItem("Overview Total", "over-view", <PieChartOutlined />),
+  getItem("Manage Users", "manage-user", <PieChartOutlined />),
   getItem(
     "Manage Health Service Category",
     "health-service-category",
@@ -23,7 +24,7 @@ const items = [
   getItem("Manage Fish Categories", "fish-category", <PieChartOutlined />),
   getItem("Manage Delivery", "manage-delivery", <PieChartOutlined />),
 ];
-const DashboardManager = () => {
+const DashboarManager = () => {
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -37,7 +38,7 @@ const DashboardManager = () => {
         }}
       >
         <Sider
-          width={200}
+          width={290}
           collapsible
           collapsed={collapsed}
           onCollapse={(value) => setCollapsed(value)}
@@ -79,4 +80,4 @@ const DashboardManager = () => {
     </>
   );
 };
-export default DashboardManager;
+export default DashboarManager;
