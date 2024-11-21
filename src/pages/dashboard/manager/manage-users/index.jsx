@@ -9,20 +9,31 @@ import {
   Modal,
   Popconfirm,
   Upload,
+  Select,
 } from "antd";
 import { toast } from "react-toastify"; // Import react-toastify
 import "react-toastify/dist/ReactToastify.css"; // Import CSS của react-toastify
 import api from "../../../../config/axios";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { BlockOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { UploadOutlined } from "@ant-design/icons";
 import uploadFile from "../../../../utils/file";
 
 function ManageUser() {
   const [users, setUsers] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  const [showAddModal, setAddShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState([]);
+  const [currentUserId, setCurrentUserId] = useState(null);
+
+  const roles = [
+    { id: 1, name: "Customer" },
+    { id: 2, name: "MANAGER" },
+    { id: 3, name: "DELIVERY_STAFF" },
+    { id: 4, name: "SALE_STAFF" },
+  ];
+
   const fetchUsers = async () => {
     try {
       const response = await api.get("/customer/view-all");
@@ -55,7 +66,7 @@ function ManageUser() {
       }
       fetchUsers();
       form.resetFields();
-      setShowModal(false);
+      setAddShowModal(false);
     } catch (error) {
       toast.error(error.response.data);
     } finally {
@@ -66,6 +77,55 @@ function ManageUser() {
   const handleUploadChange = (info) => {
     setFileList(info.fileList);
   };
+
+  const handleEditUser = async (userId, updatedUser) => {
+    try {
+      const response = await api.put(`/customer/edit-user/${userId}`, {
+        name: updatedUser.name,
+        address: updatedUser.address,
+        avatar: updatedUser.avatar, // Nếu avatar là đường dẫn đến hình ảnh
+        phone: updatedUser.phone,
+      });
+
+      if (response.status === 200) {
+        toast.success('User  updated successfully!');
+        fetchUsers();
+      } else {
+        toast.error('Failed to update user');
+      }
+    } catch (error) {
+      toast.error('Error updating user: ' + error.message);
+    }
+  };
+
+  const handleFinish = async (values) => {
+    await handleEditUser(currentUserId, values);
+    setShowEditModal(false);
+    form.resetFields();
+  };
+
+  const handleBlockUnblockUser = async (userId, isBlocked) => {
+    try {
+      const action = isBlocked ? 'unblock' : 'block';
+      const response = await api.put(`/customer/block-unblock/${userId}`, { action });
+
+      if (response.status === 200) {
+        toast.success(`User ${action}ed successfully!`);
+
+        // Cập nhật trạng thái cục bộ
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user.id === userId ? { ...user, status: isBlocked ? 'VERIFIED' : 'BLOCKED' } : user
+          )
+        );
+      } else {
+        toast.error('Failed to update user status');
+      }
+    } catch (error) {
+      toast.error('Error updating user status: ' + error.message);
+    }
+  };
+
 
   useEffect(() => {
     fetchUsers();
@@ -121,29 +181,27 @@ function ManageUser() {
       ),
     },
     {
-      title: "Action",
-      dataIndex: "id",
-      key: "id",
-      render: (id, category) => (
+      title: "Actions",
+      key: "actions",
+      render: (text, record) => (
         <Space size="middle">
           <Button
-            type="primary"
             icon={<EditOutlined />}
             onClick={() => {
-              setShowModal(true);
-              form.setFieldsValue(category);
+              setCurrentUserId(record.id);
+              form.setFieldsValue(record);
+              setShowEditModal(true);
             }}
           >
             Edit
           </Button>
 
           <Popconfirm
-            title="Delete"
-            description="Do you want to delete this category?"
-            onConfirm={() => handleDelete(id)}
+            title={record.status === "BLOCKED" ? "Unblock this user?" : "Block this user?"}
+            onConfirm={() => handleBlockUnblockUser(record.id, record.status === "BLOCKED")}
           >
-            <Button type="primary" danger icon={<DeleteOutlined />}>
-              Delete
+            <Button type="primary" danger icon={<BlockOutlined />}>
+              {record.status === "BLOCKED" ? "Unblock" : "Block"}
             </Button>
           </Popconfirm>
         </Space>
@@ -156,7 +214,7 @@ function ManageUser() {
       <Button
         type="primary"
         icon={<PlusOutlined />}
-        onClick={() => setShowModal(true)}
+        onClick={() => setAddShowModal(true)}
         style={{ marginBottom: "16px" }}
       >
         Add New User
@@ -164,10 +222,10 @@ function ManageUser() {
       <Table dataSource={users} columns={columns} rowKey="id" />
 
       <Modal
-        open={showModal}
-        onCancel={() => setShowModal(false)}
+        open={showAddModal}
+        onCancel={() => setAddShowModal(false)}
         onOk={() => form.submit()}
-        title="Health Service Category"
+        title="Add New User"
         confirmLoading={loading}
         okText="Save"
         cancelText="Cancel"
@@ -267,16 +325,57 @@ function ManageUser() {
           </Form.Item>
 
           <Form.Item
-            name="roleId"
-            label="Role ID"
+            name="role"
+            label="Role"
             rules={[
-              { required: true, message: "Please input user's role ID!" },
+              { required: true, message: "Please input user's role !" },
             ]}
           >
-            <Input
-              type="number"
-              placeholder="Enter role ID (0 for User, 1 for Admin)"
-            />
+            <Select>
+              {roles.map((role) => (
+                <Select.Option key={role.id} value={role.name}>
+                  {role.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Edit User Modal */}
+      <Modal
+        title="Edit User"
+        visible={showEditModal}
+        onCancel={() => setShowEditModal(false)}
+        footer={null}
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleFinish}
+        >
+          <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="address" label="Address">
+            <Input />
+          </Form.Item>
+          <Form.Item name="phone" label="Phone" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="avatar" label="Upload Avatar">
+            <Upload
+              beforeUpload={() => false}
+              onChange={handleUploadChange}
+              fileList={fileList}
+            >
+              <Button icon={<UploadOutlined />}>Upload</Button>
+            </Upload>
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              Save
+            </Button>
           </Form.Item>
         </Form>
       </Modal>

@@ -1,33 +1,17 @@
-import React, { useEffect, useState } from "react";
-
-import api from "../../config/axios";
-import "./index.scss";
+import React from "react";
 
 import Banner from "../../components/banner";
 import NewsSection from "../../components/news";
-import ServiceList from "../../components/list-service/service-delivery";
-import TransportManagement from "../../components/list-service/service-health";
+import DeliveryServiceList from "../../components/list-service/delivery-method";
+import HealthServiceCategory from "../../components/list-service/health-service-cate";
 
 function HomePage() {
-  // const [services, setServices] = useState([]);
-  // const fetchService = async () => {
-  //   try {
-  //     const response = await api.get("/product/all");
-  //     setServices(response.data.content);
-  //   } catch (e) {
-  //     console.log("Error fetch Service:".e);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchService();
-  // }, []);
 
   return (
     <>
       <Banner />
-      <ServiceList />
-      <TransportManagement />
+      <DeliveryServiceList />
+      <HealthServiceCategory />
       <NewsSection />
     </>
   );

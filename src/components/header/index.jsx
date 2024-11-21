@@ -29,17 +29,6 @@ const Header = () => {
     </Menu>
   );
 
-  // const moreMenu = (
-  //   <Menu>
-  //     <Menu.Item key="1">
-  //       <a href="#option1">Option 1</a>
-  //     </Menu.Item>
-  //     <Menu.Item key="2">
-  //       <a href="#option2">Option 2</a>
-  //     </Menu.Item>
-  //   </Menu>
-  // );
-
   return (
     <header className="header">
       <div className="header-left">

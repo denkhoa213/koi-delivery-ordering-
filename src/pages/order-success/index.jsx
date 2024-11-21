@@ -9,7 +9,7 @@ function OrderSuccess() {
     }
 
     const handleBuyAgain = () => {
-        navigate("/fish-profile");
+        navigate("/form-order");
     };
 
     return (

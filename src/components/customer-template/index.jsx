@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { PieChartOutlined } from "@ant-design/icons";
+import { HistoryOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
 import { Layout, Menu, theme } from "antd";
 import { Link, Outlet } from "react-router-dom";
+import Header from "../header";
 
 const { Content, Footer, Sider } = Layout;
 function getItem(label, key, icon, children) {
@@ -13,8 +14,9 @@ function getItem(label, key, icon, children) {
     };
 }
 const items = [
-    getItem("Customer Profile", "customer-profile", <PieChartOutlined />),
-    getItem("Customer Order", "customer-order", <PieChartOutlined />),
+    getItem("Hồ sơ của tôi", "customer-profile", <UserOutlined />),
+    getItem("Danh sách đơn hàng", "customer-order", <ShoppingCartOutlined />),
+    getItem("Lịch sử giao dịch", "transaction-history", <HistoryOutlined />),
 
 
 ];
@@ -25,7 +27,7 @@ const CustomerTemplate = () => {
     } = theme.useToken();
     return (
         <>
-
+            <Header />
             <Layout
                 style={{
                     minHeight: "100vh",
@@ -36,10 +38,11 @@ const CustomerTemplate = () => {
                     collapsible
                     collapsed={collapsed}
                     onCollapse={(value) => setCollapsed(value)}
+                    style={{ background: '#fff' }}
                 >
                     <div className="demo-logo-vertical" />
                     <Menu
-                        theme="dark"
+                        theme="light"
                         defaultSelectedKeys={["1"]}
                         mode="inline"
                         items={items}

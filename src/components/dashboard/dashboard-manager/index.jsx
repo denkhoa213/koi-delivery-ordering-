@@ -24,6 +24,9 @@ const items = [
 
   getItem("Manage Fish Categories", "fish-category", <PieChartOutlined />),
   getItem("Manage Delivery", "manage-delivery", <PieChartOutlined />),
+  getItem("Manage Feedback", "manage-feedback", <PieChartOutlined />),
+  getItem("Manage Report", "manage-report", <PieChartOutlined />),
+
 ];
 const DashboarManager = () => {
   const [collapsed, setCollapsed] = useState(false);
