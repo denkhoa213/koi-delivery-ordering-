@@ -9,6 +9,7 @@ function ManageHealthService() {
   const [healthService, setHealthService] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [form] = Form.useForm();
+  const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
 
   //GET
@@ -133,7 +134,11 @@ function ManageHealthService() {
       <Button
         type="primary"
         icon={<PlusOutlined />}
-        onClick={() => setShowModal(true)}
+        onClick={() => {
+          setShowModal(true);
+          form.resetFields();
+          setFileList([]);
+        }}
         style={{ marginBottom: "16px" }}
       >
         Add New Service

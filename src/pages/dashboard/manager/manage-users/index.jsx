@@ -214,7 +214,11 @@ function ManageUser() {
       <Button
         type="primary"
         icon={<PlusOutlined />}
-        onClick={() => setAddShowModal(true)}
+        onClick={() => {
+          setAddShowModal(true);
+          form.resetFields();
+          setFileList([]);
+        }}
         style={{ marginBottom: "16px" }}
       >
         Add New User

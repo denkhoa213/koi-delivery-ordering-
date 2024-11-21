@@ -19,6 +19,7 @@ function ManageFishCategory() {
   const [showAddModal, setAddShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [form] = Form.useForm();
+  const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentFishCateogry, setCurrentFishCateogry] = useState(null);
 
@@ -159,7 +160,11 @@ function ManageFishCategory() {
       <Button
         type="primary"
         icon={<PlusOutlined />}
-        onClick={() => setAddShowModal(true)}
+        onClick={() => {
+          setAddShowModal(true);
+          form.resetFields();
+          setFileList([]);
+        }}
         style={{ marginBottom: "16px" }}
       >
         Add New User

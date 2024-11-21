@@ -18,6 +18,7 @@ function ManageDelivery() {
   const [deliveryMethod, setdeliveryMethod] = useState([]);
   const [showAddModal, setAddShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [fileList, setFileList] = useState([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [currentDeliveryMethod, setcurrentDeliveryMethod] = useState(null);
@@ -159,7 +160,11 @@ function ManageDelivery() {
       <Button
         type="primary"
         icon={<PlusOutlined />}
-        onClick={() => setAddShowModal(true)}
+        onClick={() => {
+          setAddShowModal(true);
+          form.resetFields();
+          setFileList([]);
+        }}
         style={{ marginBottom: "16px" }}
       >
         Add New User
