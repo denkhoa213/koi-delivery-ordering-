@@ -1,9 +1,13 @@
 import React, { useState } from "react";
-import { PieChartOutlined } from "@ant-design/icons";
-import { Breadcrumb, Layout, Menu, theme } from "antd";
+import { PieChartOutlined, UserOutlined } from "@ant-design/icons";
+import { Layout, Menu, Space, Avatar, Button, theme } from "antd";
 import { Link, Outlet } from "react-router-dom";
-import Header from "../../header";
+import { AiOutlineLogout, AiOutlineLogin } from "react-icons/ai";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../../redux/features/userSlice";
+
 const { Content, Footer, Sider } = Layout;
+
 function getItem(label, key, icon, children) {
   return {
     key,
@@ -12,8 +16,9 @@ function getItem(label, key, icon, children) {
     label: <Link to={`/dashboard-delivery-staff/${key}`}>{label}</Link>,
   };
 }
+
 const items = [
-  getItem("Manage Order", "manage-order", <PieChartOutlined />),
+  getItem("Profile", "profile", <PieChartOutlined />),
   getItem("Check Health", "check-health-fish", <PieChartOutlined />),
   getItem("Manage Package", "create-package", <PieChartOutlined />),
   getItem(
@@ -22,19 +27,22 @@ const items = [
     <PieChartOutlined />
   ),
 ];
+
 const DashboardDeliveryStaff = () => {
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+
+  const handleLogout = () => {
+    dispatch(logout()); // Dispatch logout action
+  };
+
   return (
     <>
-      <Header />
-      <Layout
-        style={{
-          minHeight: "100vh",
-        }}
-      >
+      <Layout style={{ minHeight: "100vh" }}>
         <Sider
           width={200}
           collapsible
@@ -48,6 +56,24 @@ const DashboardDeliveryStaff = () => {
             mode="inline"
             items={items}
           />
+
+          {/* User Avatar and Logout Button */}
+          {user ? (
+            <Space style={{ position: "absolute", bottom: 20, left: 20 }}>
+              <Avatar icon={<UserOutlined />} style={{ cursor: "pointer" }} />
+              <Button
+                type="link"
+                icon={<AiOutlineLogout fontSize={18} />}
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
+            </Space>
+          ) : (
+            <Button type="link" icon={<AiOutlineLogin fontSize={18} />}>
+              <Link to="/login">Đăng nhập</Link>
+            </Button>
+          )}
         </Sider>
         <Layout>
           <Content
@@ -78,4 +104,5 @@ const DashboardDeliveryStaff = () => {
     </>
   );
 };
+
 export default DashboardDeliveryStaff;

@@ -34,6 +34,11 @@ import CheckHealth from "./pages/dashboard/delivery-staff/manage-checkHealth";
 import ManagePackage from "./pages/dashboard/delivery-staff/manage-package";
 import HealthcareHistoryManager from "./pages/dashboard/delivery-staff/manage-health-history";
 import HandoverForm from "./pages/dashboard/sale-staff/handOver";
+
+import CustomerDeclatation from "./pages/dashboard/sale-staff/customer-declatation";
+import Report from "./pages/dashboard/sale-staff/report";
+import Profile from "./components/profile";
+
 import Header from "./components/header";
 import DeliveryServiceList from "./components/list-service/delivery-method";
 import HealServiceCategory from "./components/list-service/health-service-cate";
@@ -111,6 +116,10 @@ function App() {
       ),
       children: [
         {
+          path: "profile",
+          element: <Profile />,
+        },
+        {
           path: "manage-user",
           element: <ManageUser />,
         },
@@ -137,7 +146,7 @@ function App() {
         {
           path: "manage-report",
           element: <ViewReport />,
-        }
+        },
       ],
     },
     {
@@ -149,8 +158,20 @@ function App() {
       ),
       children: [
         {
+          path: "profile",
+          element: <Profile />,
+        },
+        {
           path: "hand-over",
           element: <HandoverForm />,
+        },
+        {
+          path: "customer-declatation",
+          element: <CustomerDeclatation />,
+        },
+        {
+          path: "report",
+          element: <Report />,
         },
       ],
     },
@@ -162,6 +183,10 @@ function App() {
         </ProtectRouterAuth>
       ),
       children: [
+        {
+          path: "profile",
+          element: <Profile />,
+        },
         {
           path: "check-health-fish",
           element: <CheckHealth />,
@@ -207,14 +232,11 @@ function App() {
 
     {
       path: "customer",
-      element: (
-        <Header />,
-        <CustomerTemplate />
-      ),
+      element: ((<Header />), (<CustomerTemplate />)),
       children: [
         {
           path: "customer-profile",
-          element: <CustomerProfile />
+          element: <CustomerProfile />,
         },
         {
           path: "customer-order",
@@ -222,8 +244,8 @@ function App() {
         },
         {
           path: "transaction-history",
-          element: <TransactionHistory />
-        }
+          element: <TransactionHistory />,
+        },
       ],
     },
   ]);

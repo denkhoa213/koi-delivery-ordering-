@@ -1,300 +1,419 @@
-import React, { useState, useEffect } from "react";
-import {
-  Form,
-  Input,
-  Button,
-  Select,
-  message,
-  Row,
-  Col,
-  Card,
-  Table,
-} from "antd";
-import api from "../../../../config/axios";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import api from "../../../../config/axios";
+import {
+  Button,
+  Col,
+  Divider,
+  Form,
+  Image,
+  Input,
+  Modal,
+  Popconfirm,
+  Row,
+  Select,
+  Space,
+  Table,
+  Typography,
+} from "antd";
+import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 
-const { TextArea } = Input;
-
-const HandoverForm = () => {
+function HandoverForm() {
+  const [viewOrders, setViewOrders] = useState([]);
+  const [viewDeliveryStaff, setViewDeliveryStaff] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [handoverDetails, setHandoverDetails] = useState(null);
   const [form] = Form.useForm();
-  const [packages, setPackages] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const [selectedPackageId, setSelectedPackageId] = useState(null);
-  const [handoverDocuments, setHandoverDocuments] = useState([]);
 
-  useEffect(() => {
-    fetchPackages();
-    fetchOrders();
-    const packageId = localStorage.getItem("selectedPackageId");
-    if (packageId) {
-      setSelectedPackageId(packageId);
-    }
-  }, []);
-
-  const fetchPackages = async () => {
+  const fetchViewAllOrder = async () => {
     try {
-      const response = await api.get("/package/view-all");
-      setPackages(response.data.result);
+      const response = await api.get("/order/view-all");
+      setViewOrders(response.data.result);
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response.data);
     }
   };
 
-  const fetchOrders = async () => {
+  const fetchDeliveryStaff = async () => {
     try {
-      const response = await api.get("/order/view-order-available");
-      setOrders(response.data.result);
+      const response = await api.get("/customer/view-delivery-staff");
+      const deliveryStaff = response.data.result;
+      setViewDeliveryStaff(deliveryStaff);
+      if (deliveryStaff && deliveryStaff.length > 0) {
+        setUserId(deliveryStaff[0].id);
+      }
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response.data);
     }
   };
 
-  const fetchHandoverDocuments = async (orderId) => {
+  const handleViewHandover = async (orderId) => {
     try {
       const response = await api.get(
         `/handover-documents/view-by-order/${orderId}`
       );
-      setHandoverDocuments(response.data.result || []);
+      setSelectedOrderId(orderId);
+      setHandoverDetails(response.data.result);
+      setShowViewModal(true);
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response.data);
     }
   };
 
-  const handleCreateHandover = async (values) => {
-    const userId = localStorage.getItem("createBy");
-
-    if (!userId) {
-      message.error("User ID không hợp lệ");
-      return;
-    }
-
-    if (!values.packageId || !values.orderId) {
-      message.error("Vui lòng chọn gói và đơn hàng!");
-      return;
-    }
-
+  // Hàm handleCreateHandOver
+  const handleCreateHandOver = async (values) => {
     try {
+      // Gọi API để tạo biên bản bàn giao
       const response = await api.post("/handover-documents/create", {
-        userId,
-        packageId: values.packageId,
-        orderId: values.orderId,
-        handoverDescription: values.handoverDescription,
+        ...values,
+        orderId: selectedOrderId,
       });
 
-      if (response.data.code === 200 && response.data.result.id !== 0) {
-        const handoverDocumentId = response.data.result.id;
-        localStorage.setItem("handoverDocumentId", handoverDocumentId);
+      toast.success(response.data.message);
 
-        toast.success("Handover created successfully!");
-        form.resetFields();
-      } else {
-        toast.error(response.data.message || "Lỗi khi tạo handover!");
-      }
+      setShowModal(false);
+      form.resetFields();
+
+      fetchViewAllOrder();
     } catch (error) {
-      toast.error("Lỗi khi tạo handover!");
+      toast.error(error.response?.data || "Có lỗi xảy ra!");
     }
   };
-
-  const deleteHandoverDocument = async (id) => {
+  const handleDelete = async (orderId) => {
     try {
-      const response = await api.put(`/handover-documents/delete/${id}`);
-      if (response.data.code === 200) {
-        toast.success("Xóa biên bản bàn giao thành công!");
-        fetchHandoverDocuments(form.getFieldValue("orderId"));
-      } else {
-        toast.error(response.data.message || "Lỗi khi xóa biên bản bàn giao!");
-      }
+      const response = await api.delete(
+        `/handover-documents/delete/${orderId}`
+      );
+      setSelectedOrderId(orderId);
+      toast.success(response.data.message);
+
+      fetchViewAllOrder();
     } catch (error) {
-      toast.error("Lỗi khi xóa biên bản bàn giao!");
+      toast.error(
+        error.response?.data || "Có lỗi xảy ra khi xóa biên bản bàn giao!"
+      );
     }
   };
 
-  const updateHandoverDocument = async (id, updatedDescription) => {
-    try {
-      const response = await api.put(`/handover-documents/update/${id}`, {
-        handoverDescription: updatedDescription,
-      });
-      if (response.data.code === 200) {
-        toast.success("Cập nhật biên bản bàn giao thành công!");
-        fetchHandoverDocuments(form.getFieldValue("orderId"));
-      } else {
-        toast.error(
-          response.data.message || "Lỗi khi cập nhật biên bản bàn giao!"
-        );
-      }
-    } catch (error) {
-      toast.error("Lỗi khi cập nhật biên bản bàn giao!");
-    }
-  };
+  useEffect(() => {
+    fetchViewAllOrder();
+    fetchDeliveryStaff();
+  }, []);
 
   const columns = [
     {
-      title: "Mã Biên Bản",
-      dataIndex: "handoverNo",
-      key: "handoverNo",
+      title: "Mã đơn",
+      dataIndex: "orderCode",
+      key: "orderCode",
+      width: 100, // Giảm kích thước cột
     },
     {
-      title: "Mô Tả",
-      dataIndex: "handoverDescription",
-      key: "handoverDescription",
+      title: "Phương thức giao",
+      dataIndex: "deliveryMethod",
+      key: "deliveryMethod",
+      width: 120,
     },
     {
-      title: "Phương Tiện",
-      dataIndex: "vehicle",
-      key: "vehicle",
+      title: "Ngày đặt",
+      dataIndex: "orderDate",
+      key: "orderDate",
+      width: 120,
     },
     {
-      title: "Điểm Đến",
+      title: "Điểm đến",
       dataIndex: "destination",
       key: "destination",
+      width: 150,
     },
     {
-      title: "Điểm Khởi Hành",
+      title: "Khởi hành",
       dataIndex: "departure",
       key: "departure",
+      width: 150,
     },
     {
-      title: "Giá Trị Tổng",
-      dataIndex: "totalPrice",
-      key: "totalPrice",
-      render: (text) => text.toLocaleString(),
+      title: "Khoảng cách",
+      dataIndex: "distance",
+      key: "distance",
+      width: 100,
     },
     {
-      title: "Hành Động",
-      key: "action",
-      render: (_, record) => (
-        <div>
-          {/* Nút Cập Nhật */}
-          <Button
-            type="link"
-            onClick={() => {
-              const updatedDescription = prompt(
-                "Nhập mô tả mới:",
-                record.handoverDescription
-              );
-              if (updatedDescription) {
-                updateHandoverDocument(record.id, updatedDescription);
-              }
+      title: "Số điện thoại",
+      dataIndex: "phone",
+      key: "phone",
+      width: 120,
+    },
+    {
+      title: "Tổng tiền",
+      dataIndex: "totalAmount",
+      key: "totalAmount",
+      width: 120,
+    },
+    {
+      title: "Trạng thái thanh toán",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus",
+      width: 120,
+      render: (paymentStatus) => {
+        let statusColor = "#d9d9d9"; // Màu mặc định
+
+        if (paymentStatus === "UNPAID") {
+          statusColor = "#f5222d"; // Màu đỏ cho trạng thái UNPAID
+        } else if (paymentStatus === "PAID") {
+          statusColor = "#52c41a"; // Màu xanh cho trạng thái PAID
+        }
+
+        return (
+          <span
+            style={{
+              backgroundColor: statusColor,
+              color: "#fff",
+              padding: "5px 10px",
+              borderRadius: "5px",
             }}
           >
-            Cập Nhật
-          </Button>
-          {/* Nút Xóa */}
-          <Button
-            type="link"
-            danger
-            onClick={() => deleteHandoverDocument(record.id)}
+            {paymentStatus}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Trạng thái đơn",
+      dataIndex: "status",
+      key: "status",
+      width: 120,
+      render: (status) => {
+        let statusColor = "#d9d9d9"; // Màu mặc định
+
+        if (status === "IN_PROGRESS") {
+          statusColor = "#52c41a"; // Màu xanh cho trạng thái IN_PROGRESS
+        } else if (status === "AVAILABLE") {
+          statusColor = "#ff8c00"; // Màu xanh dương cho trạng thái AVAILABLE
+        }
+
+        return (
+          <span
+            style={{
+              backgroundColor: statusColor,
+              color: "#fff",
+              padding: "5px 10px",
+              borderRadius: "5px",
+            }}
           >
-            Xóa
-          </Button>
-        </div>
+            {status}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Hành động",
+      dataIndex: "id",
+      key: "id",
+      width: 180,
+      render: (orderId, record) => (
+        <Space size="middle">
+          {record.status === "AVAILABLE" && (
+            <>
+              <Button
+                type="primary"
+                onClick={() => {
+                  setSelectedOrderId(orderId);
+                  setShowModal(true); // Mở modal
+                }}
+              >
+                Tạo
+              </Button>
+              <Button
+                type="default"
+                onClick={() => handleViewHandover(orderId)} // Xem
+                icon={<EyeOutlined />}
+              >
+                Xem
+              </Button>
+              <Popconfirm
+                title="Xóa"
+                description="Bạn có muốn xóa biên bản bàn giao này không?"
+                onConfirm={() => handleDelete(orderId)}
+              >
+                <Button type="primary" danger icon={<DeleteOutlined />}>
+                  Xóa
+                </Button>
+              </Popconfirm>
+            </>
+          )}
+          {record.status === "IN_PROGRESS" && (
+            <Button
+              type="default"
+              onClick={() => handleViewHandover(orderId)} // Xem
+              icon={<EyeOutlined />}
+            >
+              Xem
+            </Button>
+          )}
+        </Space>
       ),
     },
   ];
 
   return (
-    <div style={{ padding: "30px", backgroundColor: "#f9fafb" }}>
-      <h1 style={{ textAlign: "center", marginBottom: "30px", color: "#333" }}>
-        Tạo Handover
-      </h1>
-      <Card
-        style={{
-          maxWidth: "800px",
-          margin: "0 auto",
-          padding: "30px",
-          backgroundColor: "#ffffff",
-          borderRadius: "8px",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-        }}
+    <div>
+      <Table dataSource={viewOrders} columns={columns} />
+
+      {/* Modal Tạo Biên Bản Bàn Giao */}
+      <Modal
+        open={showModal}
+        onCancel={() => setShowModal(false)}
+        onOk={() => form.submit()}
       >
-        <Form form={form} onFinish={handleCreateHandover} layout="vertical">
+        <Form form={form} onFinish={handleCreateHandOver} layout="vertical">
           <Form.Item
-            name="packageId"
-            label="Chọn Gói"
-            rules={[{ required: true, message: "Vui lòng chọn gói!" }]}
+            label="Phân công:"
+            name="userId"
+            rules={[{ required: true, message: "Vui lòng chọn nhân viên!" }]}
           >
             <Select
-              placeholder="Chọn gói"
-              style={{ width: "100%" }}
-              value={selectedPackageId} // Set giá trị mặc định cho packageId
-              onChange={(value) => setSelectedPackageId(value)} // Cập nhật giá trị khi chọn gói
+              placeholder="Chọn Staff"
+              value={userId}
+              onChange={(value) => setUserId(value)}
             >
-              {packages.map((pkg) => (
-                <Select.Option key={pkg.id} value={pkg.id}>
-                  {`${pkg.packageNo} - ${pkg.packageDescription}`}
+              {viewDeliveryStaff.map((staff) => (
+                <Select.Option key={staff.id} value={staff.id}>
+                  {staff.name}
                 </Select.Option>
               ))}
             </Select>
           </Form.Item>
 
-          <Form.Item
-            name="orderId"
-            label="Chọn Đơn Hàng"
-            rules={[{ required: true, message: "Vui lòng chọn đơn hàng!" }]}
-          >
-            <Select placeholder="Chọn đơn hàng" style={{ width: "100%" }}>
-              {orders.map((order) => (
-                <Select.Option key={order.id} value={order.id}>
-                  {`Đơn hàng #${order.id}`}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
+          <Typography.Paragraph hidden>
+            <strong>Order ID:</strong> {selectedOrderId}
+          </Typography.Paragraph>
 
           <Form.Item
+            label="Mô tả Giao hàng"
             name="handoverDescription"
-            label="Mô Tả Handover"
-            rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
+            rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
           >
-            <TextArea rows={4} placeholder="Mô tả tình trạng handover..." />
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{
-                width: "100%",
-                backgroundColor: "#1abc9c",
-                borderColor: "#1abc9c",
-                borderRadius: "4px",
-              }}
-            >
-              Tạo Handover
-            </Button>
-          </Form.Item>
-
-          {/* Nút Xem Biên Bản Bàn Giao */}
-          <Form.Item>
-            <Button
-              type="default"
-              onClick={() =>
-                fetchHandoverDocuments(form.getFieldValue("orderId"))
-              }
-              style={{
-                width: "100%",
-                marginTop: "10px",
-                borderRadius: "4px",
-              }}
-            >
-              Xem Biên Bản Bàn Giao
-            </Button>
+            <Input.TextArea placeholder="Nhập mô tả giao hàng" rows={4} />
           </Form.Item>
         </Form>
-      </Card>
+      </Modal>
 
-      {/* Bảng hiển thị biên bản bàn giao */}
-      <div style={{ marginTop: "30px" }}>
-        <h2>Biên Bản Bàn Giao</h2>
-        <Table
-          columns={columns}
-          dataSource={handoverDocuments}
-          rowKey="id"
-          pagination={false}
-        />
-      </div>
+      <Modal
+        open={showViewModal}
+        onCancel={() => setShowViewModal(false)}
+        footer={null}
+        width={900} // Tăng chiều rộng để modal thoáng hơn
+      >
+        {handoverDetails ? (
+          <div style={{ padding: "20px" }}>
+            <Typography.Title
+              level={4}
+              style={{ marginBottom: "20px", textAlign: "center" }}
+            >
+              Chi Tiết Biên Bản Bàn Giao
+            </Typography.Title>
+
+            <Row gutter={16} style={{ marginBottom: "10px" }}>
+              <Col span={8}>
+                <Typography.Text strong style={{ color: "#000" }}>
+                  Số Biên Bản:
+                </Typography.Text>
+                <p>{handoverDetails.handoverNo}</p>
+              </Col>
+              <Col span={8}>
+                <Typography.Text strong style={{ color: "#000" }}>
+                  Mô Tả:
+                </Typography.Text>
+                <p>{handoverDetails.handoverDescription}</p>
+              </Col>
+            </Row>
+
+            <Row gutter={16} style={{ marginBottom: "10px" }}>
+              <Col span={8}>
+                <Typography.Text strong style={{ color: "#000" }}>
+                  Phương Tiện:
+                </Typography.Text>
+                <p>{handoverDetails.vehicle}</p>
+              </Col>
+              <Col span={8}>
+                <Typography.Text strong style={{ color: "#000" }}>
+                  Điểm Đến:
+                </Typography.Text>
+                <p>{handoverDetails.destination}</p>
+              </Col>
+              <Col span={8}>
+                <Typography.Text strong style={{ color: "#000" }}>
+                  Điểm Khởi Hành:
+                </Typography.Text>
+                <p>{handoverDetails.departure}</p>
+              </Col>
+            </Row>
+
+            <Row gutter={16} style={{ marginBottom: "10px" }}>
+              <Col span={8}>
+                <Typography.Text strong style={{ color: "#000" }}>
+                  Tổng Giá:
+                </Typography.Text>
+                <p>{handoverDetails.totalPrice}</p>
+              </Col>
+            </Row>
+
+            <Divider style={{ margin: "20px 0" }} />
+
+            <Row gutter={16} style={{ marginBottom: "20px" }}>
+              <Col span={8}>
+                <Typography.Text strong style={{ color: "#000" }}>
+                  Hình Ảnh:
+                </Typography.Text>
+                <div style={{ textAlign: "center", marginTop: "10px" }}>
+                  <Image
+                    src={handoverDetails.image}
+                    alt="Handover Document"
+                    style={{
+                      width: "100%",
+                      maxHeight: "300px",
+                      objectFit: "contain",
+                      borderRadius: "8px",
+                      border: "1px solid #ddd",
+                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                    }}
+                  />
+                </div>
+              </Col>
+            </Row>
+
+            <Divider style={{ margin: "20px 0" }} />
+
+            <Row gutter={16} style={{ marginBottom: "10px" }}>
+              <Col span={8}>
+                <Typography.Text strong style={{ color: "#000" }}>
+                  Trạng Thái Bàn Giao:
+                </Typography.Text>
+                <Typography.Text
+                  style={{
+                    color:
+                      handoverDetails.handoverStatusEnum === "IN_PROGRESS"
+                        ? "#52c41a"
+                        : "#fa8c16",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {handoverDetails.handoverStatusEnum}
+                </Typography.Text>
+              </Col>
+            </Row>
+          </div>
+        ) : (
+          <p style={{ textAlign: "center", color: "#999" }}>
+            Không có biên bản bàn giao để hiển thị.
+          </p>
+        )}
+      </Modal>
     </div>
   );
-};
+}
 
 export default HandoverForm;

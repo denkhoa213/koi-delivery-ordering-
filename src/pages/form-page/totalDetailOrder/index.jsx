@@ -241,7 +241,6 @@ function TotalOrder() {
     }
   };
 
-  // Hiển thị khi đang tải dữ liệu
   if (loading) {
     return <Spin size="large" tip="Đang tải..." />;
   }
@@ -342,7 +341,7 @@ function TotalOrder() {
                         <Col span={18}>
                           <Text strong>Tên cá: {fish.name}</Text>
                           <div>
-                            <Text>Loại Cá: {fish.fishCategory}</Text>
+                            <Text>Loại Cá: {fish.species}</Text>
                           </div>
                         </Col>
                       </Row>
@@ -383,7 +382,10 @@ function TotalOrder() {
 
               {/* Thanh toán */}
               <Row gutter={16}>
-                <Col span={24}>
+                <Col span={12}>
+                  <Button type="primary">Hủy đơn hàng</Button>
+                </Col>
+                <Col span={12}>
                   <Button type="primary" onClick={handlePayment}>
                     Thanh Toán
                   </Button>
