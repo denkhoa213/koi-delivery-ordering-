@@ -89,33 +89,24 @@ const CustomerProfile = () => {
     const handleChangeAvatar = async (file) => {
         if (file.size > maxFileSize) {
             toast.error(`File size must be smaller than ${maxFileSize / 1000000} MB!`);
-            return;
+            return false;
         }
 
         const formData = new FormData();
         formData.append('avatar', file);
 
         try {
-            const response = await api.put('/customer/update-avatar', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const response = await api.put('/customer/update-profile', formData);
             if (response.status === 200) {
-                const avatarUrl = response.data.avatarUrl; // Assuming the URL is returned
                 setCustomer((prevState) => ({
                     ...prevState,
-                    avatar: avatarUrl, // Update the state with the new avatar URL
+                    avatar: response.data.avatarUrl,
                 }));
                 toast.success("Cập nhật avatar thành công!");
             }
         } catch (error) {
-            if (error.response?.status === 500 && error.response?.data?.message === "No static resource customer/update-avatar.") {
-                toast.error("Đã xảy ra lỗi khi cập nhật avatar! Vui lòng thử lại.");
-            } else {
-                console.error("Error updating avatar:", error);
-                toast.error("Đã xảy ra lỗi khi cập nhật avatar! Vui lòng thử lại.");
-            }
+            const errorMessage = error.response?.data?.message || "Đã xảy ra lỗi khi cập nhật avatar!";
+            toast.error(errorMessage);
         }
     };
 

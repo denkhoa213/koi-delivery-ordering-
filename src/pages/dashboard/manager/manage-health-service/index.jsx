@@ -56,7 +56,7 @@ function ManageHealthService() {
   //DELETE
   const handleDelete = async (id) => {
     try {
-      const response = await api.put(`heal-service-category/delete/${id}`);
+      const response = await api.delete(`heal-service-category/delete/${id}`);
       toast.success(response.data.message);
       fetchHealthService();
     } catch (error) {
@@ -96,16 +96,6 @@ function ManageHealthService() {
       dataIndex: "updateAt",
       key: "updateAt",
       render: (date) => new Date(date).toLocaleString(),
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => (
-        <span style={{ color: status === "AVAILABLE" ? "green" : "red" }}>
-          {status}
-        </span>
-      ),
     },
     {
       title: "Action",

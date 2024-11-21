@@ -103,7 +103,7 @@ function CRUDTemplate({ columns, formItem, path }) {
         onClick={() => setShowModal(true)}
         style={{ marginBottom: "16px" }}
       >
-        Add
+        Thêm mới
       </Button>
       <Table dataSource={datas} columns={tableColumn} />
       <Modal
