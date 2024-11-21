@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Card, Typography, Tabs, Button, Modal, Input, Rate } from 'antd';
+import { Layout, Card, Typography, Tabs, Button, Modal, Input, Rate, Table } from 'antd';
 import { List } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import api from '../../../config/axios';
@@ -15,10 +15,16 @@ const CustomerOrder = () => {
     const [setLoadingOrders] = useState(true);
     const [setErrorOrders] = useState(null);
     const [selectedOrder, setSelectedOrder] = useState(null);
+    const [fishProfiles, setFishProfiles] = useState([]);
+
+    const [reportModalVisible, setReportModalVisible] = useState(false);
+    const [reportTitle, setReportTitle] = useState("");
+    const [reportDescription, setReportDescription] = useState("");
 
     //Lọc đơn hàng
     const completedOrders = orders.filter(order => order.status === 'COMPLETED');
     const availableOrders = orders.filter(order => order.status === 'AVAILABLE');
+    const inprogressOrders = orders.filter(order => order.status === 'IN_PROGRESS');
 
     const [feedbackModalVisible, setFeedbackModalVisible] = useState(false);
     const [feedback, setFeedback] = useState({
@@ -79,8 +85,51 @@ const CustomerOrder = () => {
         }
     };
 
-    const handleOrderClick = (order) => {
+    const submitReport = async () => {
+        if (!reportTitle || !reportDescription) {
+            toast.warning("Vui lòng nhập mô tả báo cáo!");
+            return;
+        }
+        try {
+            const response = await api.post(`/report/create/${selectedOrder.id}`, { title: reportTitle, description: reportDescription });
+            if (response.data.code === 200) {
+                toast.success("Báo cáo đã được gửi thành công!");
+                closeReportModal();
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            toast.error("Đã xảy ra lỗi khi gửi báo cáo!");
+            console.error("Error", error);
+        }
+    };
+
+    const showReportModal = (order) => {
+        setReportModalVisible(true);
         setSelectedOrder(order);
+    };
+
+    const closeReportModal = () => {
+        setReportModalVisible(false);
+        setReportTitle("");
+        setReportDescription("");
+    };
+
+    const handleOrderClick = async (order) => {
+        setSelectedOrder(order);
+        try {
+            const response = await api.get(`/fish-profile/view-by-order/${order.id}`);
+            if (response.data.code === 200) {
+                setFishProfiles(response.data.result);
+            } else {
+                toast.error(response.data.message);
+                setFishProfiles([]); // Reset fish profiles if there's an error
+            }
+        } catch (error) {
+            toast.error("Đã xảy ra lỗi khi lấy thông tin Fish Profiles!");
+            console.error("Error", error);
+            setFishProfiles([]); // Reset fish profiles if there's an error
+        }
     }
 
 
@@ -100,32 +149,11 @@ const CustomerOrder = () => {
                     }}
                 >
 
-                    <Card title="Danh sách đơn hàng" style={{ width: '100%', maxWidth: 600, borderRadius: '10px', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)' }}>
+                    <Card title="Danh sách đơn hàng" style={{ width: '790px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)' }}>
                         <Tabs
                             onChange={() => setSelectedOrder(null)}
                         >
-                            <TabPane tab="Danh sách đơn hàng đã hoàn thành" key="1">
-                                <Title level={4} className="order-completed">Thông tin chi tiết</Title>
-                                <List
-                                    itemLayout="horizontal"
-                                    dataSource={completedOrders}
-                                    renderItem={order => (
-                                        <List.Item onClick={() => handleOrderClick(order)}>
-                                            <List.Item.Meta
-                                                title={`Đơn hàng: ${order.orderCode}`}
-                                                description={`Tổng tiền: ${order.totalAmount} VNĐ`}
-                                            />
-                                            <Button
-                                                type="primary"
-                                                onClick={() => showFeedbackModal(order)}
-                                            >
-                                                Gửi phản hồi
-                                            </Button>
-                                        </List.Item>
-                                    )}
-                                />
-                            </TabPane>
-                            <TabPane tab="Danh sách đơn hàng đang chờ" key="2">
+                            <TabPane tab="Danh sách đơn hàng đang chờ" key="1">
                                 <Title level={4} className="order-wait">Thông tin chi tiết</Title>
                                 <List
                                     itemLayout="horizontal"
@@ -134,8 +162,65 @@ const CustomerOrder = () => {
                                         <List.Item onClick={() => handleOrderClick(order)}>
                                             <List.Item.Meta
                                                 title={`Đơn hàng: ${order.orderCode}`}
-                                                description={`Tổng tiền: ${order.totalAmount} VNĐ`}
+                                                description={`Tổng tiền: ${order.totalAmount} VNĐ - Trạng thái thanh toán: ${order.paymentStatus}`}
                                             />
+                                            <Button
+                                                type="danger"
+                                                onClick={() => showReportModal(order)}
+                                                style={{ marginLeft: 8 }}
+                                            >
+                                                Báo cáo
+                                            </Button>
+                                        </List.Item>
+                                    )}
+                                />
+                            </TabPane>
+                            <TabPane tab="Danh sách đơn hàng đang giao" key="2">
+                                <Title level={4} className="order-in-progress">Thông tin chi tiết</Title>
+                                <List
+                                    itemLayout="horizontal"
+                                    dataSource={inprogressOrders}
+                                    renderItem={order => (
+                                        <List.Item onClick={() => handleOrderClick(order)}>
+                                            <List.Item.Meta
+                                                title={`Đơn hàng: ${order.orderCode}`}
+                                                description={`Tổng tiền: ${order.totalAmount} VNĐ - Trạng thái thanh toán: ${order.paymentStatus}`}
+                                            />
+                                            <Button
+                                                type="danger"
+                                                onClick={() => showReportModal(order)}
+                                                style={{ marginLeft: 8 }}
+                                            >
+                                                Báo cáo
+                                            </Button>
+                                        </List.Item>
+                                    )}
+                                />
+                            </TabPane>
+                            <TabPane tab="Danh sách đơn hàng đã hoàn thành" key="3">
+                                <Title level={4} className="order-completed">Thông tin chi tiết</Title>
+                                <List
+                                    itemLayout="horizontal"
+                                    dataSource={completedOrders}
+                                    renderItem={order => (
+                                        <List.Item onClick={() => handleOrderClick(order)}>
+                                            <List.Item.Meta
+                                                title={`Đơn hàng: ${order.orderCode}`}
+                                                description={`Tổng tiền: ${order.totalAmount} VNĐ - Trạng thái thanh toán: ${order.paymentStatus}`}
+                                            />
+                                            <Button
+                                                type="primary"
+                                                onClick={() => showFeedbackModal(order)}
+                                            >
+                                                Gửi phản hồi
+                                            </Button>
+                                            <Button
+                                                type="danger"
+                                                onClick={() => showReportModal(order)}
+                                                style={{ marginLeft: 8 }}
+                                            >
+                                                Báo cáo
+                                            </Button>
                                         </List.Item>
                                     )}
                                 />
@@ -164,7 +249,28 @@ const CustomerOrder = () => {
                             value={feedback.feedbackDescription}
                             onChange={(e) => setFeedback({ ...feedback, feedbackDescription: e.target.value })}
                         />
+                    </Modal>
 
+                    <Modal
+                        title="Báo cáo"
+                        visible={reportModalVisible}
+                        onCancel={closeReportModal}
+                        onOk={submitReport}
+                        okText="Gửi"
+                        cancelText="Hủy"
+                    >
+                        <Input
+                            placeholder="Nhập tiêu đề báo cáo của bạn..."
+                            style={{ marginBottom: 16 }}
+                            value={reportTitle}
+                            onChange={(e) => setReportTitle(e.target.value)}
+                        />
+                        <Input.TextArea
+                            placeholder="Nhập mô tả báo cáo của bạn..."
+                            rows={4}
+                            value={reportDescription}
+                            onChange={(e) => setReportDescription(e.target.value)}
+                        />
                     </Modal>
 
                     {selectedOrder && (
@@ -181,10 +287,6 @@ const CustomerOrder = () => {
                                 </Button>
                             }
                         >
-                            <div className="order-info">
-                                <span className="order-info__label">ID :</span>
-                                <span className="order-info__value">{selectedOrder.id}</span>
-                            </div>
                             <div className="order-info">
                                 <span className="order-info__label">Tên đơn hàng :</span>
                                 <span className="order-info__value">{selectedOrder.orderCode}</span>
@@ -213,6 +315,27 @@ const CustomerOrder = () => {
                                 <span className="order-info__label">Trạng thái :</span>
                                 <span className="order-info__value">{selectedOrder.status}</span>
                             </div>
+                            <div style={{ marginTop: 30 }}>
+                                <Title level={5}>Fish Profiles</Title>
+                            </div>
+                            <Table
+                                dataSource={fishProfiles}
+                                columns={[
+                                    { title: 'Species', dataIndex: 'species', key: 'species' },
+                                    { title: 'Name', dataIndex: 'name', key: 'name' },
+                                    { title: 'Description', dataIndex: 'description', key: 'description' },
+                                    { title: 'Sex', dataIndex: 'sex', key: 'sex' },
+                                    { title: 'Size', dataIndex: 'size', key: 'size' },
+                                    { title: 'Age', dataIndex: 'age', key: 'age' },
+                                    { title: 'Origin', dataIndex: 'origin', key: 'origin' },
+                                    { title: 'Weight', dataIndex: 'weight', key: 'weight' },
+                                    { title: 'Color', dataIndex: 'color', key: 'color' },
+                                    { title: 'Image', dataIndex: 'image', key: 'image', render: (text) => <img src={text} alt="fish" style={{ width: 50 }} /> },
+                                ]}
+                                rowKey="id"
+                                pagination={false}
+                            />
+
                         </Card>
                     )}
 

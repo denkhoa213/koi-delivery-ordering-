@@ -16,8 +16,6 @@ import Support from "./components/support";
 import ServiceDetail from "./components/detail-service";
 import OrderForm from "./pages/form-page/order";
 import FishProfileForm from "./pages/form-page/fishProfile";
-import DeliveryServiceList from "./components/list-service/service-delivery";
-import HealthServiceList from "./components/list-service/service-health";
 import CustomsDeclarationForm from "./pages/form-page/declaration";
 import TotalOrder from "./pages/form-page/totalDetailOrder";
 import OrderSuccess from "./pages/order-success";
@@ -37,6 +35,9 @@ import ManagePackage from "./pages/dashboard/delivery-staff/manage-package";
 import HealthcareHistoryManager from "./pages/dashboard/delivery-staff/manage-health-history";
 import HandoverForm from "./pages/dashboard/sale-staff/handOver";
 import Header from "./components/header";
+import DeliveryServiceList from "./components/list-service/delivery-method";
+import HealServiceCategory from "./components/list-service/health-service-cate";
+import TransactionHistory from "./pages/customer-page/customer-transaction";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
@@ -77,12 +78,12 @@ function App() {
           element: <Contact />,
         },
         {
-          path: "services",
+          path: "delivery-service",
           element: <DeliveryServiceList />,
         },
         {
-          path: "health-services",
-          element: <HealthServiceList />,
+          path: "health-category",
+          element: <HealServiceCategory />,
         },
         {
           path: "services/:id",
@@ -203,15 +204,16 @@ function App() {
       children: [
         {
           path: "customer-profile",
-          element: (
-            <Header />,
-            <CustomerProfile />
-          ),
+          element: <CustomerProfile />
         },
         {
           path: "customer-order",
           element: <CustomerOrder />,
         },
+        {
+          path: "transaction-history",
+          element: <TransactionHistory />
+        }
       ],
     },
   ]);
