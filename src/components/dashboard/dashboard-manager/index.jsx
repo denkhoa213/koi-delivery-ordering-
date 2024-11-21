@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { PieChartOutlined } from "@ant-design/icons";
 import { Layout, Menu, theme } from "antd";
 import { Link, Outlet } from "react-router-dom";
-import Header from "../../header";
+
 const { Content, Footer, Sider } = Layout;
 function getItem(label, key, icon, children) {
   return {
@@ -13,6 +13,7 @@ function getItem(label, key, icon, children) {
   };
 }
 const items = [
+  getItem("Profile", "profile", <PieChartOutlined />),
   getItem("Overview Total", "over-view", <PieChartOutlined />),
   getItem("Manage Users", "manage-user", <PieChartOutlined />),
   getItem(
@@ -31,7 +32,6 @@ const DashboarManager = () => {
   } = theme.useToken();
   return (
     <>
-      <Header />
       <Layout
         style={{
           minHeight: "100vh",

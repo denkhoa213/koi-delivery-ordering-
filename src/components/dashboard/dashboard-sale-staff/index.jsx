@@ -12,7 +12,12 @@ function getItem(label, key, icon, children) {
     label: <Link to={`/dashboard-sale-staff/${key}`}>{label}</Link>,
   };
 }
-const items = [getItem("HandOver", "hand-over", <PieChartOutlined />)];
+const items = [
+  getItem("Profile", "profile", <PieChartOutlined />),
+  getItem("Biên bản bàn giao", "hand-over", <PieChartOutlined />),
+  getItem("Tờ khai hải quan", "customer-declatation", <PieChartOutlined />),
+  getItem("Báo cáo", "report", <PieChartOutlined />),
+];
 const DashboardSaleStaff = () => {
   const [collapsed, setCollapsed] = useState(false);
   const {
@@ -20,14 +25,13 @@ const DashboardSaleStaff = () => {
   } = theme.useToken();
   return (
     <>
-      <Header />
       <Layout
         style={{
           minHeight: "100vh",
         }}
       >
         <Sider
-          width={200}
+          width={190}
           collapsible
           collapsed={collapsed}
           onCollapse={(value) => setCollapsed(value)}
@@ -41,11 +45,7 @@ const DashboardSaleStaff = () => {
           />
         </Sider>
         <Layout>
-          <Content
-            style={{
-              margin: "0 16px",
-            }}
-          >
+          <Content>
             <div
               style={{
                 padding: 24,

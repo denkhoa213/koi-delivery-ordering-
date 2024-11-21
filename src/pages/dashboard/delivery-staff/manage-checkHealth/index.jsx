@@ -1,304 +1,338 @@
 import React, { useState, useEffect } from "react";
-import { Button, Input, Form, Select, Row, Col, Card, Table } from "antd";
 import { toast } from "react-toastify";
 import api from "../../../../config/axios";
-
-const { TextArea } = Input;
+import { Button, Table, Modal, Input, Form, Select, Descriptions } from "antd";
 
 const CheckHealth = () => {
-  const [orders, setOrders] = useState([]);
-  const [packages, setPackages] = useState([]);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [healthData, setHealthData] = useState([]);
+  const [viewHandOver, setViewHandOver] = useState([]);
+  const [fishProfile, setFishProfile] = useState([]);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [isHealthModalVisible, setIsHealthModalVisible] = useState(false);
+  const [isViewFishModalVisible, setIsViewFishModalVisible] = useState(false);
+  const [selectedFish, setSelectedFish] = useState([]);
+
   const [form] = Form.useForm();
 
-  useEffect(() => {
-    fetchOrders();
-    fetchPackages();
-  }, []);
-
-  const fetchOrders = async () => {
-    try {
-      const response = await api.get("/order/view-order-available");
-      setOrders(response.data.result);
-    } catch (error) {
-      toast.error(error.message || "Lỗi khi tải đơn hàng!");
-    }
-  };
-
-  const fetchPackages = async () => {
-    try {
-      const response = await api.get("/package/view-all");
-      setPackages(response.data.result);
-    } catch (error) {
-      toast.error(error.message || "Lỗi khi tải gói hàng!");
-    }
-  };
-
-  const fetchHealthDataByOrderDetailId = async (orderDetailId) => {
+  const fetchHandOver = async () => {
     try {
       const response = await api.get(
-        `/checking-koi-health/view-by-order-detail-id/${orderDetailId}`
+        "/handover-documents/view-by-delivery-staff"
       );
-      console.log(response.data.result); // Kiểm tra dữ liệu trả về
-      setHealthData(response.data.result);
+      setViewHandOver(response.data.result);
     } catch (error) {
-      toast.error(error.message || "Lỗi khi tải dữ liệu sức khỏe!");
+      toast.error(error.response.data);
     }
   };
 
-  const handleSelectOrder = (orderId) => {
-    const selected = orders.find((order) => order.id === orderId);
-    setSelectedOrder(selected);
-    form.setFieldsValue({
-      orderDetailId: selected.id,
-      packageId: selected.packageId,
-    });
-    fetchHealthDataByOrderDetailId(selected.id);
-  };
-
-  const handleCreateCheckHealth = async (values) => {
+  const fetchFishProfile = async (orderId) => {
+    if (!orderId) {
+      toast.error("Order ID không hợp lệ!");
+      return;
+    }
     try {
-      const response = await api.post("/checking-koi-health/create", values);
-      if (response.data.code === 200) {
-        toast.success(response.data.message);
-        fetchHealthDataByOrderDetailId(values.orderDetailId);
-      } else {
-        throw new Error(response.data.message || "Lỗi khi tạo kiểm tra!");
-      }
+      const response = await api.get(`/fish-profile/view-by-order/${orderId}`);
+      const fishData = response.data.result;
+
+      const updatedFishData = await Promise.all(
+        fishData.map(async (fish) => {
+          try {
+            const healthResponse = await api.get(
+              `/checking-koi-health/existed-checking-koi-heath/${fish.id}`
+            );
+            return {
+              ...fish,
+              isHealthChecked: healthResponse.data.result,
+            };
+          } catch (error) {
+            toast.error(error.healthResponse.data);
+            return { ...fish, isHealthChecked: false };
+          }
+        })
+      );
+
+      setFishProfile(updatedFishData);
+      setSelectedOrderId(orderId);
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response.data);
+    }
+  };
+  useEffect(() => {
+    fetchHandOver();
+    viewHealthByFishProfile();
+  }, []);
+
+  const handleHealthSubmit = async (values) => {
+    try {
+      const payload = {
+        healthStatus: values.healthStatus,
+        healthStatusDescription: values.healthStatusDescription,
+        weight: selectedFish.weight,
+        type: selectedFish.type,
+        color: selectedFish.color,
+        age: selectedFish.age,
+        species: selectedFish.species,
+        sex: selectedFish.sex,
+      };
+
+      const response = await api.post(
+        `/checking-koi-health/create/${selectedFish.id}`,
+        payload
+      );
+
+      toast.success(response.data.message);
+
+      setSelectedFish({
+        ...selectedFish,
+        healthStatus: values.healthStatus,
+        healthStatusDescription: values.healthStatusDescription,
+        isHealthChecked: true,
+      });
+      setIsHealthModalVisible(false);
+      fetchFishProfile(selectedOrderId); // Làm mới danh sách cá
+      form.resetFields();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Không thể kiểm tra sức khỏe cá!"
+      );
     }
   };
 
-  const handleDeleteCheckHealth = async (id) => {
+  const viewHealthByFishProfile = async (fish) => {
     try {
-      const response = await api.put(`/checking-koi-health/delete/${id}`);
-      if (response.data.code === 200) {
-        toast.success(response.data.message);
-        fetchHealthDataByOrderDetailId(selectedOrder.id);
-      } else {
-        throw new Error(response.data.message || "Lỗi khi xóa!");
-      }
+      const response = await api.get(
+        `/checking-koi-health/view-by-fish-profile/${fish.id}`
+      );
+      const healthData = response.data.result;
+
+      // Lấy bản ghi mới nhất dựa trên trường `updateAt`
+      const latestHealthData = healthData.sort(
+        (a, b) => new Date(b.updateAt) - new Date(a.updateAt)
+      )[0];
+
+      setSelectedFish({
+        ...fish,
+        healthStatus: latestHealthData?.healthStatus || "Chưa kiểm tra",
+        healthStatusDescription:
+          latestHealthData?.healthStatusDescription || "Chưa có thông tin",
+        isHealthChecked: !!latestHealthData,
+      });
+
+      setIsViewFishModalVisible(true);
     } catch (error) {
-      toast.error(error.message);
+      console.error("Error fetching health data:", error);
     }
   };
 
   const columns = [
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
+      title: "Số biên bản bàn giao",
+      dataIndex: "handoverNo",
+      key: "handoverNo",
     },
     {
-      title: "Tình Trạng Sức Khỏe",
-      dataIndex: "healthStatus",
-      key: "healthStatus",
+      title: "Mô tả",
+      dataIndex: "handoverDescription",
+      key: "handoverDescription",
     },
     {
-      title: "Mô Tả Tình Trạng Sức Khỏe",
-      dataIndex: "healthStatusDescription",
-      key: "healthStatusDescription",
+      title: "Phương tiện",
+      dataIndex: "vehicle",
+      key: "vehicle",
     },
     {
-      title: "Cân Nặng (kg)",
-      dataIndex: "weight",
-      key: "weight",
+      title: "Điểm đến",
+      dataIndex: "destination",
+      key: "destination",
     },
     {
-      title: "Màu Sắc",
-      dataIndex: "color",
-      key: "color",
+      title: "Điểm khởi hành",
+      dataIndex: "departure",
+      key: "departure",
     },
     {
-      title: "Tuổi",
-      dataIndex: "age",
-      key: "age",
+      title: "Tổng giá",
+      dataIndex: "totalPrice",
+      key: "totalPrice",
+      render: (text) => <span>{text.toLocaleString()} VNĐ</span>,
     },
     {
-      title: "Hành Động",
+      title: "Trạng thái bàn giao",
+      dataIndex: "handoverStatusEnum",
+      key: "handoverStatusEnum",
+    },
+    {
+      title: "Action",
       key: "action",
-      render: (_, record) => (
-        <>
-          <Button
-            type="primary"
-            onClick={() => form.setFieldsValue(record)}
-            style={{
-              marginRight: "8px",
-              backgroundColor: "#3498db",
-              borderColor: "#3498db",
-            }}
-          >
-            Cập Nhật
-          </Button>
-          <Button
-            type="danger"
-            onClick={() => handleDeleteCheckHealth(record.id)}
-            style={{
-              backgroundColor: "#e74c3c",
-              borderColor: "#e74c3c",
-            }}
-          >
-            Xóa
-          </Button>
-        </>
+      render: (record) => (
+        <Button type="primary" onClick={() => fetchFishProfile(record.orderId)}>
+          Xem cá
+        </Button>
       ),
     },
   ];
 
+  const fishColumns = [
+    {
+      title: "Loại cá",
+      dataIndex: "fishCategory",
+      key: "fishCategory",
+    },
+    {
+      title: "Tên cá",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Mô tả",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "Kích thước",
+      dataIndex: "size",
+      key: "size",
+    },
+    {
+      title: "Nguồn gốc",
+      dataIndex: "origin",
+      key: "origin",
+    },
+    {
+      title: "Hình ảnh",
+      dataIndex: "image",
+      key: "image",
+      render: (url) => <img src={url} alt="Fish" style={{ width: "100px" }} />,
+    },
+    {
+      title: "Trạng thái kiểm tra sức khỏe",
+      key: "isHealthChecked",
+      render: (value) => (
+        <span style={{ color: value.isHealthChecked ? "green" : "red" }}>
+          {value.isHealthChecked ? "Đã kiểm tra" : "Chưa kiểm tra"}
+        </span>
+      ),
+    },
+    {
+      title: "Action",
+      dataIndex: "id",
+      key: "id",
+      render: (id, value) => (
+        <div>
+          <Button
+            type="default"
+            onClick={() => {
+              setSelectedFish(value);
+              setIsHealthModalVisible(true);
+              form.setFieldsValue({
+                healthStatus: "",
+                healthStatusDescription: "",
+              });
+            }}
+          >
+            Kiểm tra sức khỏe
+          </Button>
+
+          <Button type="default" onClick={() => viewHealthByFishProfile(value)}>
+            Xem thông tin sức khỏe
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  const hideFishProfile = () => {
+    setSelectedOrderId(null);
+    setFishProfile([]);
+  };
+
   return (
-    <div style={{ padding: "30px", backgroundColor: "#f9fafb" }}>
-      <h1
-        style={{ textAlign: "center", color: "#34495e", marginBottom: "30px" }}
-      >
-        Kiểm Tra Sức Khỏe Koi
-      </h1>
+    <div>
+      <Table dataSource={viewHandOver} columns={columns} />
 
-      <Form
-        layout="vertical"
-        style={{ marginBottom: "25px", maxWidth: "600px", margin: "0 auto" }}
-      >
-        <Form.Item label="Chọn Đơn Hàng">
-          <Select
-            onChange={handleSelectOrder}
-            placeholder="Chọn một đơn hàng"
-            style={{ width: "100%", borderRadius: "5px" }}
-          >
-            {orders.map((order) => (
-              <Select.Option key={order.id} value={order.id}>
-                {`Đơn hàng #${order.id}`}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-      </Form>
-
-      {selectedOrder && (
-        <Card
-          title="Thông Tin Kiểm Tra Sức Khỏe"
-          style={{
-            marginBottom: "30px",
-            borderRadius: "10px",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-            backgroundColor: "#ffffff",
-            padding: "20px",
-          }}
-        >
-          <Form
-            form={form}
-            onFinish={handleCreateCheckHealth}
-            layout="vertical"
-          >
-            <Form.Item name="orderDetailId" hidden>
-              <Input type="number" value={selectedOrder.id} disabled />
-            </Form.Item>
-
-            <Form.Item
-              name="packageId"
-              label="Chọn Gói"
-              rules={[{ required: true }]}
-            >
-              <Select placeholder="Chọn gói" style={{ borderRadius: "5px" }}>
-                {packages.map((pkg) => (
-                  <Select.Option key={pkg.id} value={pkg.id}>
-                    {`${pkg.packageNo} - ${pkg.packageDescription}`}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              name="healthStatus"
-              label="Tình Trạng Sức Khỏe"
-              rules={[{ required: true }]}
-            >
-              <Select
-                placeholder="Chọn tình trạng sức khỏe"
-                style={{ borderRadius: "5px" }}
-              >
-                <Select.Option value="HEALTHY">HEALTHY</Select.Option>
-                <Select.Option value="ILLNESS">ILLNESS</Select.Option>
-                <Select.Option value="WEAKNESS">WEAKNESS</Select.Option>
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              name="healthStatusDescription"
-              label="Mô Tả Tình Trạng Sức Khỏe"
-              rules={[{ required: true }]}
-            >
-              <TextArea rows={4} style={{ borderRadius: "5px" }} />
-            </Form.Item>
-
-            <Row gutter={20}>
-              <Col span={8}>
-                <Form.Item
-                  name="weight"
-                  label="Cân Nặng"
-                  rules={[{ required: true }]}
-                >
-                  <Input type="number" style={{ borderRadius: "5px" }} />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item
-                  name="type"
-                  label="Loại"
-                  rules={[{ required: true }]}
-                >
-                  <Input style={{ borderRadius: "5px" }} />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item
-                  name="color"
-                  label="Màu Sắc"
-                  rules={[{ required: true }]}
-                >
-                  <Input style={{ borderRadius: "5px" }} />
-                </Form.Item>
-              </Col>
-            </Row>
-
-            <Form.Item name="age" label="Tuổi" rules={[{ required: true }]}>
-              <Input type="number" style={{ borderRadius: "5px" }} />
-            </Form.Item>
-
-            <Form.Item>
-              <Button
-                type="primary"
-                htmlType="submit"
-                style={{
-                  width: "100%",
-                  backgroundColor: "#1abc9c",
-                  borderColor: "#1abc9c",
-                  borderRadius: "5px",
-                  transition: "background-color 0.3s ease",
-                }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor = "#16a085")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.backgroundColor = "#1abc9c")
-                }
-              >
-                Tạo Kiểm Tra
-              </Button>
-            </Form.Item>
-          </Form>
-
-          {healthData.length > 0 && (
-            <Table
-              columns={columns}
-              dataSource={healthData}
-              rowKey="id"
-              pagination={false}
-              bordered
-            />
-          )}
-        </Card>
+      {selectedOrderId && (
+        <div>
+          <h2>Danh sách cá cho Order Code: {selectedOrderId}</h2>
+          <Button type="default" onClick={hideFishProfile}>
+            Ẩn
+          </Button>
+          <Table dataSource={fishProfile} columns={fishColumns} />
+        </div>
       )}
+
+      <Modal
+        title="Kiểm tra sức khỏe cá"
+        open={isHealthModalVisible}
+        onOk={() => form.submit()}
+        onCancel={() => setIsHealthModalVisible(false)}
+      >
+        <Form form={form} labelCol={{ span: 24 }} onFinish={handleHealthSubmit}>
+          <Form.Item
+            label="Trạng thái sức khỏe"
+            name="healthStatus"
+            rules={[
+              { required: true, message: "Vui lòng chọn trạng thái sức khỏe!" },
+            ]}
+          >
+            <Select placeholder="Chọn trạng thái sức khỏe">
+              <Select.Option value="HEALTHY">HEALTHY</Select.Option>
+              <Select.Option value="ILLNESS">ILLNESS</Select.Option>
+              <Select.Option value="WEAKENED">WEAKENED</Select.Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="Mô tả tình trạng sức khỏe"
+            name="healthStatusDescription"
+            rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
+          >
+            <Input.TextArea />
+          </Form.Item>
+
+          <Form.Item label="Cân nặng">
+            <Input value={selectedFish?.weight || 0} readOnly />
+          </Form.Item>
+          <Form.Item label="Giới tính">
+            <Input value={selectedFish?.sex || ""} readOnly />
+          </Form.Item>
+          <Form.Item label="Loại">
+            <Input value={selectedFish?.species || ""} readOnly />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="Thông Tin Chi Tiết Cá"
+        open={isViewFishModalVisible}
+        onCancel={() => setIsViewFishModalVisible(false)}
+        footer={null}
+      >
+        <Descriptions bordered column={1}>
+          <Descriptions.Item label="Tên Cá">
+            {selectedFish?.name || "N/A"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Tình Trạng Sức Khỏe">
+            {selectedFish?.healthStatus || "Chưa kiểm tra"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Mô Tả Tình Trạng">
+            {selectedFish?.healthStatusDescription || "Chưa có thông tin"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Cân Nặng (kg)">
+            {selectedFish?.weight || "N/A"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Loài Cá">
+            {selectedFish?.species || "N/A"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Màu Sắc">
+            {selectedFish?.color || "N/A"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Nguồn Gốc">
+            {selectedFish?.origin || "N/A"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Giới Tính">
+            {selectedFish?.sex || "N/A"}
+          </Descriptions.Item>
+        </Descriptions>
+      </Modal>
     </div>
   );
 };

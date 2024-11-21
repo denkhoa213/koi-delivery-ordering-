@@ -3,97 +3,203 @@ import { toast } from "react-toastify";
 import api from "../../../../config/axios";
 import {
   Button,
-  DatePicker,
-  Form,
-  Input,
   Modal,
-  Popconfirm,
-  Select,
   Space,
   Table,
+  Form,
+  Input,
+  Upload,
+  Popconfirm,
+  Select, // Import Select for packageStatus
 } from "antd";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import moment from "moment";
-import { Option } from "antd/es/mentions";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
+
+import uploadFile from "../../../../utils/file";
 
 function ManagePackage() {
   const [showModal, setShowModal] = useState(false);
-  const [data, setData] = useState([]);
+  const [viewHandOver, setViewHandOver] = useState([]);
+  const [viewPackages, setViewPackages] = useState([]);
+  const [selectedOrderId, setSelectedOrderId] = useState(null); // Thay thế localStorage
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [editingId, setEditingId] = useState(null);
+  const [fileList, setFileList] = useState([]);
+  const [isEdit, setIsEdit] = useState(false); // Track if we're in edit mode
+  const [editingPackage, setEditingPackage] = useState(null); // Store the package to be edited
 
-  const fetchData = async () => {
+  // Fetch danh sách handover
+  const fetchHandOver = async () => {
     try {
-      const response = await api.get("/package/view-all");
-      const result = response.data.result.map((item) => ({
-        ...item,
-        packageDate: item.packageDate ? moment(item.packageDate) : null,
-      }));
-      setData(result);
+      const response = await api.get(
+        "/handover-documents/view-by-delivery-staff"
+      );
+      setViewHandOver(response.data.result);
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Error fetching handovers");
     }
   };
 
-  const handleSubmit = async (values) => {
+  const handleViewPackages = async (orderId) => {
     try {
-      setLoading(true);
+      const response = await api.get(`/package/view-by-order/${orderId}`);
+      const packageData = response.data.result;
+      setViewPackages([packageData]);
+      setSelectedOrderId(orderId);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Error fetching packages for this handover"
+      );
+    }
+  };
 
-      if (editingId) {
-        // Cập nhật gói đã tồn tại chỉ với trường "packageStatus"
-        const response = await api.put(`/package/update/${editingId}`, {
-          packageStatus: values.packageStatus,
+  const handleEditPackage = (record) => {
+    setIsEdit(true);
+    setEditingPackage(record);
+    setShowModal(true);
+
+    form.setFieldsValue({
+      description: record.packageDescription,
+      image: record.image,
+      packageStatus: record.packageStatus,
+    });
+  };
+
+  const handleSubmit = async (values) => {
+    setLoading(true);
+    if (!selectedOrderId) {
+      toast.error("Order ID is required to create a package.");
+      return;
+    }
+
+    if (fileList.length > 0) {
+      const file = fileList[0].originFileObj;
+      try {
+        const url = await uploadFile(file);
+        values.image = url;
+        toast.success("Tải lên hình ảnh thành công!");
+      } catch (error) {
+        toast.error("Lỗi khi tải lên hình ảnh!");
+        return;
+      }
+    }
+
+    try {
+      let response;
+      if (isEdit) {
+        response = await api.put(`/package/update/${selectedOrderId}`, {
+          ...values,
+          id: editingPackage.id,
+          packageDescription: values.description,
         });
-
-        if (response.data.code === 200) {
-          toast.success(response.data.message);
-        }
       } else {
-        // Tạo gói mới
-        const response = await api.post("/package/create", values);
-
-        if (response.data.code === 200) {
-          toast.success(response.data.message);
-
-          const newPackageId = response.data.result.packageId;
-          localStorage.setItem("packageId", newPackageId);
-          setData((prevData) => [
-            ...prevData,
-            {
-              ...values,
-              id: newPackageId, // Lưu packageId vào trong dữ liệu
-            },
-          ]);
-        }
+        // Tạo package mới
+        response = await api.post(`/package/create/${selectedOrderId}`, values);
       }
 
-      fetchData(); // Tải lại dữ liệu từ server
+      if (response.data.code === 200) {
+        toast.success(response.data.message);
+      }
       form.resetFields();
       setShowModal(false);
-      setEditingId(null);
+      handleViewPackages(selectedOrderId);
     } catch (error) {
-      toast.error(error.response.data);
+      toast.error(error.response?.data?.message || "Error processing request");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id) => {
+  // Xử lý thay đổi file upload
+  const handleUploadChange = (info) => {
+    setFileList(info.fileList);
+  };
+
+  const handleDeletePackage = async (id) => {
     try {
-      const response = await api.put(`/package/delete/${id}`);
-      toast.success(response.data.message);
-      fetchData();
+      const response = await api.delete(`/package/delete/${id}`);
+      if (response.data.code === 200) {
+        toast.success("Xóa package thành công!");
+
+        setViewPackages((prev) => prev.filter((pkg) => pkg.id !== id));
+      }
     } catch (error) {
-      toast.error(error.response.data);
+      toast.error(error.response?.data?.message || "Lỗi khi xóa package!");
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchHandOver();
   }, []);
 
-  const columns = [
+  const handoverColumns = [
+    {
+      title: "Số biên bản bàn giao",
+      dataIndex: "handoverNo",
+      key: "handoverNo",
+    },
+    {
+      title: "Mô tả",
+      dataIndex: "handoverDescription",
+      key: "handoverDescription",
+    },
+    {
+      title: "Phương tiện",
+      dataIndex: "vehicle",
+      key: "vehicle",
+    },
+    {
+      title: "Điểm đến",
+      dataIndex: "destination",
+      key: "destination",
+    },
+    {
+      title: "Điểm khởi hành",
+      dataIndex: "departure",
+      key: "departure",
+    },
+    {
+      title: "Tổng giá",
+      dataIndex: "totalPrice",
+      key: "totalPrice",
+      render: (text) => <span>{text.toLocaleString()} VNĐ</span>,
+    },
+    {
+      title: "Trạng thái bàn giao",
+      dataIndex: "handoverStatusEnum",
+      key: "handoverStatusEnum",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (record) => (
+        <Space size="middle">
+          <Button
+            type="primary"
+            onClick={() => {
+              setShowModal(true);
+              setSelectedOrderId(record.orderId);
+              form.resetFields();
+            }}
+          >
+            Tạo package
+          </Button>
+          <Button
+            type="default"
+            onClick={() => handleViewPackages(record.orderId)}
+          >
+            Xem package
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+
+  const packageColumns = [
     {
       title: "Package No",
       dataIndex: "packageNo",
@@ -105,25 +211,26 @@ function ManagePackage() {
       key: "packageDescription",
     },
     {
-      title: "Package Date",
-      dataIndex: "packageDate",
-      key: "packageDate",
-      render: (text) => new Date(text).toLocaleString(),
-    },
-    {
-      title: "packageStatus",
+      title: "Status",
       dataIndex: "packageStatus",
       key: "packageStatus",
       render: (status) => (
-        <span style={{ color: status === "PACKING" ? "green" : "red" }}>
+        <span style={{ color: status === "UNPACKED" ? "orange" : "green" }}>
           {status}
         </span>
       ),
     },
     {
-      title: "Packaged By",
-      dataIndex: "packagedBy",
-      key: "packagedBy",
+      title: "Image",
+      dataIndex: "image",
+      key: "image",
+      render: (image) => (
+        <img
+          src={image}
+          alt="Package"
+          style={{ width: "50px", height: "50px", objectFit: "cover" }}
+        />
+      ),
     },
     {
       title: "Created At",
@@ -132,48 +239,25 @@ function ManagePackage() {
       render: (text) => new Date(text).toLocaleString(),
     },
     {
-      title: "Updated At",
-      dataIndex: "updateAt",
-      key: "updateAt",
-      render: (text) => new Date(text).toLocaleString(),
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => (
-        <span style={{ color: status === "AVAILABLE" ? "green" : "red" }}>
-          {status}
-        </span>
-      ),
-    },
-    {
       title: "Action",
-      dataIndex: "id",
-      key: "id",
-      render: (id, category) => (
-        <Space size="middle">
+      key: "action",
+      render: (record) => (
+        <Space>
           <Button
-            type="primary"
             icon={<EditOutlined />}
-            onClick={() => {
-              setShowModal(true);
-              setEditingId(id);
-              form.setFieldsValue({
-                packageStatus: category.packageStatus,
-              });
-            }}
+            onClick={() => handleEditPackage(record)}
           >
-            Edit
+            Sửa
           </Button>
 
           <Popconfirm
-            title="Delete"
-            description="Do you want to delete this category?"
-            onConfirm={() => handleDelete(id)}
+            title="Bạn có chắc muốn xóa package này không?"
+            onConfirm={() => handleDeletePackage(record.id)}
+            okText="Xóa"
+            cancelText="Hủy"
           >
-            <Button type="primary" danger icon={<DeleteOutlined />}>
-              Delete
+            <Button type="default" icon={<DeleteOutlined />} danger>
+              Xóa
             </Button>
           </Popconfirm>
         </Space>
@@ -183,110 +267,56 @@ function ManagePackage() {
 
   return (
     <div>
-      <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={() => {
-          setShowModal(true);
-          setEditingId(null);
-        }}
-        style={{ marginBottom: "16px" }}
-      >
-        Add New Package
-      </Button>
-      <Table dataSource={data} columns={columns} />
+      <Table dataSource={viewHandOver} columns={handoverColumns} rowKey="id" />
+
+      <div style={{ marginTop: 20 }}>
+        <h3>Danh sách Package</h3>
+        <Table dataSource={viewPackages} columns={packageColumns} rowKey="id" />
+      </div>
+
       <Modal
         open={showModal}
         onCancel={() => setShowModal(false)}
         onOk={() => form.submit()}
-        title="Package"
+        title={isEdit ? "Chỉnh sửa Package" : "Tạo Package"}
         confirmLoading={loading}
-        okText="Save"
-        cancelText="Cancel"
-        width={600}
+        okText="Lưu"
+        cancelText="Hủy"
       >
-        <Form
-          form={form}
-          labelCol={{
-            span: 24,
-          }}
-          onFinish={handleSubmit}
-          layout="vertical"
-          title="Package"
-        >
-          {editingId ? (
-            <Form.Item
-              label="Package Status"
-              name="packageStatus"
-              rules={[
-                { required: true, message: "Please select the package status" },
-              ]}
+        <Form form={form} onFinish={handleSubmit} layout="vertical">
+          <Form.Item
+            name="description"
+            label="Mô tả"
+            rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item name="image" label="Hình ảnh">
+            <Upload
+              fileList={fileList}
+              onChange={handleUploadChange}
+              customRequest={() => {}}
+              listType="picture"
             >
-              <Select>
-                <Option value="UNPACKED">UNPACKED</Option>
-                <Option value="PACKED">PACKED</Option>
-                <Option value="PACKING">PACKING</Option>
-              </Select>
+              <Button icon={<UploadOutlined />}>Tải lên hình ảnh</Button>
+            </Upload>
+          </Form.Item>
+
+          {isEdit && (
+            <Form.Item
+              name="packageStatus"
+              label="Trạng thái"
+              rules={[{ required: true, message: "Vui lòng chọn trạng thái!" }]}
+            >
+              <Select
+                defaultValue="UNPACKED"
+                options={[
+                  { value: "UNPACKED", label: "Chưa đóng gói" },
+                  { value: "PACKED", label: "Đã đóng gói" },
+                ]}
+              />
             </Form.Item>
-          ) : (
-            <>
-              <Form.Item
-                label="Package Description"
-                name="packageDescription"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter the package description",
-                  },
-                ]}
-              >
-                <Input placeholder="Enter package description" />
-              </Form.Item>
-
-              <Form.Item
-                label="Package Date"
-                name="packageDate"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select the package date!",
-                  },
-                ]}
-              >
-                <DatePicker style={{ width: "100%" }} />
-              </Form.Item>
-
-              <Form.Item
-                label="Package Status"
-                name="packageStatus"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select the package status",
-                  },
-                ]}
-              >
-                <Select>
-                  <Option value="UNPACKED">UNPACKED</Option>
-                  <Option value="PACKED">PACKED</Option>
-                  <Option value="PACKING">PACKING</Option>
-                </Select>
-              </Form.Item>
-
-              <Form.Item
-                label="Packaged By"
-                name="packageBy"
-                rules={[
-                  {
-                    required: true,
-                    message:
-                      "Please enter the name of the person who packaged this",
-                  },
-                ]}
-              >
-                <Input placeholder="Enter packager's name" />
-              </Form.Item>
-            </>
           )}
         </Form>
       </Modal>
