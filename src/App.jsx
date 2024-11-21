@@ -38,6 +38,8 @@ import Header from "./components/header";
 import DeliveryServiceList from "./components/list-service/delivery-method";
 import HealServiceCategory from "./components/list-service/health-service-cate";
 import TransactionHistory from "./pages/customer-page/customer-transaction";
+import ViewFeedback from "./pages/dashboard/manager/manage-feedback";
+import ViewReport from "./pages/dashboard/manager/manage-report";
 
 function App() {
   const ProtectRouterAuth = ({ children }) => {
@@ -128,6 +130,14 @@ function App() {
           path: "over-view",
           element: <OverViewTotal />,
         },
+        {
+          path: "manage-feedback",
+          element: <ViewFeedback />,
+        },
+        {
+          path: "manage-report",
+          element: <ViewReport />,
+        }
       ],
     },
     {
