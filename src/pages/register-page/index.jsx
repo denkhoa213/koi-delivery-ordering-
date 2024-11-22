@@ -31,7 +31,6 @@ function RegisterPage() {
       navigate("/login");
       handleSendVerificationEmail();
     } catch (err) {
-      console.error("Server error:", err.response?.data); // Xem chi tiết lỗi server trả về
       if (err.response?.data?.message === "Email already registered") {
         toast.error("Email này đã được đăng ký. Vui lòng đăng nhập!");
       } else {
@@ -39,7 +38,6 @@ function RegisterPage() {
       }
     }
   };
-
 
   return (
     <AuthenTemplate>
