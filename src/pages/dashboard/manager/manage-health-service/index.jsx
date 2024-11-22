@@ -78,30 +78,30 @@ function ManageHealthService() {
 
   const columns = [
     {
-      title: "Service Name",
+      title: "Tên dịch vụ",
       dataIndex: "serviceName",
       key: "serviceName",
     },
     {
-      title: "Service Description",
+      title: "Mô tả dịch vụ",
       dataIndex: "serviceDescription",
       key: "serviceDescription",
     },
     {
-      title: "Price",
+      title: "Giá",
       dataIndex: "price",
       key: "price",
       render: (price) => `${price} VND`,
       width: 120,
     },
     {
-      title: "Created At",
+      title: "Ngày tạo",
       dataIndex: "createAt",
       key: "createAt",
       render: (date) => new Date(date).toLocaleString(),
     },
     {
-      title: "Updated At",
+      title: "Ngày cập nhật",
       dataIndex: "updateAt",
       key: "updateAt",
       render: (date) => new Date(date).toLocaleString(),
@@ -120,7 +120,7 @@ function ManageHealthService() {
               form.setFieldsValue(category);
             }}
           >
-            Edit
+            Chỉnh sửa
           </Button>
 
           <Popconfirm
@@ -129,7 +129,7 @@ function ManageHealthService() {
             onConfirm={() => handleDelete(id)}
           >
             <Button type="primary" danger icon={<DeleteOutlined />}>
-              Delete
+              Xoá
             </Button>
           </Popconfirm>
         </Space>
@@ -149,7 +149,7 @@ function ManageHealthService() {
         }}
         style={{ marginBottom: "16px" }}
       >
-        Add New Service
+        Thêm mới dịch vụ
       </Button>
       <Table dataSource={healthService} columns={columns} rowKey="id" />
 

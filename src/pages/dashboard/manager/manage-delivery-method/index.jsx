@@ -110,14 +110,14 @@ function ManageDelivery() {
       key: "description",
     },
     {
-      title: "Created At",
+      title: "Ngày tạo",
       dataIndex: "createAt",
       key: "createAt",
       render: (text) => <span>{new Date(text).toLocaleDateString()}</span>,
     },
 
     {
-      title: "Updated At",
+      title: "Ngày cập nhật",
       dataIndex: "updateAt",
       key: "updateAt",
       render: (text) => <span>{new Date(text).toLocaleDateString()}</span>,
@@ -125,7 +125,7 @@ function ManageDelivery() {
     {
       title: "Giá",
       dataIndex: "price",
-      render: (price) => `${price}K VND`,
+      render: (price) => `${price} VND/Km`,
       width: 120,
     },
     {
@@ -143,7 +143,7 @@ function ManageDelivery() {
               form.setFieldsValue(deliveryMethod);
             }}
           >
-            Edit
+            Chỉnh sửa
           </Button>
 
           <Popconfirm
@@ -152,7 +152,7 @@ function ManageDelivery() {
             onConfirm={() => handleDelete(id)}
           >
             <Button type="primary" danger icon={<DeleteOutlined />}>
-              Delete
+              Xoá
             </Button>
           </Popconfirm>
         </Space>
@@ -172,7 +172,7 @@ function ManageDelivery() {
         }}
         style={{ marginBottom: "16px" }}
       >
-        Add New User
+        Thêm mới phương tiện vận chuyển
       </Button>
       <Table dataSource={deliveryMethod} columns={columns} rowKey="id" />
 

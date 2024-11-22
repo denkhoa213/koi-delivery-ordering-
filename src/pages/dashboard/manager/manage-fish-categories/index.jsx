@@ -110,14 +110,14 @@ function ManageFishCategory() {
       key: "fishCategoryDescription",
     },
     {
-      title: "Created At",
+      title: "Ngày tạo",
       dataIndex: "createAt",
       key: "createAt",
       render: (text) => <span>{new Date(text).toLocaleDateString()}</span>,
     },
 
     {
-      title: "Updated At",
+      title: "Ngày cập nhật",
       dataIndex: "updateAt",
       key: "updateAt",
       render: (text) => <span>{new Date(text).toLocaleDateString()}</span>,
@@ -143,7 +143,7 @@ function ManageFishCategory() {
               form.setFieldsValue(category);
             }}
           >
-            Edit
+            Chỉnh sửa
           </Button>
 
           <Popconfirm
@@ -152,7 +152,7 @@ function ManageFishCategory() {
             onConfirm={() => handleDelete(id)}
           >
             <Button type="primary" danger icon={<DeleteOutlined />}>
-              Delete
+              Xoá
             </Button>
           </Popconfirm>
         </Space>
@@ -172,7 +172,7 @@ function ManageFishCategory() {
         }}
         style={{ marginBottom: "16px" }}
       >
-        Add New Fish Category
+        Thêm mới loại cá
       </Button>
       <Table dataSource={fishCategory} columns={columns} rowKey="id" />
 

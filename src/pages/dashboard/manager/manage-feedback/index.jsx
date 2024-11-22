@@ -33,17 +33,17 @@ function ViewFeedback() {
     // Define table columns
     const columns = [
         {
-            title: "Feedback ID",
+            title: "ID phản hồi",
             dataIndex: "id",
             key: "id",
         },
         {
-            title: "Customer ID",
+            title: "ID khách hàng",
             dataIndex: "customerId",
             key: "customerId",
         },
         {
-            title: "Description Feedback",
+            title: "Mô tả phản hồi",
             dataIndex: "feedbackDescription",
             key: "feedbackDescription",
         },
@@ -57,7 +57,7 @@ function ViewFeedback() {
 
     return (
         <div>
-            <h1>Manage Feedback</h1>
+            <h1>Phản hồi</h1>
             <Table
                 dataSource={feedbacks}
                 columns={columns}

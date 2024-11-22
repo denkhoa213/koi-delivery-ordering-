@@ -158,7 +158,7 @@ function ManageUser() {
 
   const columns = [
     {
-      title: "Name",
+      title: "Tên tài khoản",
       dataIndex: "name",
       key: "name",
       render: (text) => <a>{text}</a>,
@@ -169,12 +169,12 @@ function ManageUser() {
       key: "email",
     },
     {
-      title: "Address",
+      title: "Địa chỉ",
       dataIndex: "address",
       key: "address",
     },
     {
-      title: "Avatar",
+      title: "Ảnh đại diện",
       dataIndex: "avatar",
       key: "avatar",
       render: (avatarUrl) => (
@@ -186,12 +186,12 @@ function ManageUser() {
       ),
     },
     {
-      title: "Phone",
+      title: "Số điện thoại",
       dataIndex: "phone",
       key: "phone",
     },
     {
-      title: "Status",
+      title: "Trạng thái",
       dataIndex: "status",
       key: "status",
       render: (status) => (
@@ -223,7 +223,7 @@ function ManageUser() {
               setShowEditModal(true);
             }}
           >
-            Edit
+            Chỉnh sửa
           </Button>
 
           <Popconfirm
@@ -251,7 +251,7 @@ function ManageUser() {
         }}
         style={{ marginBottom: "16px" }}
       >
-        Add New User
+        Thêm mới tài khoản
       </Button>
       <Table dataSource={users} columns={columns} rowKey="id" />
 

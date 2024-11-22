@@ -121,7 +121,9 @@ const HealthcareHistoryManager = () => {
 
       // Close modal after successful update
       setShowModal(false);
+
       form.resetFields();
+      setShowModal(false);
       fetchHandOver(); // Refresh data after update
     } catch (error) {
       toast.error(error.response.data);

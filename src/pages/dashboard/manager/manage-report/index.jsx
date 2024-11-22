@@ -33,17 +33,17 @@ function ViewReport() {
     // Define table columns
     const columns = [
         {
-            title: "Feedback ID",
+            title: "ID báo cáo",
             dataIndex: "id",
             key: "id",
         },
         {
-            title: "Order ID",
+            title: "ID đơn hàng",
             dataIndex: "orderId",
             key: "orderId",
         },
         {
-            title: "Customer ID",
+            title: "ID khách hàng",
             dataIndex: "userId",
             key: "userId",
         },
@@ -53,7 +53,7 @@ function ViewReport() {
             key: "title",
         },
         {
-            title: "Description Report",
+            title: "Mô tả báo cáo",
             dataIndex: "description",
             key: "description",
         },
@@ -68,7 +68,7 @@ function ViewReport() {
 
     return (
         <div>
-            <h1>Manage Report</h1>
+            <h1>Báo cáo</h1>
             <Table
                 dataSource={reports}
                 columns={columns}
