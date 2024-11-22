@@ -91,7 +91,14 @@ const HealthcareHistoryManager = () => {
       form.resetFields();
       fetchHealthcareHistories(selectedHandover); // Refresh healthcare histories
     } catch (error) {
-      toast.error(error.response.data);
+      const errorCode = error.response?.data?.code;
+      const errorMessage = error.response?.data?.message;
+
+      if (errorCode === 1048) {
+        toast.error(errorMessage);
+      } else {
+        toast.error(errorMessage || "Đã xảy ra lỗi khi xử lý yêu cầu.");
+      }
     }
   };
 

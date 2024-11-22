@@ -16,7 +16,7 @@ import {
   Table,
   Typography,
 } from "antd";
-import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
 
 function HandoverForm() {
   const [viewOrders, setViewOrders] = useState([]);
@@ -79,7 +79,15 @@ function HandoverForm() {
         fetchViewAllOrder();
       }
     } catch (error) {
-      toast.error(error.response?.data || "Có lỗi xảy ra!");
+      const errorCode = error.response?.data?.code;
+      const errorMessage = error.response?.data?.message;
+
+      if (errorCode === 1044) {
+        toast.error(error.response.data.message);
+      } else {
+        // Thông báo lỗi chung
+        toast.error(errorMessage || "Có lỗi xảy ra!");
+      }
     }
   };
 
@@ -109,7 +117,7 @@ function HandoverForm() {
       title: "Mã đơn",
       dataIndex: "orderCode",
       key: "orderCode",
-      width: 100, // Giảm kích thước cột
+      width: 100,
     },
     {
       title: "Phương thức giao",
@@ -224,6 +232,7 @@ function HandoverForm() {
                   setSelectedOrderId(orderId);
                   setShowModal(true); // Mở modal
                 }}
+                icon={<EditOutlined />}
               >
                 Tạo
               </Button>

@@ -67,7 +67,7 @@ function Report() {
   };
 
   const handleAnswerReport = async (reportId) => {
-    console.log("Report ID:", reportId); // Debug ID
+    console.log("Report ID:", reportId);
     console.log("Answer:", answers[reportId]);
     setLoadingReportId(reportId);
     try {

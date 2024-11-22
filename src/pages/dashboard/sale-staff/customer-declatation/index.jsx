@@ -12,7 +12,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import uploadFile from "../../../../utils/file";
-import { EyeOutlined, UploadOutlined } from "@ant-design/icons";
+import { EditOutlined, EyeOutlined, UploadOutlined } from "@ant-design/icons";
 import api from "../../../../config/axios";
 import moment from "moment";
 
@@ -222,7 +222,11 @@ function CustomerDeclaration() {
       render: (orderId, record) => (
         <Space size="middle">
           {record.status === "AVAILABLE" && (
-            <Button type="primary" onClick={() => openCreateModal(orderId)}>
+            <Button
+              type="primary"
+              icon={<EditOutlined />}
+              onClick={() => openCreateModal(orderId)}
+            >
               Tạo
             </Button>
           )}

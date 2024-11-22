@@ -71,8 +71,10 @@ function ManagePackage() {
 
   const handleSubmit = async (values) => {
     setLoading(true);
+
     if (!selectedOrderId) {
       toast.error("Order ID is required to create a package.");
+      setLoading(false); // Đảm bảo ngừng loading khi lỗi xảy ra
       return;
     }
 
@@ -81,9 +83,9 @@ function ManagePackage() {
       try {
         const url = await uploadFile(file);
         values.image = url;
-        toast.success("Tải lên hình ảnh thành công!");
       } catch (error) {
-        toast.error("Lỗi khi tải lên hình ảnh!");
+        toast.error("Lỗi tải ảnh lên");
+        setLoading(false); // Đảm bảo ngừng loading khi lỗi xảy ra
         return;
       }
     }
@@ -97,18 +99,28 @@ function ManagePackage() {
           packageDescription: values.description,
         });
       } else {
-        // Tạo package mới
         response = await api.post(`/package/create/${selectedOrderId}`, values);
       }
 
       if (response.data.code === 200) {
         toast.success(response.data.message);
+        if (fileList.length > 0) {
+          toast.success("Tải lên hình ảnh thành công!");
+        }
+        form.resetFields();
+        setShowModal(false);
+        handleViewPackages(selectedOrderId);
       }
-      form.resetFields();
-      setShowModal(false);
-      handleViewPackages(selectedOrderId);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Error processing request");
+      const errorCode = error.response?.data?.code;
+      const errorMessage = error.response?.data?.message;
+      if (errorCode === 1038) {
+        toast.error(
+          errorMessage || "Chỉ có thể tạo gói hàng khi tất cả cá đều khỏe mạnh"
+        );
+      } else {
+        toast.error(errorMessage || "Error processing request");
+      }
     } finally {
       setLoading(false);
     }
