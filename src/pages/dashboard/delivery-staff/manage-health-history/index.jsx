@@ -24,7 +24,6 @@ const HealthcareHistoryManager = () => {
   const [handoverList, setHandoverList] = useState([]);
   const [healthcareHistories, setHealthcareHistories] = useState([]);
   const [selectedHandover, setSelectedHandover] = useState(null);
-  const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -40,10 +39,6 @@ const HealthcareHistoryManager = () => {
         "/handover-documents/view-by-delivery-staff"
       );
       setHandoverList(response.data.result);
-      if (response.data.result.length > 0) {
-        // Store the orderId of the first handover document
-        setSelectedOrderId(response.data.result[0].orderId);
-      }
     } catch (error) {
       toast.error("Không thể lấy danh sách bàn giao.");
     }
@@ -53,7 +48,6 @@ const HealthcareHistoryManager = () => {
     fetchHandOver();
   }, []);
 
-  // Fetch healthcare histories for selected handoverDocumentId
   const fetchHealthcareHistories = async (handoverDocumentId) => {
     try {
       const response = await api.get(
@@ -113,15 +107,14 @@ const HealthcareHistoryManager = () => {
         return;
       }
     }
-    if (!selectedOrderId) {
+    if (!selectedHandover) {
       toast.error("Không có ID bàn giao được chọn!");
       return;
     }
 
     try {
-      // Use selectedOrderId for the API call
       const response = await api.put(
-        `/handover-documents/update/${selectedOrderId}`,
+        `/handover-documents/update/${selectedHandover}`,
         values
       );
       toast.success(response.data.message);
@@ -134,7 +127,6 @@ const HealthcareHistoryManager = () => {
       toast.error("Có lỗi xảy ra khi cập nhật thông tin bàn giao.");
     }
   };
-  console.log("Selected Handover:", selectedHandover);
 
   // Handle delete
   const handleDelete = async (id) => {

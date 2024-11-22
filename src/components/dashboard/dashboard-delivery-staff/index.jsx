@@ -18,11 +18,11 @@ function getItem(label, key, icon, children) {
 }
 
 const items = [
-  getItem("Profile", "profile", <PieChartOutlined />),
-  getItem("Check Health", "check-health-fish", <PieChartOutlined />),
-  getItem("Manage Package", "create-package", <PieChartOutlined />),
+  getItem("Thông tin cá nhân", "profile", <PieChartOutlined />),
+  getItem("Kiểm tra sức khỏe", "check-health-fish", <PieChartOutlined />),
+  getItem("Quản lí đóng gói", "create-package", <PieChartOutlined />),
   getItem(
-    "Health Care History",
+    "Lịch sử vận chuyển",
     "manage-health-care-history",
     <PieChartOutlined />
   ),

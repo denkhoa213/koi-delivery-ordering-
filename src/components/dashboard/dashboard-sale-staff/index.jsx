@@ -13,7 +13,7 @@ function getItem(label, key, icon, children) {
   };
 }
 const items = [
-  getItem("Profile", "profile", <PieChartOutlined />),
+  getItem("Thông tin cá nhân", "profile", <PieChartOutlined />),
   getItem("Biên bản bàn giao", "hand-over", <PieChartOutlined />),
   getItem("Tờ khai hải quan", "customer-declatation", <PieChartOutlined />),
   getItem("Báo cáo", "report", <PieChartOutlined />),

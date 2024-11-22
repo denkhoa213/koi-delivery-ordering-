@@ -13,20 +13,23 @@ function getItem(label, key, icon, children) {
   };
 }
 const items = [
-  getItem("Profile", "profile", <PieChartOutlined />),
-  getItem("Overview Total", "over-view", <PieChartOutlined />),
-  getItem("Manage Users", "manage-user", <PieChartOutlined />),
+  getItem("Thông tin cá nhân", "profile", <PieChartOutlined />),
+  getItem("Doanh thu", "over-view", <PieChartOutlined />),
+  getItem("Quản lí người dùng", "manage-user", <PieChartOutlined />),
   getItem(
-    "Manage Health Service Category",
+    "Quản lí doanh mục dịch vụ",
     "health-service-category",
     <PieChartOutlined />
   ),
 
-  getItem("Manage Fish Categories", "fish-category", <PieChartOutlined />),
-  getItem("Manage Delivery", "manage-delivery", <PieChartOutlined />),
-  getItem("Manage Feedback", "manage-feedback", <PieChartOutlined />),
-  getItem("Manage Report", "manage-report", <PieChartOutlined />),
-
+  getItem("Quản lí doanh mục cá", "fish-category", <PieChartOutlined />),
+  getItem(
+    "Quản lí doanh mục vận chuyển",
+    "manage-delivery",
+    <PieChartOutlined />
+  ),
+  getItem("Quản lí phản hồi", "manage-feedback", <PieChartOutlined />),
+  getItem("Quản lí báo cáo", "manage-report", <PieChartOutlined />),
 ];
 const DashboarManager = () => {
   const [collapsed, setCollapsed] = useState(false);

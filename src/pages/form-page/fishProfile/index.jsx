@@ -119,7 +119,6 @@ const FishProfileForm = () => {
   };
 
   const handleAddCertificate = async (values) => {
-    // Kiểm tra có fishProfileId hay không
     if (!fishProfileId || fishProfileId.length === 0) {
       toast.error("Không có fishProfileId để tạo chứng chỉ!");
       return;
@@ -154,16 +153,28 @@ const FishProfileForm = () => {
   };
 
   const handleEditCertificate = async (formEditCetificate) => {
+    if (fileList.length > 0) {
+      const file = fileList[0].originFileObj;
+      try {
+        const url = await uploadFile(file);
+        formEditCetificate.image = url;
+        toast.success("Tải lên hình ảnh thành công!");
+      } catch (error) {
+        toast.error("Lỗi khi tải lên hình ảnh!");
+        return;
+      }
+    }
     try {
       const certificateId = certificates[0].id;
       const response = await api.put(
         `/certificates/update/${certificateId}`,
         formEditCetificate
       );
-      toast.success(response.data.message);
       fetchViewFishOrder();
       fetchViewCertificate(fishProfileId);
+      toast.success(response.data.message);
       formEditCetificate.resetFields();
+      setShowModalEdit(false);
     } catch (error) {
       toast.error(error.response.data);
     }
@@ -193,14 +204,37 @@ const FishProfileForm = () => {
     fetchViewCertificate();
   }, []);
 
-  const handlePaymentClick = () => {
-    navigate(`/total-order/${orderId}`);
+  const handlePaymentClick = async () => {
+    if (!orderId || orderId === "") {
+      // Hiển thị thông báo lỗi nếu không có mã đơn hàng
+      toast.error("Không có mã đơn hàng để thanh toán!");
+      return;
+    }
+
+    try {
+      const response = await api.get(`/fish-profile/view-by-order/${orderId}`);
+      const fishOrderData = response.data.result;
+
+      if (fishOrderData.length === 0) {
+        // Nếu không có cá trong đơn hàng, hiển thị thông báo lỗi
+        toast.error("Không có cá trong đơn hàng để thanh toán!");
+        return;
+      }
+
+      // Nếu có cá, điều hướng
+      navigate(`/total-order/${orderId}`);
+    } catch (error) {
+      const errorMessage =
+        error.response?.data || "Có lỗi xảy ra khi kiểm tra hồ sơ cá!";
+      toast.error(errorMessage);
+    }
   };
+
   const columns = [
     {
       title: "Loại cá",
-      dataIndex: "fishCategory",
-      key: "fishCategory",
+      dataIndex: "species",
+      key: "species",
     },
     {
       title: "Tên cá",
@@ -312,6 +346,18 @@ const FishProfileForm = () => {
       title: "Tuổi",
       dataIndex: "age",
       key: "age",
+    },
+    {
+      title: "Hình ảnh",
+      dataIndex: "image",
+      key: "image",
+      render: (text) => (
+        <img
+          src={text}
+          alt="Fish"
+          style={{ width: 100, borderRadius: "8px" }}
+        />
+      ),
     },
     {
       title: "Action",

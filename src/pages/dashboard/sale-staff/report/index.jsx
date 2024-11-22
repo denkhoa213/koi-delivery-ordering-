@@ -1,39 +1,26 @@
 import React, { useEffect, useState } from "react";
-import {
-  Table,
-  Button,
-  Modal,
-  Spin,
-  Alert,
-  Input,
-  Form,
-  Row,
-  Col,
-  Card,
-} from "antd";
+import { Table, Button, Modal, Input, Form } from "antd";
 import api from "../../../../config/axios"; // Đảm bảo đường dẫn đúng
 import { toast } from "react-toastify";
 
 function Report() {
   const [handoverData, setHandoverData] = useState([]);
   const [reportData, setReportData] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedReport, setSelectedReport] = useState(null); // Báo cáo được chọn
-  const [isModalVisible, setIsModalVisible] = useState(false); // Hiển thị modal
-  const [answer, setAnswer] = useState(""); // Trả lời của người dùng
+  const [selectedReport, setSelectedReport] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [answers, setAnswers] = useState({}); // Quản lý trả lời cho từng báo cáo
+  const [loadingReportId, setLoadingReportId] = useState(null);
 
   useEffect(() => {
     const fetchHandoverData = async () => {
       try {
         const response = await api.get("/handover-documents/view-all");
         setHandoverData(response.data.result);
-        setLoading(false);
       } catch (err) {
         setError(
           err.response?.data?.message || "Có lỗi xảy ra khi tải dữ liệu"
         );
-        setLoading(false);
       }
     };
 
@@ -42,29 +29,38 @@ function Report() {
 
   const handleViewReport = async (orderId) => {
     try {
-      setLoading(true);
       const response = await api.get(`/report/view-by-order/${orderId}`);
-      setReportData(response.data.result);
-      setSelectedReport(response.data.result);
-      setIsModalVisible(true); // Mở modal
-      setLoading(false);
+      setReportData(response.data.result); // Cập nhật dữ liệu báo cáo
+      setIsModalVisible(true); // Hiển thị modal
     } catch (err) {
-      toast.error(err.response.data);
-      setLoading(false);
+      toast.error(err.response?.data || "Không thể tải báo cáo");
     }
   };
 
+  const handleAnswerChange = (reportId, value) => {
+    setAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [reportId]: value, // Cập nhật nội dung trả lời của từng báo cáo
+    }));
+  };
+
   const handleAnswerReport = async (reportId) => {
+    setLoadingReportId(reportId);
     try {
       const data = {
-        answer: answer,
+        answer: answers[reportId], // Gửi nội dung trả lời của báo cáo tương ứng
       };
       const response = await api.put(`/report/answer/${reportId}`, data);
       toast.success(response.data.message);
-      setIsModalVisible(false);
-      setAnswer("");
+      setAnswers((prevAnswers) => ({
+        ...prevAnswers,
+        [reportId]: "", // Xóa nội dung trả lời sau khi gửi
+      }));
+      setIsModalVisible(false); // Đóng modal sau khi trả lời
     } catch (err) {
-      toast.error(err.response.data);
+      toast.error(err.response?.data || "Không thể gửi câu trả lời");
+    } finally {
+      setLoadingReportId(null);
     }
   };
 
@@ -104,6 +100,26 @@ function Report() {
       title: "Trạng thái bàn giao",
       dataIndex: "handoverStatusEnum",
       key: "handoverStatusEnum",
+      render: (handoverStatusEnum) => {
+        let statusColor = "#d9d9d9"; // Màu mặc định (xám)
+
+        if (handoverStatusEnum === "COMPLETED") {
+          statusColor = "#d9d9d9"; // Màu xanh cho COMPLETED
+        }
+
+        return (
+          <span
+            style={{
+              backgroundColor: statusColor,
+              color: "#fff",
+              padding: "5px 10px",
+              borderRadius: "5px",
+            }}
+          >
+            {handoverStatusEnum}
+          </span>
+        );
+      },
     },
     {
       title: "Xem báo cáo",
@@ -116,85 +132,76 @@ function Report() {
     },
   ];
 
-  if (loading) {
-    return <Spin size="large" tip="Đang tải dữ liệu..." />;
-  }
-
-  if (error) {
-    return <Alert message={error} type="error" showIcon />;
-  }
-
   return (
     <div>
       <h3>Danh sách Biên bản Bàn giao</h3>
-      <Table
-        dataSource={handoverData}
-        columns={handoverColumns}
-        rowKey="handoverNo"
-        pagination={{ pageSize: 10 }}
-        bordered
-        size="middle"
-      />
+      {error ? (
+        <p style={{ color: "red" }}>{error}</p>
+      ) : (
+        <Table
+          dataSource={handoverData}
+          columns={handoverColumns}
+          rowKey="handoverNo"
+          pagination={{ pageSize: 10 }}
+          bordered
+          size="middle"
+        />
+      )}
 
       <Modal
         title="Báo Cáo"
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
-        width={800}
+        width={600}
       >
-        {selectedReport && selectedReport.length > 0 ? (
-          selectedReport.map((report) => (
+        {reportData.length > 0 ? (
+          reportData.map((report) => (
             <div key={report.id} style={{ marginBottom: "20px" }}>
-              <Card style={{ marginBottom: "20px" }} bordered={false}>
-                <Row gutter={16}>
-                  <Col span={8}>
-                    <strong>Tiêu đề:</strong>
-                  </Col>
-                  <Col span={16}>{report.title}</Col>
-                </Row>
-                <Row gutter={16}>
-                  <Col span={8}>
-                    <strong>Mô tả:</strong>
-                  </Col>
-                  <Col span={16}>{report.description}</Col>
-                </Row>
-                <Row gutter={16}>
-                  <Col span={8}>
-                    <strong>Trả lời:</strong>
-                  </Col>
-                  <Col span={16}>{report.answer || "Chưa có câu trả lời"}</Col>
-                </Row>
-              </Card>
+              <div style={{ marginBottom: "10px" }}>
+                <strong>Tiêu đề:</strong> {report.title}
+              </div>
+              <div style={{ marginBottom: "10px" }}>
+                <strong>Mô tả:</strong> {report.description}
+              </div>
+              <div style={{ marginBottom: "10px" }}>
+                <strong>Trả lời:</strong>{" "}
+                {report.answer || "Chưa có câu trả lời"}
+              </div>
 
-              <Card title="Trả lời báo cáo" bordered={false}>
-                <Form
-                  layout="vertical"
-                  onFinish={() => handleAnswerReport(report.id)}
-                >
-                  <Form.Item label="Trả lời">
-                    <Input.TextArea
-                      rows={4}
-                      value={answer}
-                      onChange={(e) => setAnswer(e.target.value)}
-                      placeholder="Nhập trả lời ở đây..."
-                      style={{ borderRadius: "8px" }}
-                    />
-                  </Form.Item>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
+              <Form
+                layout="vertical"
+                onFinish={() => handleAnswerReport(report.id)}
+              >
+                <Form.Item>
+                  <Input.TextArea
+                    rows={4}
+                    value={answers[report.id] || ""} // Hiển thị nội dung riêng cho từng báo cáo
+                    onChange={(e) =>
+                      handleAnswerChange(report.id, e.target.value)
+                    }
+                    placeholder="Nhập trả lời ở đây..."
                     style={{
-                      marginTop: 10,
                       borderRadius: "8px",
-                      backgroundColor: "#4CAF50",
-                      borderColor: "#4CAF50",
+                      border: "1px solid #d9d9d9",
+                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
                     }}
-                  >
-                    Trả lời
-                  </Button>
-                </Form>
-              </Card>
+                  />
+                </Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  style={{
+                    marginTop: 10,
+                    borderRadius: "8px",
+                    backgroundColor: "#4CAF50",
+                    borderColor: "#4CAF50",
+                  }}
+                  loading={loadingReportId === report.id}
+                >
+                  Trả lời
+                </Button>
+              </Form>
             </div>
           ))
         ) : (

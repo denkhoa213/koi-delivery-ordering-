@@ -29,7 +29,7 @@ function CustomerDeclaration() {
   const fetchViewAllOrder = async () => {
     try {
       const response = await api.get("/order/view-all");
-      setViewOrders(response.data.result); // Assuming response.data.result contains the orders
+      setViewOrders(response.data.result);
     } catch (error) {
       toast.error(
         error.response ? error.response.data : "Error fetching orders"
@@ -37,13 +37,12 @@ function CustomerDeclaration() {
     }
   };
 
-  // Fetch customs declaration by orderId
   const fetchCustomsDeclaration = async (orderId) => {
     try {
       const response = await api.get(
         `/customs-declaration/view-by-order/${orderId}`
       );
-      setViewDeclarationData(response.data.result); // Assuming response.data.result contains the declaration data
+      setViewDeclarationData(response.data.result);
     } catch (error) {
       toast.error(
         error.response
@@ -53,47 +52,42 @@ function CustomerDeclaration() {
     }
   };
 
-  // Open the create modal and fetch the customs declaration for the selected order
   const openCreateModal = (orderId) => {
     setSelectedOrderId(orderId);
-    setShowCreateModal(true); // Open the create modal
+    setShowCreateModal(true);
   };
 
-  // Open the view modal and fetch the customs declaration for the selected order
   const openViewModal = (orderId) => {
-    setSelectedOrderId(orderId); // Save the selected order ID to state
-    fetchCustomsDeclaration(orderId); // Fetch the declaration data for the selected order
-    setShowViewModal(true); // Open the view modal
+    setSelectedOrderId(orderId);
+    fetchCustomsDeclaration(orderId);
+    setShowViewModal(true);
   };
 
   useEffect(() => {
-    fetchViewAllOrder(); // Fetch orders when the component mounts
+    fetchViewAllOrder();
   }, []);
 
   const handleSubmit = async (values) => {
-    // If a file is selected, upload it
     if (fileList.length > 0) {
       const file = fileList[0].originFileObj;
       try {
         const url = await uploadFile(file);
-        values.image = url; // Add uploaded file URL to form values
+        values.image = url;
       } catch (error) {
         toast.error("Image upload failed: " + error.message);
         return;
       }
     }
 
-    // Ensure selectedOrderId is present before submitting
     if (!selectedOrderId) {
       toast.error("Please select an order first.");
       return;
     }
 
     try {
-      // Submit the form data with the selected orderId
       const response = await api.post(
-        `/customs-declaration/create/${selectedOrderId}`, // Use the selectedOrderId
-        { ...values } // Include all form values
+        `/customs-declaration/create/${selectedOrderId}`,
+        { ...values }
       );
 
       if (response.data.code === 200) {
@@ -227,20 +221,16 @@ function CustomerDeclaration() {
       width: 180,
       render: (orderId, record) => (
         <Space size="middle">
-          {/* Hiển thị nút "Tạo" nếu trạng thái là AVAILABLE */}
           {record.status === "AVAILABLE" && (
-            <Button
-              type="primary"
-              onClick={() => openCreateModal(orderId)} // Mở modal tạo tờ khai
-            >
+            <Button type="primary" onClick={() => openCreateModal(orderId)}>
               Tạo
             </Button>
           )}
-          {/* Hiển thị nút "Xem" cho tất cả các trạng thái */}
+
           <Button
             type="default"
             icon={<EyeOutlined />}
-            onClick={() => openViewModal(orderId)} // Mở modal xem tờ khai
+            onClick={() => openViewModal(orderId)}
           >
             Xem
           </Button>

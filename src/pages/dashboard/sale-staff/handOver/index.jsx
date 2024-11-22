@@ -66,22 +66,23 @@ function HandoverForm() {
   // Hàm handleCreateHandOver
   const handleCreateHandOver = async (values) => {
     try {
-      // Gọi API để tạo biên bản bàn giao
       const response = await api.post("/handover-documents/create", {
         ...values,
         orderId: selectedOrderId,
       });
 
-      toast.success(response.data.message);
-
-      setShowModal(false);
-      form.resetFields();
-
-      fetchViewAllOrder();
+      // Kiểm tra mã trả về từ server
+      if (response.data.code === 200) {
+        toast.success(response.data.message);
+        setShowModal(false);
+        form.resetFields();
+        fetchViewAllOrder();
+      }
     } catch (error) {
       toast.error(error.response?.data || "Có lỗi xảy ra!");
     }
   };
+
   const handleDelete = async (orderId) => {
     try {
       const response = await api.delete(
@@ -262,7 +263,6 @@ function HandoverForm() {
     <div>
       <Table dataSource={viewOrders} columns={columns} />
 
-      {/* Modal Tạo Biên Bản Bàn Giao */}
       <Modal
         open={showModal}
         onCancel={() => setShowModal(false)}
@@ -305,7 +305,7 @@ function HandoverForm() {
         open={showViewModal}
         onCancel={() => setShowViewModal(false)}
         footer={null}
-        width={900} // Tăng chiều rộng để modal thoáng hơn
+        width={900}
       >
         {handoverDetails ? (
           <div style={{ padding: "20px" }}>
