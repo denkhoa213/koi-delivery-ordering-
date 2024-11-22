@@ -466,7 +466,7 @@ const FishProfileForm = () => {
                   rules={[
                     { required: true, message: "Vui lòng nhập mô tả!" },
                     {
-                      max: 200,
+                      max: 300,
                       message: "Mô tả không được vượt quá 200 ký tự!",
                     },
                   ]}
@@ -516,14 +516,14 @@ const FishProfileForm = () => {
                     { required: true, message: "Vui lòng nhập kích thước!" },
                     {
                       type: "number",
-                      min: 0.01,
+                      min: 1,
                       max: 100,
-                      message: "Kích thước phải từ 0.01 đến 100 cm!",
+                      message: "Kích thước phải từ 1 đến 100 cm!",
                     },
                   ]}
                 >
                   <InputNumber
-                    min={0.01}
+                    min={1}
                     max={100}
                     addonAfter="Cm"
                     placeholder="Nhập kích thước"
@@ -555,14 +555,14 @@ const FishProfileForm = () => {
                     { required: true, message: "Vui lòng nhập tuổi!" },
                     {
                       type: "number",
-                      min: 0,
+                      min: 1,
                       max: 20,
-                      message: "Tuổi phải từ 0 đến 20!",
+                      message: "Tuổi phải từ 1 đến 20!",
                     },
                   ]}
                 >
                   <InputNumber
-                    min={0}
+                    min={1}
                     max={20}
                     addonAfter="Năm"
                     placeholder="Nhập tuổi"
@@ -599,14 +599,14 @@ const FishProfileForm = () => {
                     { required: true, message: "Vui lòng nhập cân nặng cá!" },
                     {
                       type: "number",
-                      min: 0.01,
+                      min: 1,
                       max: 20,
-                      message: "Cân nặng phải từ 0.01 đến 20 kg!",
+                      message: "Cân nặng phải từ 1 đến 20 kg!",
                     },
                   ]}
                 >
                   <InputNumber
-                    min={0.01}
+                    min={1}
                     max={20}
                     addonAfter="Kg"
                     placeholder="Nhập cân nặng"

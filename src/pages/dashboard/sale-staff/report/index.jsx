@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Button, Modal, Input, Form, Card } from "antd";
 import api from "../../../../config/axios";
 import { toast } from "react-toastify";
+import { DeleteOutlined } from "@ant-design/icons";
 
 function Report() {
   const [orderData, setOrderData] = useState([]);
@@ -29,7 +30,18 @@ function Report() {
     fetchOrder();
   }, []);
 
+  useEffect(() => {
+    if (isModalVisible) {
+      reportData.forEach((report) => {
+        form.setFieldsValue({
+          [`answer_${report.id}`]: answers[report.id] || "",
+        });
+      });
+    }
+  }, [isModalVisible, reportData, answers, form]);
+
   const handleViewReport = async (orderId) => {
+    console.log("Fetching report for orderId:", orderId);
     if (!orderId) {
       toast.error("Mã đơn hàng không hợp lệ");
       return;
@@ -55,6 +67,8 @@ function Report() {
   };
 
   const handleAnswerReport = async (reportId) => {
+    console.log("Report ID:", reportId); // Debug ID
+    console.log("Answer:", answers[reportId]);
     setLoadingReportId(reportId);
     try {
       const data = {
@@ -63,12 +77,19 @@ function Report() {
       const response = await api.put(`/report/answer/${reportId}`, data);
       toast.success(response.data.message);
 
+      // Cập nhật danh sách reportData
+      setReportData((prevReports) =>
+        prevReports.filter((report) => report.id !== reportId)
+      );
+
+      // Reset câu trả lời
       setAnswers((prevAnswers) => {
         const newAnswers = { ...prevAnswers };
         delete newAnswers[reportId];
         return newAnswers;
       });
 
+      // Đóng Modal sau khi trả lời xong
       setIsModalVisible(false);
 
       form.resetFields();
@@ -76,6 +97,20 @@ function Report() {
       toast.error(err.response?.data || "Không thể gửi câu trả lời");
     } finally {
       setLoadingReportId(null);
+    }
+  };
+
+  const handleDeleteReport = async (reportId) => {
+    try {
+      const response = await api.delete(`/report/delete/${reportId}`);
+      toast.success(response.data.message);
+
+      // Cập nhật danh sách báo cáo sau khi xóa
+      setReportData((prevReportData) =>
+        prevReportData.filter((report) => report.id !== reportId)
+      );
+    } catch (err) {
+      toast.error(err.response?.data || "Không thể xóa báo cáo");
     }
   };
 
@@ -199,8 +234,22 @@ function Report() {
                 marginBottom: "20px",
                 borderRadius: "8px",
                 boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                position: "relative", // Để định vị nút xóa
               }}
             >
+              <Button
+                type="text"
+                danger
+                onClick={() => handleDeleteReport(report.id)}
+                style={{
+                  position: "absolute",
+                  top: "10px",
+                  right: "10px",
+                }}
+              >
+                <DeleteOutlined />
+              </Button>
+
               <div style={{ marginBottom: "10px" }}>
                 <strong>Tiêu đề:</strong> {report.title}
               </div>
@@ -213,13 +262,13 @@ function Report() {
               </div>
 
               <Form
-                form={form} // Gán form instance
+                form={form}
                 layout="vertical"
                 onFinish={() => handleAnswerReport(report.id)}
               >
                 <Form.Item
                   name={`answer_${report.id}`}
-                  initialValue={answers[report.id] || ""} // Nếu không có trả lời, để trống
+                  initialValue={answers[report.id] || ""}
                 >
                   <Input.TextArea
                     rows={4}
