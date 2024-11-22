@@ -100,20 +100,6 @@ function Report() {
     }
   };
 
-  const handleDeleteReport = async (reportId) => {
-    try {
-      const response = await api.delete(`/report/delete/${reportId}`);
-      toast.success(response.data.message);
-
-      // Cập nhật danh sách báo cáo sau khi xóa
-      setReportData((prevReportData) =>
-        prevReportData.filter((report) => report.id !== reportId)
-      );
-    } catch (err) {
-      toast.error(err.response?.data || "Không thể xóa báo cáo");
-    }
-  };
-
   const orderColumns = [
     {
       title: "Mã đơn",
@@ -237,19 +223,6 @@ function Report() {
                 position: "relative", // Để định vị nút xóa
               }}
             >
-              <Button
-                type="text"
-                danger
-                onClick={() => handleDeleteReport(report.id)}
-                style={{
-                  position: "absolute",
-                  top: "10px",
-                  right: "10px",
-                }}
-              >
-                <DeleteOutlined />
-              </Button>
-
               <div style={{ marginBottom: "10px" }}>
                 <strong>Tiêu đề:</strong> {report.title}
               </div>
