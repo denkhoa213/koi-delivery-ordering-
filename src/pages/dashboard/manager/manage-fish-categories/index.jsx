@@ -76,10 +76,14 @@ function ManageFishCategory() {
   const handleDelete = async (id) => {
     try {
       const response = await api.delete(`fish-category/delete/${id}`);
-      toast.success(response.data.message);
+      if (response.data.code === 200) {
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.data.message);
+      }
       fetchFishCategory();
     } catch (error) {
-      toast.error(error.response.data);
+      toast.error(error.response?.data?.message || "Error deleting fish category");
     }
   };
 
@@ -106,14 +110,14 @@ function ManageFishCategory() {
       key: "fishCategoryDescription",
     },
     {
-      title: "Created At",
+      title: "Ngày tạo",
       dataIndex: "createAt",
       key: "createAt",
       render: (text) => <span>{new Date(text).toLocaleDateString()}</span>,
     },
 
     {
-      title: "Updated At",
+      title: "Ngày cập nhật",
       dataIndex: "updateAt",
       key: "updateAt",
       render: (text) => <span>{new Date(text).toLocaleDateString()}</span>,
@@ -121,7 +125,8 @@ function ManageFishCategory() {
     {
       title: "Giá",
       dataIndex: "price",
-      key: "price",
+      render: (price) => `${price} VND`,
+      width: 120,
     },
     {
       title: "Action",
@@ -138,7 +143,7 @@ function ManageFishCategory() {
               form.setFieldsValue(category);
             }}
           >
-            Edit
+            Chỉnh sửa
           </Button>
 
           <Popconfirm
@@ -147,7 +152,7 @@ function ManageFishCategory() {
             onConfirm={() => handleDelete(id)}
           >
             <Button type="primary" danger icon={<DeleteOutlined />}>
-              Delete
+              Xoá
             </Button>
           </Popconfirm>
         </Space>
@@ -167,7 +172,7 @@ function ManageFishCategory() {
         }}
         style={{ marginBottom: "16px" }}
       >
-        Add New User
+        Thêm mới loại cá
       </Button>
       <Table dataSource={fishCategory} columns={columns} rowKey="id" />
 

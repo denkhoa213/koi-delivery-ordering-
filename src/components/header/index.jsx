@@ -38,12 +38,15 @@ const Header = () => {
             alt="Logo"
           />
         </div>
-        <div className="search-bar">
+        {/* <div className="search-bar">
           <Search
             placeholder="Nhập để tìm kiếm..."
             onSearch={(value) => console.log(value)}
             style={{ width: 570 }}
           />
+        </div> */}
+        <div className="nameLogo">
+          Fast Koi
         </div>
       </div>
 

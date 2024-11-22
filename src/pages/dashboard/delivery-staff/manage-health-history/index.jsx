@@ -40,7 +40,7 @@ const HealthcareHistoryManager = () => {
       );
       setHandoverList(response.data.result);
     } catch (error) {
-      toast.error("Không thể lấy danh sách bàn giao.");
+      toast.error(error.response.data);
     }
   };
 
@@ -55,7 +55,7 @@ const HealthcareHistoryManager = () => {
       );
       setHealthcareHistories(response.data.result);
     } catch (error) {
-      toast.error("Không thể lấy lịch sử chăm sóc sức khỏe.");
+      toast.error(error.response.data);
     }
   };
 
@@ -91,7 +91,7 @@ const HealthcareHistoryManager = () => {
       form.resetFields();
       fetchHealthcareHistories(selectedHandover); // Refresh healthcare histories
     } catch (error) {
-      toast.error("Có lỗi xảy ra trong quá trình xử lý.");
+      toast.error(error.response.data);
     }
   };
 
@@ -103,7 +103,7 @@ const HealthcareHistoryManager = () => {
         values.image = url;
         toast.success("Tải lên hình ảnh thành công!");
       } catch (error) {
-        toast.error("Lỗi khi tải lên hình ảnh!");
+        toast.error(error.response.data);
         return;
       }
     }
@@ -119,11 +119,14 @@ const HealthcareHistoryManager = () => {
       );
       toast.success(response.data.message);
 
+      // Close modal after successful update
+      setShowModal(false);
+
       form.resetFields();
       setShowModal(false);
       fetchHandOver(); // Refresh data after update
     } catch (error) {
-      toast.error("Có lỗi xảy ra khi cập nhật thông tin bàn giao.");
+      toast.error(error.response.data);
     }
   };
 
@@ -136,7 +139,7 @@ const HealthcareHistoryManager = () => {
         healthcareHistories.filter((item) => item.id !== id)
       );
     } catch (error) {
-      toast.error("Có lỗi xảy ra khi xóa bản ghi.");
+      toast.error(error.response.data);
     }
   };
 

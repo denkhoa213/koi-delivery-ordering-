@@ -23,7 +23,7 @@ const TransactionHistory = () => {
                 const response = await api.get('/payos/view-by-user');
                 if (response.data.code === 200) {
                     setTransactions(response.data.result);
-                    setFilteredTransactions(response.data.result); // Ban đầu hiển thị tất cả
+                    setFilteredTransactions(response.data.result);
                 } else {
                     toast.error(response.data.message);
                     setError(response.data.message);
@@ -46,7 +46,7 @@ const TransactionHistory = () => {
     };
 
     const handleDateChange = (dates) => {
-        setDateRange(dates); // Lưu khoảng ngày khi người dùng chọn
+        setDateRange(dates);
     };
 
     const handleFilter = () => {

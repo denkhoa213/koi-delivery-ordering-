@@ -28,11 +28,11 @@ const CustomerProfile = () => {
                 setCustomer(response.data.result);
             } else {
                 toast.error(response.data.message);
-                setError(response.data.message); //Cập nhật trạng thái lỗi
+                setError(response.data.message);
             }
         } catch (error) {
             toast.error("Đã xảy ra lỗi khi lấy thông tin từ khách hàng!!!");
-            setError("Đã xảy ra lỗi khi lấy thông tin từ khách hàng!!!"); // Cập nhật trạng thái lỗi
+            setError("Đã xảy ra lỗi khi lấy thông tin từ khách hàng!!!");
             console.error("Error", error);
         } finally {
             setLoading(false);
@@ -40,41 +40,47 @@ const CustomerProfile = () => {
     }
 
     const handleChangePassword = async () => {
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/; // Mật khẩu ít nhất 6 ký tự, bao gồm cả chữ và số.
+
+        if (!passwordRegex.test(newPassword)) {
+            toast.error("Mật khẩu mới phải có ít nhất 6 ký tự và bao gồm cả chữ và số!");
+            return;
+        }
+
         if (newPassword !== confirmPassword) {
             toast.error("Mật khẩu xác nhận không khớp!");
             return;
         }
 
         try {
-
             const response = await api.put('/auth/change-password', {
                 oldPassword,
                 newPassword,
                 confirmPassword
             });
 
-
-            // Thông báo thành công nếu API trả về status 200
             if (response.status === 200) {
                 toast.success("Mật khẩu đã được cập nhật thành công!");
                 setOldPassword('');
                 setNewPassword('');
                 setConfirmPassword('');
+            } else {
+                toast.error(response.data.message || "Đã xảy ra lỗi!");
             }
         } catch (error) {
-            // Hiển thị chi tiết lỗi nếu có
+            // Xử lý lỗi từ server
             const errorMessage = error.response?.data?.message || "Đã xảy ra lỗi phía server!";
             toast.error(errorMessage);
             console.error("Error:", error);
         }
     };
 
+
     const updateProfile = async (values) => {
         try {
             const response = await api.put('/customer/update-profile', values);
             if (response.status === 200) {
                 toast.success("Cập nhật hồ sơ thành công!");
-                // Optionally, you can fetch the updated profile again
                 fetchCustomerProfile();
             } else {
                 toast.error(response.data.message);
@@ -88,7 +94,7 @@ const CustomerProfile = () => {
 
     const handleChangeAvatar = async (file) => {
         if (file.size > maxFileSize) {
-            toast.error(`File size must be smaller than ${maxFileSize / 1000000} MB!`);
+            toast.error(`Dung lượng tệp phải nhỏ hơn ${maxFileSize / 1000000} MB!`);
             return false;
         }
 
@@ -96,19 +102,33 @@ const CustomerProfile = () => {
         formData.append('avatar', file);
 
         try {
-            const response = await api.put('/customer/update-profile', formData);
+            // Hiển thị thông báo đang tải lên
+            toast.info("Đang tải ảnh đại diện lên...");
+
+            const response = await api.put('/customer/update-avatar', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
             if (response.status === 200) {
+                // Cập nhật avatar trong state
                 setCustomer((prevState) => ({
                     ...prevState,
-                    avatar: response.data.avatarUrl,
+                    avatar: response.data.result.avatarUrl, // Sử dụng URL avatar mới trả về từ server
                 }));
-                toast.success("Cập nhật avatar thành công!");
+                toast.success("Cập nhật ảnh đại diện thành công!");
+            } else {
+                toast.error(response.data.message || "Đã xảy ra lỗi khi cập nhật ảnh đại diện!");
             }
         } catch (error) {
-            const errorMessage = error.response?.data?.message || "Đã xảy ra lỗi khi cập nhật avatar!";
+            const errorMessage = error.response?.data?.message || "Đã xảy ra lỗi phía server khi cập nhật ảnh đại diện!";
             toast.error(errorMessage);
+            console.error("Error updating avatar:", error);
         }
+        return false; // Trả về false để Ant Design không tự upload
     };
+
 
 
     const onFinish = (values) => {
@@ -187,12 +207,21 @@ const CustomerProfile = () => {
                                         name="email"
                                         rules={[{ required: true, message: 'Vui lòng nhập email của bạn!' }, { type: 'email', message: 'Email không hợp lệ!' }]}
                                     >
-                                        <Input />
+                                        <Input
+                                            disabled={true}
+                                            style={{ opacity: 0.8 }}
+                                        />
                                     </Form.Item>
                                     <Form.Item
                                         label="Số điện thoại"
                                         name="phone"
-                                        rules={[{ required: true, message: 'Vui lòng nhập số điện thoại của bạn!' }]}
+                                        rules={[
+                                            { required: true, message: 'Vui lòng nhập số điện thoại của bạn!' },
+                                            {
+                                                pattern: /^[0-9]{10}$/,
+                                                message: 'Số điện thoại phải có 10 chữ số!'
+                                            }
+                                        ]}
                                     >
                                         <Input />
                                     </Form.Item>

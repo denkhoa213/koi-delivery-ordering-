@@ -311,7 +311,7 @@ function CustomerDeclaration() {
               {viewDeclarationData.declarationBy}
             </Descriptions.Item>
             <Descriptions.Item label="Mã tham chiếu">
-              {viewDeclarationData.referenceCode}
+              {viewDeclarationData.referenceNo}
             </Descriptions.Item>
             <Descriptions.Item label="Ảnh tờ khai">
               <img

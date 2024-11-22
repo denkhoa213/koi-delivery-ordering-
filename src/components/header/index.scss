@@ -10,15 +10,35 @@
   .header-left {
     display: flex;
     align-items: center;
+    margin-right: 50px;
 
     .logo img {
-      height: 50px;
-      margin-right: 20px;
+      height: 66px;
+      margin-left: 50px;
+      margin-right: 30px;
     }
 
-    .search-bar {
-      flex-grow: 1;
+    .nameLogo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px; /* Cỡ chữ lớn hơn để giống biển hiệu */
+      font-weight: bold;
+      color: #FF5722; /* Đỏ cam ánh vàng */
+      text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5); /* Bóng đổ để làm nổi bật chữ */
+      padding: 20px 30px; /* Padding rộng hơn cho logo lớn */
+      border: 3px solid #FF4500; /* Viền đỏ cam */
+      border-radius: 12px; /* Góc bo tròn nhẹ */
+      background-color: #fff8e1; /* Nền vàng nhạt */
+      display: inline-block;
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3); /* Bóng đổ tổng thể để nổi bật logo */
+      transition: transform 0.3s ease, box-shadow 0.3s ease; /* Hiệu ứng hover */
     }
+    
+    .nameLogo:hover {
+      transform: scale(1.1); /* Phóng to khi hover */
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5); /* Tăng độ bóng đổ khi hover */
+    }
+
+
   }
 
   .header-right {

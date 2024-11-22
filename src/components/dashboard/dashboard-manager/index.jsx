@@ -39,7 +39,6 @@ const DashboarManager = () => {
   } = theme.useToken();
   return (
     <>
-      <Header />
       <Layout
         style={{
           minHeight: "100vh",

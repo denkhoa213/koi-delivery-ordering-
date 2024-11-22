@@ -57,13 +57,20 @@ function ManageHealthService() {
   //DELETE
   const handleDelete = async (id) => {
     try {
-      const response = await api.delete(`heal-service-category/delete/${id}`);
-      toast.success(response.data.message);
+      const response = await api.delete(`/heal-service-category/delete/${id}`);
+
+      if (response.data.code === 200) {
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.data.message);
+      }
+
       fetchHealthService();
     } catch (error) {
-      toast.error(error.response.data);
+      toast.error(error.response?.data?.message || "Error deleting fish category");
     }
   };
+
 
   useEffect(() => {
     fetchHealthService();
@@ -71,29 +78,30 @@ function ManageHealthService() {
 
   const columns = [
     {
-      title: "Service Name",
+      title: "Tên dịch vụ",
       dataIndex: "serviceName",
       key: "serviceName",
     },
     {
-      title: "Service Description",
+      title: "Mô tả dịch vụ",
       dataIndex: "serviceDescription",
       key: "serviceDescription",
     },
     {
-      title: "Price",
+      title: "Giá",
       dataIndex: "price",
       key: "price",
-      render: (price) => `$${price}`,
+      render: (price) => `${price} VND`,
+      width: 120,
     },
     {
-      title: "Created At",
+      title: "Ngày tạo",
       dataIndex: "createAt",
       key: "createAt",
       render: (date) => new Date(date).toLocaleString(),
     },
     {
-      title: "Updated At",
+      title: "Ngày cập nhật",
       dataIndex: "updateAt",
       key: "updateAt",
       render: (date) => new Date(date).toLocaleString(),
@@ -112,7 +120,7 @@ function ManageHealthService() {
               form.setFieldsValue(category);
             }}
           >
-            Edit
+            Chỉnh sửa
           </Button>
 
           <Popconfirm
@@ -121,7 +129,7 @@ function ManageHealthService() {
             onConfirm={() => handleDelete(id)}
           >
             <Button type="primary" danger icon={<DeleteOutlined />}>
-              Delete
+              Xoá
             </Button>
           </Popconfirm>
         </Space>
@@ -141,7 +149,7 @@ function ManageHealthService() {
         }}
         style={{ marginBottom: "16px" }}
       >
-        Add New Service
+        Thêm mới dịch vụ
       </Button>
       <Table dataSource={healthService} columns={columns} rowKey="id" />
 
