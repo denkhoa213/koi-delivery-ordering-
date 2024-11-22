@@ -312,12 +312,15 @@ function ManagePackage() {
             <Input />
           </Form.Item>
 
-          <Form.Item name="image" label="Hình ảnh">
+          <Form.Item
+            label="Tải lên hình ảnh"
+            name="image"
+            rules={[{ required: true, message: "Vui lòng tải lên hình ảnh!" }]}
+          >
             <Upload
               fileList={fileList}
               onChange={handleUploadChange}
-              customRequest={() => {}}
-              listType="picture"
+              beforeUpload={() => false}
             >
               <Button icon={<UploadOutlined />}>Tải lên hình ảnh</Button>
             </Upload>
