@@ -16,7 +16,7 @@ import Support from "./components/support";
 import ServiceDetail from "./components/detail-service";
 import OrderForm from "./pages/form-page/order";
 import FishProfileForm from "./pages/form-page/fishProfile";
-import CustomsDeclarationForm from "./pages/form-page/declaration";
+
 import TotalOrder from "./pages/form-page/totalDetailOrder";
 import OrderSuccess from "./pages/order-success";
 import CustomerTemplate from "./components/customer-template";
@@ -211,10 +211,7 @@ function App() {
       path: "fish-profile/:orderId",
       element: <FishProfileForm />,
     },
-    {
-      path: "form-declaration/:orderId",
-      element: <CustomsDeclarationForm />,
-    },
+
     {
       path: "total-order/:orderId",
       element: <TotalOrder />,

@@ -62,7 +62,10 @@ const Header = () => {
             <Button
               type="link"
               icon={<AiOutlineLogout fontSize={18} />}
-              onClick={() => dispatch(logout())}
+              onClick={() => {
+                dispatch(logout());
+                navigate("/");
+              }}
             >
               Logout
             </Button>

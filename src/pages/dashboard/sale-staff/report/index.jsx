@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Modal, Input, Form } from "antd";
-import api from "../../../../config/axios"; // Đảm bảo đường dẫn đúng
+import { Table, Button, Modal, Input, Form, Card } from "antd";
+import api from "../../../../config/axios";
 import { toast } from "react-toastify";
 
 function Report() {
-  const [handoverData, setHandoverData] = useState([]);
+  const [orderData, setOrderData] = useState([]);
   const [reportData, setReportData] = useState([]);
   const [error, setError] = useState(null);
-  const [selectedReport, setSelectedReport] = useState([]);
+
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [answers, setAnswers] = useState({}); // Quản lý trả lời cho từng báo cáo
+  const [answers, setAnswers] = useState({});
   const [loadingReportId, setLoadingReportId] = useState(null);
 
+  const [form] = Form.useForm();
+
   useEffect(() => {
-    const fetchHandoverData = async () => {
+    const fetchOrder = async () => {
       try {
-        const response = await api.get("/handover-documents/view-all");
-        setHandoverData(response.data.result);
+        const response = await api.get("/order/view-all");
+        setOrderData(response.data.result);
       } catch (err) {
         setError(
           err.response?.data?.message || "Có lỗi xảy ra khi tải dữ liệu"
@@ -24,14 +26,22 @@ function Report() {
       }
     };
 
-    fetchHandoverData();
+    fetchOrder();
   }, []);
 
   const handleViewReport = async (orderId) => {
+    if (!orderId) {
+      toast.error("Mã đơn hàng không hợp lệ");
+      return;
+    }
+
     try {
       const response = await api.get(`/report/view-by-order/${orderId}`);
-      setReportData(response.data.result); // Cập nhật dữ liệu báo cáo
-      setIsModalVisible(true); // Hiển thị modal
+      setReportData(response.data.result);
+      setIsModalVisible(true);
+
+      setAnswers({});
+      form.resetFields();
     } catch (err) {
       toast.error(err.response?.data || "Không thể tải báo cáo");
     }
@@ -40,7 +50,7 @@ function Report() {
   const handleAnswerChange = (reportId, value) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
-      [reportId]: value, // Cập nhật nội dung trả lời của từng báo cáo
+      [reportId]: value,
     }));
   };
 
@@ -48,15 +58,20 @@ function Report() {
     setLoadingReportId(reportId);
     try {
       const data = {
-        answer: answers[reportId], // Gửi nội dung trả lời của báo cáo tương ứng
+        answer: answers[reportId],
       };
       const response = await api.put(`/report/answer/${reportId}`, data);
       toast.success(response.data.message);
-      setAnswers((prevAnswers) => ({
-        ...prevAnswers,
-        [reportId]: "", // Xóa nội dung trả lời sau khi gửi
-      }));
-      setIsModalVisible(false); // Đóng modal sau khi trả lời
+
+      setAnswers((prevAnswers) => {
+        const newAnswers = { ...prevAnswers };
+        delete newAnswers[reportId];
+        return newAnswers;
+      });
+
+      setIsModalVisible(false);
+
+      form.resetFields();
     } catch (err) {
       toast.error(err.response?.data || "Không thể gửi câu trả lời");
     } finally {
@@ -64,47 +79,67 @@ function Report() {
     }
   };
 
-  const handoverColumns = [
+  const orderColumns = [
     {
-      title: "Số biên bản bàn giao",
-      dataIndex: "handoverNo",
-      key: "handoverNo",
+      title: "Mã đơn",
+      dataIndex: "orderCode",
+      key: "orderCode",
+      width: 100,
     },
     {
-      title: "Mô tả",
-      dataIndex: "handoverDescription",
-      key: "handoverDescription",
+      title: "Phương thức giao",
+      dataIndex: "deliveryMethod",
+      key: "deliveryMethod",
+      width: 120,
     },
     {
-      title: "Phương tiện",
-      dataIndex: "vehicle",
-      key: "vehicle",
+      title: "Ngày đặt",
+      dataIndex: "orderDate",
+      key: "orderDate",
+      width: 120,
     },
     {
       title: "Điểm đến",
       dataIndex: "destination",
       key: "destination",
+      width: 150,
     },
     {
-      title: "Điểm khởi hành",
+      title: "Khởi hành",
       dataIndex: "departure",
       key: "departure",
+      width: 150,
     },
     {
-      title: "Tổng giá",
-      dataIndex: "totalPrice",
-      key: "totalPrice",
-      render: (text) => <span>{text.toLocaleString()} VNĐ</span>,
+      title: "Khoảng cách",
+      dataIndex: "distance",
+      key: "distance",
+      width: 100,
     },
     {
-      title: "Trạng thái bàn giao",
-      dataIndex: "handoverStatusEnum",
-      key: "handoverStatusEnum",
-      render: (handoverStatusEnum) => {
-        let statusColor = "#d9d9d9"; // Màu mặc định (xám)
+      title: "Số điện thoại",
+      dataIndex: "phone",
+      key: "phone",
+      width: 120,
+    },
+    {
+      title: "Tổng tiền",
+      dataIndex: "totalAmount",
+      key: "totalAmount",
+      width: 120,
+    },
+    {
+      title: "Trạng thái thanh toán",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus",
+      width: 120,
+      render: (paymentStatus) => {
+        let statusColor = "#d9d9d9";
 
-        if (handoverStatusEnum === "COMPLETED") {
-          statusColor = "#d9d9d9"; // Màu xanh cho COMPLETED
+        if (paymentStatus === "UNPAID") {
+          statusColor = "#f5222d";
+        } else if (paymentStatus === "PAID") {
+          statusColor = "#52c41a";
         }
 
         return (
@@ -116,7 +151,7 @@ function Report() {
               borderRadius: "5px",
             }}
           >
-            {handoverStatusEnum}
+            {paymentStatus}
           </span>
         );
       },
@@ -125,7 +160,7 @@ function Report() {
       title: "Xem báo cáo",
       key: "viewReport",
       render: (text, record) => (
-        <Button onClick={() => handleViewReport(record.orderId)} type="primary">
+        <Button onClick={() => handleViewReport(record.id)} type="primary">
           Xem Báo Cáo
         </Button>
       ),
@@ -139,8 +174,8 @@ function Report() {
         <p style={{ color: "red" }}>{error}</p>
       ) : (
         <Table
-          dataSource={handoverData}
-          columns={handoverColumns}
+          dataSource={orderData}
+          columns={orderColumns}
           rowKey="handoverNo"
           pagination={{ pageSize: 10 }}
           bordered
@@ -154,10 +189,18 @@ function Report() {
         onCancel={() => setIsModalVisible(false)}
         footer={null}
         width={600}
+        centered
       >
         {reportData.length > 0 ? (
           reportData.map((report) => (
-            <div key={report.id} style={{ marginBottom: "20px" }}>
+            <Card
+              key={report.id}
+              style={{
+                marginBottom: "20px",
+                borderRadius: "8px",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+              }}
+            >
               <div style={{ marginBottom: "10px" }}>
                 <strong>Tiêu đề:</strong> {report.title}
               </div>
@@ -170,13 +213,16 @@ function Report() {
               </div>
 
               <Form
+                form={form} // Gán form instance
                 layout="vertical"
                 onFinish={() => handleAnswerReport(report.id)}
               >
-                <Form.Item>
+                <Form.Item
+                  name={`answer_${report.id}`}
+                  initialValue={answers[report.id] || ""} // Nếu không có trả lời, để trống
+                >
                   <Input.TextArea
                     rows={4}
-                    value={answers[report.id] || ""} // Hiển thị nội dung riêng cho từng báo cáo
                     onChange={(e) =>
                       handleAnswerChange(report.id, e.target.value)
                     }
@@ -188,21 +234,25 @@ function Report() {
                     }}
                   />
                 </Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  style={{
-                    marginTop: 10,
-                    borderRadius: "8px",
-                    backgroundColor: "#4CAF50",
-                    borderColor: "#4CAF50",
-                  }}
-                  loading={loadingReportId === report.id}
-                >
-                  Trả lời
-                </Button>
+
+                <Form.Item>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    style={{
+                      marginTop: 10,
+                      borderRadius: "8px",
+                      backgroundColor: "#4CAF50",
+                      borderColor: "#4CAF50",
+                      width: "100%",
+                    }}
+                    loading={loadingReportId === report.id}
+                  >
+                    Trả lời
+                  </Button>
+                </Form.Item>
               </Form>
-            </div>
+            </Card>
           ))
         ) : (
           <p>Không có báo cáo nào cho đơn hàng này.</p>

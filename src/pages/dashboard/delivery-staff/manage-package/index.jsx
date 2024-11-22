@@ -267,7 +267,7 @@ function ManagePackage() {
             icon={<EditOutlined />}
             onClick={() => handleEditPackage(record)}
           >
-            Sửa
+            Cập nhật
           </Button>
 
           <Popconfirm

@@ -194,8 +194,8 @@ const CheckHealth = () => {
   const fishColumns = [
     {
       title: "Loại cá",
-      dataIndex: "fishCategory",
-      key: "fishCategory",
+      dataIndex: "species",
+      key: "species",
     },
     {
       title: "Tên cá",

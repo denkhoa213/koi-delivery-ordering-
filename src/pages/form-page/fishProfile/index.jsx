@@ -33,7 +33,8 @@ const { Title, Text } = Typography;
 
 const FishProfileForm = () => {
   const [showModal, setShowModal] = useState(false);
-  const [showModalEdit, setShowModalEdit] = useState(false);
+  const [showModalEditCertificate, setShowModalEditCertificate] =
+    useState(false);
   const navigate = useNavigate();
   const { orderId } = useParams();
   const [fileList, setFileList] = useState([]);
@@ -56,7 +57,7 @@ const FishProfileForm = () => {
   };
 
   const handleBack = () => {
-    navigate(-1); // Quay lại trang trước đó
+    navigate(-1);
   };
 
   const fetchViewFishOrder = async () => {
@@ -104,7 +105,7 @@ const FishProfileForm = () => {
         values.image = url;
         toast.success("Tải lên hình ảnh thành công!");
       } catch (error) {
-        toast.error("Lỗi khi tải lên hình ảnh!");
+        toast.error(error.message("Lỗi tải hình ảnh!"));
         return;
       }
     }
@@ -127,11 +128,10 @@ const FishProfileForm = () => {
 
   const handleAddCertificate = async (values) => {
     if (!fishProfileId || fishProfileId.length === 0) {
-      toast.error("Không có fishProfileId để tạo chứng chỉ!");
+      toast.error("Không có cá để tạo chứng chỉ!");
       return;
     }
 
-    // Nếu có file hình ảnh, tải lên hình ảnh
     if (fileList.length > 0) {
       const file = fileList[0].originFileObj;
       try {
@@ -139,7 +139,7 @@ const FishProfileForm = () => {
         values.image = url;
         toast.success("Tải lên hình ảnh thành công!");
       } catch (error) {
-        toast.error("Lỗi khi tải lên hình ảnh!");
+        toast.error(error.message("Lỗi tải hình ảnh!"));
         return;
       }
     }
@@ -147,41 +147,45 @@ const FishProfileForm = () => {
     try {
       for (const id of fishProfileId) {
         const response = await api.post(`/certificates/create/${id}`, values);
-        toast.success(
-          `Chứng chỉ đã được tạo cho cá với ID: ${id} - ${response.data.message}`
-        );
+        toast.success(response.data.message);
       }
       fetchViewCertificate(fishProfileId);
-      form.resetFields();
+      formCetificate.resetFields();
+      setFileList([]);
+      fetchViewCertificate();
       setShowModal(false);
     } catch (error) {
       toast.error(error.response?.data || "Có lỗi xảy ra khi tạo chứng chỉ.");
     }
   };
 
-  const handleEditCertificate = async (formEditCetificate) => {
+  const handleEditCertificate = async (value) => {
     if (fileList.length > 0) {
       const file = fileList[0].originFileObj;
       try {
         const url = await uploadFile(file);
-        formEditCetificate.image = url;
+        value.image = url;
         toast.success("Tải lên hình ảnh thành công!");
       } catch (error) {
-        toast.error("Lỗi khi tải lên hình ảnh!");
+        toast.error(error.message("Lỗi tải hình ảnh!"));
         return;
       }
     }
+
     try {
       const certificateId = certificates[0].id;
       const response = await api.put(
         `/certificates/update/${certificateId}`,
-        formEditCetificate
+        value
       );
+
       fetchViewFishOrder();
       fetchViewCertificate(fishProfileId);
       toast.success(response.data.message);
       formEditCetificate.resetFields();
-      setShowModalEdit(false);
+      setFileList([]);
+      setShowModalEditCertificate(false);
+      setShowCertificates(true);
     } catch (error) {
       toast.error(error.response.data);
     }
@@ -198,6 +202,7 @@ const FishProfileForm = () => {
         toast.success(response.data.message);
         fetchViewCertificate(fishProfileId);
       }
+      fetchFishCategories();
     } catch (error) {
       const errorMessage =
         error.response?.data || "Có lỗi xảy ra khi xóa hồ sơ cá!";
@@ -213,7 +218,6 @@ const FishProfileForm = () => {
 
   const handlePaymentClick = async () => {
     if (!orderId || orderId === "") {
-      // Hiển thị thông báo lỗi nếu không có mã đơn hàng
       toast.error("Không có mã đơn hàng để thanh toán!");
       return;
     }
@@ -376,7 +380,7 @@ const FishProfileForm = () => {
             type="primary"
             icon={<EditOutlined />}
             onClick={() => {
-              setShowModalEdit(true);
+              setShowModalEditCertificate(true);
               formEditCetificate.setFieldsValue({
                 name: value.name,
                 size: value.size,
@@ -437,14 +441,20 @@ const FishProfileForm = () => {
             onFinish={handleSubmitFishProfile}
             form={form}
             layout="vertical"
+            colon={false}
           >
-            <Divider>Thông tin cá Koi</Divider>
             <Row gutter={[24, 16]}>
               <Col span={12}>
                 <Form.Item
                   name="name"
                   label="Tên cá"
-                  rules={[{ required: true, message: "Vui lòng nhập tên cá!" }]}
+                  rules={[
+                    { required: true, message: "Vui lòng nhập tên cá!" },
+                    {
+                      max: 50,
+                      message: "Tên cá không được vượt quá 50 ký tự!",
+                    },
+                  ]}
                 >
                   <Input placeholder="Nhập tên cá" />
                 </Form.Item>
@@ -453,7 +463,13 @@ const FishProfileForm = () => {
                 <Form.Item
                   name="description"
                   label="Mô tả"
-                  rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
+                  rules={[
+                    { required: true, message: "Vui lòng nhập mô tả!" },
+                    {
+                      max: 200,
+                      message: "Mô tả không được vượt quá 200 ký tự!",
+                    },
+                  ]}
                 >
                   <Input placeholder="Nhập mô tả" />
                 </Form.Item>
@@ -498,9 +514,20 @@ const FishProfileForm = () => {
                   label="Kích thước"
                   rules={[
                     { required: true, message: "Vui lòng nhập kích thước!" },
+                    {
+                      type: "number",
+                      min: 0.01,
+                      max: 100,
+                      message: "Kích thước phải từ 0.01 đến 100 cm!",
+                    },
                   ]}
                 >
-                  <InputNumber min={1} max={100} placeholder="Kích thước" />
+                  <InputNumber
+                    min={0.01}
+                    max={100}
+                    addonAfter="Cm"
+                    placeholder="Nhập kích thước"
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -511,12 +538,12 @@ const FishProfileForm = () => {
                   name="sex"
                   label="Giới tính"
                   rules={[
-                    { required: true, message: "Vui lòng nhập giới tính cá!" },
+                    { required: true, message: "Vui lòng chọn giới tính cá!" },
                   ]}
                 >
                   <Select placeholder="Chọn giới tính">
-                    <Select.Option value="male">Giống Đực</Select.Option>
-                    <Select.Option value="female">Giống Cái</Select.Option>
+                    <Select.Option value="MALE">Giống Đực</Select.Option>
+                    <Select.Option value="FEMALE">Giống Cái</Select.Option>
                   </Select>
                 </Form.Item>
               </Col>
@@ -524,9 +551,22 @@ const FishProfileForm = () => {
                 <Form.Item
                   name="age"
                   label="Tuổi"
-                  rules={[{ required: true, message: "Vui lòng nhập tuổi!" }]}
+                  rules={[
+                    { required: true, message: "Vui lòng nhập tuổi!" },
+                    {
+                      type: "number",
+                      min: 0,
+                      max: 20,
+                      message: "Tuổi phải từ 0 đến 20!",
+                    },
+                  ]}
                 >
-                  <InputNumber min={1} max={100} placeholder="Chọn tuổi" />
+                  <InputNumber
+                    min={0}
+                    max={20}
+                    addonAfter="Năm"
+                    placeholder="Nhập tuổi"
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -557,9 +597,20 @@ const FishProfileForm = () => {
                   label="Cân nặng"
                   rules={[
                     { required: true, message: "Vui lòng nhập cân nặng cá!" },
+                    {
+                      type: "number",
+                      min: 0.01,
+                      max: 20,
+                      message: "Cân nặng phải từ 0.01 đến 20 kg!",
+                    },
                   ]}
                 >
-                  <InputNumber min={1} max={100} placeholder="Chọn cân nặng" />
+                  <InputNumber
+                    min={0.01}
+                    max={20}
+                    addonAfter="Kg"
+                    placeholder="Nhập cân nặng"
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -571,6 +622,10 @@ const FishProfileForm = () => {
                   label="Nguồn gốc"
                   rules={[
                     { required: true, message: "Vui lòng nhập nguồn gốc!" },
+                    {
+                      max: 100,
+                      message: "Nguồn gốc không được vượt quá 100 ký tự!",
+                    },
                   ]}
                 >
                   <Input placeholder="Nhập nguồn gốc" />
@@ -600,8 +655,8 @@ const FishProfileForm = () => {
               type="default"
               style={{
                 width: "200px",
-                marginTop: "20px", // Add some space at the top
-                fontSize: "16px", // Larger text for better readability
+                marginTop: "20px",
+                fontSize: "16px",
               }}
             >
               Quay lại
@@ -610,12 +665,12 @@ const FishProfileForm = () => {
             <Divider />
             <Form.Item style={{ textAlign: "right" }}>
               <Space>
-                <Button type="primary" onClick={handlePaymentClick}>
-                  Thanh toán
-                </Button>
-
                 <Button type="default" onClick={() => form.submit()}>
                   Tạo thêm cá mới
+                </Button>
+
+                <Button type="primary" onClick={handlePaymentClick}>
+                  Thanh toán
                 </Button>
               </Space>
             </Form.Item>
@@ -646,7 +701,7 @@ const FishProfileForm = () => {
               label="Tên cá"
               rules={[{ required: true, message: "Vui lòng nhập tên Tên cá" }]}
             >
-              <Input placeholder="Nhập tên chứng chỉ" />
+              <Input placeholder="Nhập tên tên cá" readOnly />
             </Form.Item>
 
             <Form.Item
@@ -654,7 +709,7 @@ const FishProfileForm = () => {
               label="Loài"
               rules={[{ required: true, message: "Vui lòng nhập loài!" }]}
             >
-              <Input placeholder="Nhập loài" disabled />
+              <Input placeholder="Nhập loài" readOnly />
             </Form.Item>
 
             <Form.Item
@@ -672,7 +727,7 @@ const FishProfileForm = () => {
               label="Giới tính"
               rules={[{ required: true, message: "Vui lòng nhập giới tính!" }]}
             >
-              <Input placeholder="Nhập giới tính" disabled />
+              <Input placeholder="Nhập giới tính" readOnly />
             </Form.Item>
 
             <Form.Item
@@ -680,7 +735,7 @@ const FishProfileForm = () => {
               label="Kích thước"
               rules={[{ required: true, message: "Vui lòng nhập kích thước!" }]}
             >
-              <Input type="number" placeholder="Nhập kích thước" disabled />
+              <Input type="number" placeholder="Nhập kích thước" readOnly />
             </Form.Item>
 
             <Form.Item
@@ -688,7 +743,7 @@ const FishProfileForm = () => {
               label="Tuổi"
               rules={[{ required: true, message: "Vui lòng nhập tuổi!" }]}
             >
-              <Input type="number" placeholder="Nhập tuổi" disabled />
+              <Input type="number" placeholder="Nhập tuổi" readOnly />
             </Form.Item>
 
             <Form.Item
@@ -710,10 +765,10 @@ const FishProfileForm = () => {
         </Modal>
 
         <Modal
-          open={showModalEdit}
-          onCancel={() => setShowModalEdit(false)}
+          open={showModalEditCertificate}
+          onCancel={() => setShowModalEditCertificate(false)}
           onOk={() => formEditCetificate.submit()}
-          title="Edit chứng chỉ"
+          title="Cập nhật chứng chỉ"
         >
           <Form
             form={formEditCetificate}
@@ -725,7 +780,7 @@ const FishProfileForm = () => {
               label="Tên cá"
               rules={[{ required: true, message: "Vui lòng nhập tên Tên cá" }]}
             >
-              <Input placeholder="Nhập tên chứng chỉ" />
+              <Input placeholder="Nhập tên tên cá" readOnly />
             </Form.Item>
 
             <Form.Item
@@ -733,7 +788,7 @@ const FishProfileForm = () => {
               label="Loài"
               rules={[{ required: true, message: "Vui lòng nhập loài!" }]}
             >
-              <Input placeholder="Nhập loài" disabled />
+              <Input placeholder="Nhập loài" readOnly />
             </Form.Item>
 
             <Form.Item
@@ -751,7 +806,7 @@ const FishProfileForm = () => {
               label="Giới tính"
               rules={[{ required: true, message: "Vui lòng nhập giới tính!" }]}
             >
-              <Input placeholder="Nhập giới tính" disabled />
+              <Input placeholder="Nhập giới tính" readOnly />
             </Form.Item>
 
             <Form.Item
@@ -759,7 +814,7 @@ const FishProfileForm = () => {
               label="Kích thước"
               rules={[{ required: true, message: "Vui lòng nhập kích thước!" }]}
             >
-              <Input type="number" placeholder="Nhập kích thước" disabled />
+              <Input type="number" placeholder="Nhập kích thước" readOnly />
             </Form.Item>
 
             <Form.Item
@@ -767,7 +822,7 @@ const FishProfileForm = () => {
               label="Tuổi"
               rules={[{ required: true, message: "Vui lòng nhập tuổi!" }]}
             >
-              <Input type="number" placeholder="Nhập tuổi" disabled />
+              <Input type="number" placeholder="Nhập tuổi" readOnly />
             </Form.Item>
 
             <Form.Item

@@ -20,13 +20,28 @@ import AppFooter from "../../../components/footer";
 const { Title, Text } = Typography;
 
 function OrderForm() {
-  const [isPlaneDelivery, setIsPlaneDelivery] = useState(false);
   const [selectedDelivery, setSelectedDelivery] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
   const [deliveryMethod, setDeliveryMethod] = useState([]);
   const [form] = Form.useForm();
 
-  // Fetch available delivery methods
+  // Kiểm tra trạng thái đăng nhập
+  const isTokenValid = (token) => {
+    if (!token) return false;
+    const parts = token.split(".");
+    return parts.length === 3;
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(isTokenValid(token));
+    if (!isTokenValid(token)) {
+      toast.error("Bạn cần đăng nhập để tạo đơn hàng.");
+      navigate("/login");
+    }
+  }, [navigate]);
+
   const fetchDelivery = async () => {
     try {
       const response = await api.get("/delivery-method/view-all");
@@ -38,18 +53,23 @@ function OrderForm() {
     }
   };
 
-  // Handle delivery method change
+  // Xử lý thay đổi phương thức giao hàng
   const handleDeliveryMethodChange = (value) => {
     const selected = deliveryMethod.find((delivery) => delivery.name === value);
     setSelectedDelivery(selected);
-    setIsPlaneDelivery(value.toUpperCase() === "PLANE");
-    localStorage.setItem("transportMethod", value);
   };
 
-  // Submit the order form
+  // Xử lý gửi form tạo đơn hàng
   const handleSubmitOrder = async (values) => {
+    const token = localStorage.getItem("token");
+
+    if (!isTokenValid(token)) {
+      toast.error("Bạn cần đăng nhập để tạo đơn hàng.");
+      navigate("/login");
+      return;
+    }
+
     try {
-      const token = localStorage.getItem("token");
       const dataToSubmit = {
         deliveryMethod: values.deliveryMethod,
         destination: values.destination,
@@ -66,13 +86,9 @@ function OrderForm() {
       const createBy = response.data.result.createBy;
       localStorage.setItem("orderId", orderId);
       localStorage.setItem("createBy", createBy);
-      toast.success(response.data.message);
 
-      if (values.customsDeclaration) {
-        navigate(`/form-declaration/${orderId}`);
-      } else {
-        navigate(`/fish-profile/${orderId}`);
-      }
+      navigate(`/fish-profile/${orderId}`);
+
       if (response.data.code === 200) {
         toast.success(response.data.message);
       } else {
@@ -92,14 +108,19 @@ function OrderForm() {
   return (
     <>
       <Header />
-      <div style={{
-        minHeight: "100vh", // Chiều cao tối thiểu của màn hình
-        backgroundColor: "#F5F5F5",
-        paddingTop: "70px",
-      }}>
+      <div
+        style={{
+          minHeight: "100vh",
+          backgroundColor: "#F5F5F5",
+          paddingTop: "70px",
+        }}
+      >
         <Card
           title={
-            <Title level={3} style={{ fontSize: "24px", fontWeight: "bold", color: "#333" }}>
+            <Title
+              level={3}
+              style={{ fontSize: "24px", fontWeight: "bold", color: "#333" }}
+            >
               Thông tin đơn hàng
             </Title>
           }
@@ -109,13 +130,22 @@ function OrderForm() {
             margin: "0 auto",
             border: "2px solid #000",
             borderRadius: "8px",
-
           }}
         >
+          {!isLoggedIn && (
+            <div
+              style={{
+                color: "red",
+                textAlign: "center",
+                marginBottom: "16px",
+              }}
+            >
+              Vui lòng <a href="/login">đăng nhập</a> để tiếp tục tạo đơn hàng.
+            </div>
+          )}
           <Form form={form} onFinish={handleSubmitOrder} layout="vertical">
             <Row gutter={16}>
               <Col span={12}>
-                {/* Delivery Method */}
                 <Form.Item
                   name="deliveryMethod"
                   label="Phương thức giao hàng"
@@ -138,18 +168,6 @@ function OrderForm() {
                   </Select>
                 </Form.Item>
               </Col>
-
-              {isPlaneDelivery && (
-                <Col span={12}>
-                  <Form.Item
-                    name="customsDeclaration"
-                    valuePropName="checked"
-                    style={{ marginTop: "25px" }}
-                  >
-                    <Checkbox>Yêu cầu khai báo hải quan</Checkbox>
-                  </Form.Item>
-                </Col>
-              )}
             </Row>
 
             {selectedDelivery && (
@@ -177,23 +195,26 @@ function OrderForm() {
 
             <Row gutter={16}>
               <Col span={12}>
-                {/* Destination */}
                 <Form.Item
                   label="Điểm đến"
                   name="destination"
-                  rules={[{ required: true, message: "Vui lòng nhập điểm đến!" }]}
+                  rules={[
+                    { required: true, message: "Vui lòng nhập điểm đến!" },
+                  ]}
                 >
                   <Input placeholder="Nhập điểm đến" />
                 </Form.Item>
               </Col>
 
               <Col span={12}>
-                {/* Departure */}
                 <Form.Item
                   label="Điểm khởi hành"
                   name="departure"
                   rules={[
-                    { required: true, message: "Vui lòng nhập điểm khởi hành!" },
+                    {
+                      required: true,
+                      message: "Vui lòng nhập điểm khởi hành!",
+                    },
                   ]}
                 >
                   <Input placeholder="Nhập điểm khởi hành" />
@@ -203,7 +224,6 @@ function OrderForm() {
 
             <Row gutter={16}>
               <Col span={12}>
-                {/* Phone Number */}
                 <Form.Item
                   label="Số điện thoại"
                   name="phone"
@@ -220,9 +240,13 @@ function OrderForm() {
               </Col>
             </Row>
 
-            {/* Submit Button */}
             <Form.Item style={{ textAlign: "right" }}>
-              <Button type="primary" htmlType="submit" style={{ width: "auto" }}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={{ width: "auto" }}
+                disabled={!isLoggedIn} // Chặn nút khi chưa đăng nhập
+              >
                 Xác nhận thông tin đơn hàng
               </Button>
             </Form.Item>
