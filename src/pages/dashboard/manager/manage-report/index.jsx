@@ -32,18 +32,14 @@ function ViewReport() {
 
     // Define table columns
     const columns = [
+
         {
-            title: "ID báo cáo",
-            dataIndex: "id",
-            key: "id",
-        },
-        {
-            title: "ID đơn hàng",
+            title: "Mã đơn hàng",
             dataIndex: "orderId",
             key: "orderId",
         },
         {
-            title: "ID khách hàng",
+            title: "Email khách hàng",
             dataIndex: "userId",
             key: "userId",
         },

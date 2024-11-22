@@ -33,12 +33,12 @@ function ViewFeedback() {
     // Define table columns
     const columns = [
         {
-            title: "ID phản hồi",
-            dataIndex: "id",
-            key: "id",
+            title: "Mã đơn hàng",
+            dataIndex: "orderId",
+            key: "orderId",
         },
         {
-            title: "ID khách hàng",
+            title: "Email khách hàng",
             dataIndex: "customerId",
             key: "customerId",
         },

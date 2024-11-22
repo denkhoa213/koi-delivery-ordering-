@@ -75,9 +75,9 @@ function ManageUser() {
   };
 
   const handleUploadChange = (info) => {
-    // Xóa avatar cũ khỏi fileList khi người dùng chọn file mới
+
     if (info.fileList.length === 0) {
-      setFileList([]);  // Nếu không có file nào được chọn, xóa file cũ
+      setFileList([]);
     } else {
       setFileList(info.fileList);
     }
@@ -85,14 +85,14 @@ function ManageUser() {
 
 
   const handleEditUser = async (userId, updatedUser) => {
+
+    const payload = Object.fromEntries(
+      Object.entries(updatedUser).filter(([_, value]) => value !== undefined && value !== null)
+    );
+    console.log("Payload gửi tới backend:", payload);
+
     try {
-      // Nếu có ảnh mới thì cập nhật avatar
-      const response = await api.put(`/customer/edit-user/${userId}`, {
-        name: updatedUser.name,
-        address: updatedUser.address,
-        avatar: updatedUser.avatar, // Avatar được cập nhật nếu có
-        phone: updatedUser.phone,
-      });
+      const response = await api.put(`/customer/edit-user/${userId}`, payload);
 
       if (response.status === 200) {
         toast.success('User updated successfully!');
@@ -107,27 +107,29 @@ function ManageUser() {
 
 
   const handleFinish = async (values) => {
-    // Kiểm tra nếu có ảnh mới
-    if (fileList.length > 0) {
-      const file = fileList[0].originFileObj;
-      try {
-        // Upload ảnh mới
-        const url = await uploadFile(file);
-        values.avatar = url; // Cập nhật lại URL ảnh
-        toast.success("Tải lên hình ảnh thành công!");
-      } catch (error) {
-        toast.error(error);
-        return;
+    try {
+      let avatarUrl = null;
+
+      // Kiểm tra nếu có ảnh mới được tải lên
+      if (fileList.length > 0) {
+        const file = fileList[0].originFileObj;
+        avatarUrl = await uploadFile(file); // Upload ảnh và lấy URL
       }
+
+      // Tạo payload, chỉ thêm avatar nếu có cập nhật
+      const payload = { ...values };
+      if (avatarUrl) {
+        payload.avatar = avatarUrl;
+      }
+      console.log("Payload trước khi gửi:", payload);
+
+      await handleEditUser(currentUserId, payload); // Gửi payload tới API
+      setShowEditModal(false);
+      form.resetFields();
+    } catch (error) {
+      toast.error("Có lỗi xảy ra khi cập nhật thông tin");
     }
-
-    // Cập nhật thông tin người dùng (bao gồm ảnh, nếu có)
-    await handleEditUser(currentUserId, values);
-    setShowEditModal(false);
-    form.resetFields();
   };
-
-
 
   const handleBlockUnblockUser = async (userId, isBlocked) => {
     try {
@@ -143,18 +145,20 @@ function ManageUser() {
             user.id === userId ? { ...user, status: isBlocked ? 'VERIFIED' : 'BLOCKED' } : user
           )
         );
-      } else {
-        toast.error('Failed to update user status');
       }
     } catch (error) {
-      toast.error('Error updating user status: ' + error.message);
+      toast.error('Không thể chặn tài khoản đang có đơn hàng trên hệ thống ');
     }
   };
 
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+
+    if (!showEditModal) {
+      setFileList([]); // Xóa fileList khi đóng modal
+    }
+  }, [showEditModal]);
 
   const columns = [
     {
@@ -378,7 +382,7 @@ function ManageUser() {
 
       {/* Edit User Modal */}
       <Modal
-        title="Edit User"
+        title="Chỉnh sửa thông tin người dùng"
         visible={showEditModal}
         onCancel={() => setShowEditModal(false)}
         footer={null}
@@ -386,20 +390,24 @@ function ManageUser() {
         <Form
           form={form}
           layout="vertical"
-          onFinish={handleFinish}
+          onFinish={(values) => {
+            handleFinish({ ...values, avatar: fileList[0]?.originFileObj });
+          }}
         >
-          <Form.Item name="name" label="Name" rules={[{ required: true }]}>
-            <Input />
+          <Form.Item name="name" label="Tên">
+            <Input placeholder="Enter name" />
           </Form.Item>
-          <Form.Item name="address" label="Address">
-            <Input />
+
+          <Form.Item name="address" label="Địa chỉ">
+            <Input placeholder="Enter address" />
           </Form.Item>
-          <Form.Item name="phone" label="Phone" rules={[{ required: true }]}>
-            <Input />
+
+          <Form.Item name="phone" label="Số điện thoại">
+            <Input placeholder="Enter phone number" />
           </Form.Item>
           <Form.Item name="avatar" label="Upload Avatar">
             <Upload
-              beforeUpload={() => false}
+              beforeUpload={() => false} // Không tự động tải lên
               onChange={handleUploadChange}
               fileList={fileList}
             >
@@ -408,12 +416,12 @@ function ManageUser() {
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={loading}>
-              Save
+              Lưu
             </Button>
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </div >
   );
 }
 
