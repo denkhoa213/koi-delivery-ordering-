@@ -25,6 +25,8 @@ import {
   EditOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
+import Header from "../../../components/header";
+import AppFooter from "../../../components/footer";
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -43,6 +45,7 @@ const FishProfileForm = () => {
   const [fishProfileId, setFishProfileId] = useState(null);
   const [certificates, setCertificates] = useState([]);
   const [showCertificates, setShowCertificates] = useState(false);
+
   const fetchFishCategories = async () => {
     try {
       const response = await api.get("fish-category/view-all");
@@ -354,364 +357,374 @@ const FishProfileForm = () => {
   ];
 
   return (
-    <div
-      style={{
-        padding: "20px",
-        backgroundColor: "#f0f2f5",
-        minHeight: "100vh",
-      }}
-    >
-      <Card
-        title={<Title level={3}>Thông tin hồ sơ cá Koi</Title>}
-        bordered={false}
+    <>
+      <Header />
+      <div
         style={{
-          borderRadius: "12px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+          padding: "20px",
+          marginBottom: "80px",
+          marginTop: "20px",
+          backgroundColor: "#F5F5F5",
+          minHeight: "100vh",
         }}
       >
-        <Form onFinish={handleSubmitFishProfile} form={form} layout="vertical">
-          <Divider>Thông tin cá Koi</Divider>
-          <Row gutter={[24, 16]}>
-            <Col span={12}>
-              <Form.Item
-                name="name"
-                label="Tên cá"
-                rules={[{ required: true, message: "Vui lòng nhập tên cá!" }]}
-              >
-                <Input placeholder="Nhập tên cá" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="description"
-                label="Mô tả"
-                rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
-              >
-                <Input placeholder="Nhập mô tả" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={[24, 16]}>
-            <Col span={12}>
-              <Form.Item
-                name="species"
-                label="Loại cá"
-                rules={[{ required: true, message: "Vui lòng chọn loại cá!" }]}
-              >
-                <Select
-                  placeholder="Chọn loại cá"
-                  loading={!fishCategories.length}
-                  optionLabelProp="label"
+        <Card
+          title={
+            <Title level={3} style={{ fontSize: "24px", fontWeight: "bold", color: "#333" }}>
+              Thông tin hồ sơ cá Koi
+            </Title>
+          }
+          bordered={false}
+          style={{
+            border: "2px solid #000",
+            borderRadius: "8px",
+          }}
+        >
+          <Form onFinish={handleSubmitFishProfile} form={form} layout="vertical">
+            <Divider>Thông tin cá Koi</Divider>
+            <Row gutter={[24, 16]}>
+              <Col span={12}>
+                <Form.Item
+                  name="name"
+                  label="Tên cá"
+                  rules={[{ required: true, message: "Vui lòng nhập tên cá!" }]}
                 >
-                  {fishCategories.map((category) => (
-                    <Option
-                      key={category.id}
-                      value={category.fishCategoryName}
-                      label={category.fishCategoryName}
-                    >
-                      <strong>{category.fishCategoryName}</strong>
-                      <Text
-                        type="secondary"
-                        style={{ fontSize: "12px", display: "block" }}
+                  <Input placeholder="Nhập tên cá" />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="description"
+                  label="Mô tả"
+                  rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
+                >
+                  <Input placeholder="Nhập mô tả" />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={[24, 16]}>
+              <Col span={12}>
+                <Form.Item
+                  name="species"
+                  label="Loại cá"
+                  rules={[{ required: true, message: "Vui lòng chọn loại cá!" }]}
+                >
+                  <Select
+                    placeholder="Chọn loại cá"
+                    loading={!fishCategories.length}
+                    optionLabelProp="label"
+                  >
+                    {fishCategories.map((category) => (
+                      <Option
+                        key={category.id}
+                        value={category.fishCategoryName}
+                        label={category.fishCategoryName}
                       >
-                        {category.fishCategoryDescription}
-                      </Text>
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="size"
-                label="Kích thước"
-                rules={[
-                  { required: true, message: "Vui lòng nhập kích thước!" },
-                ]}
-              >
-                <InputNumber min={1} max={100} placeholder="Kích thước" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={[24, 16]}>
-            <Col span={12}>
-              <Form.Item
-                name="sex"
-                label="Giới tính"
-                rules={[
-                  { required: true, message: "Vui lòng nhập giới tính cá!" },
-                ]}
-              >
-                <Select placeholder="Chọn giới tính">
-                  <Select.Option value="male">Giống Đực</Select.Option>
-                  <Select.Option value="female">Giống Cái</Select.Option>
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="age"
-                label="Tuổi"
-                rules={[{ required: true, message: "Vui lòng nhập tuổi!" }]}
-              >
-                <InputNumber min={1} max={100} placeholder="Chọn tuổi" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={[24, 16]}>
-            <Col span={12}>
-              <Form.Item
-                name="color"
-                label="Màu sắc"
-                rules={[{ required: true, message: "Vui lòng chọn màu sắc!" }]}
-              >
-                <Select placeholder="Chọn màu sắc">
-                  <Select.Option value="Đỏ">Đỏ</Select.Option>
-                  <Select.Option value="Xanh dương">Xanh dương</Select.Option>
-                  <Select.Option value="Xanh lá">Xanh lá</Select.Option>
-                  <Select.Option value="Vàng">Vàng</Select.Option>
-                  <Select.Option value="Trắng">Trắng</Select.Option>
-                  <Select.Option value="Đen">Đen</Select.Option>
-                </Select>
-              </Form.Item>
-            </Col>
-
-            <Col span={12}>
-              <Form.Item
-                name="weight"
-                label="Cân nặng"
-                rules={[
-                  { required: true, message: "Vui lòng nhập cân nặng cá!" },
-                ]}
-              >
-                <InputNumber min={1} max={100} placeholder="Chọn cân nặng" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={[24, 16]}>
-            <Col span={12}>
-              <Form.Item
-                name="origin"
-                label="Nguồn gốc"
-                rules={[
-                  { required: true, message: "Vui lòng nhập nguồn gốc!" },
-                ]}
-              >
-                <Input placeholder="Nhập nguồn gốc" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Tải lên hình ảnh"
-                name="image"
-                rules={[
-                  { required: true, message: "Vui lòng tải lên hình ảnh!" },
-                ]}
-              >
-                <Upload
-                  fileList={fileList}
-                  onChange={handleUploadChange}
-                  beforeUpload={() => false}
+                        <strong>{category.fishCategoryName}</strong>
+                        <Text
+                          type="secondary"
+                          style={{ fontSize: "12px", display: "block" }}
+                        >
+                          {category.fishCategoryDescription}
+                        </Text>
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="size"
+                  label="Kích thước"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập kích thước!" },
+                  ]}
                 >
-                  <Button icon={<UploadOutlined />}>Tải lên hình ảnh</Button>
-                </Upload>
-              </Form.Item>
-            </Col>
-          </Row>
+                  <InputNumber min={1} max={100} placeholder="Kích thước" />
+                </Form.Item>
+              </Col>
+            </Row>
 
-          <Divider />
-          <Form.Item style={{ textAlign: "right" }}>
-            <Space>
-              <Button type="primary" onClick={handlePaymentClick}>
-                Thanh toán
-              </Button>
+            <Row gutter={[24, 16]}>
+              <Col span={12}>
+                <Form.Item
+                  name="sex"
+                  label="Giới tính"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập giới tính cá!" },
+                  ]}
+                >
+                  <Select placeholder="Chọn giới tính">
+                    <Select.Option value="male">Giống Đực</Select.Option>
+                    <Select.Option value="female">Giống Cái</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="age"
+                  label="Tuổi"
+                  rules={[{ required: true, message: "Vui lòng nhập tuổi!" }]}
+                >
+                  <InputNumber min={1} max={100} placeholder="Chọn tuổi" />
+                </Form.Item>
+              </Col>
+            </Row>
 
-              <Button type="default" onClick={() => form.submit()}>
-                Tạo thêm cá mới
-              </Button>
-            </Space>
-          </Form.Item>
-        </Form>
-      </Card>
+            <Row gutter={[24, 16]}>
+              <Col span={12}>
+                <Form.Item
+                  name="color"
+                  label="Màu sắc"
+                  rules={[{ required: true, message: "Vui lòng chọn màu sắc!" }]}
+                >
+                  <Select placeholder="Chọn màu sắc">
+                    <Select.Option value="Đỏ">Đỏ</Select.Option>
+                    <Select.Option value="Xanh dương">Xanh dương</Select.Option>
+                    <Select.Option value="Xanh lá">Xanh lá</Select.Option>
+                    <Select.Option value="Vàng">Vàng</Select.Option>
+                    <Select.Option value="Trắng">Trắng</Select.Option>
+                    <Select.Option value="Đen">Đen</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Col>
 
-      <Divider>Danh sách hồ sơ cá Koi</Divider>
-      <Table
-        dataSource={viewFishOrder}
-        columns={columns}
-        bordered
-        rowKey="id"
-      />
+              <Col span={12}>
+                <Form.Item
+                  name="weight"
+                  label="Cân nặng"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập cân nặng cá!" },
+                  ]}
+                >
+                  <InputNumber min={1} max={100} placeholder="Chọn cân nặng" />
+                </Form.Item>
+              </Col>
+            </Row>
 
-      <Modal
-        open={showModal}
-        onCancel={() => setShowModal(false)}
-        onOk={() => formCetificate.submit()}
-        title="Thêm chứng chỉ"
-      >
-        <Form
-          form={formCetificate}
-          onFinish={handleAddCertificate}
-          layout="vertical"
+            <Row gutter={[24, 16]}>
+              <Col span={12}>
+                <Form.Item
+                  name="origin"
+                  label="Nguồn gốc"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập nguồn gốc!" },
+                  ]}
+                >
+                  <Input placeholder="Nhập nguồn gốc" />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  label="Tải lên hình ảnh"
+                  name="image"
+                  rules={[
+                    { required: true, message: "Vui lòng tải lên hình ảnh!" },
+                  ]}
+                >
+                  <Upload
+                    fileList={fileList}
+                    onChange={handleUploadChange}
+                    beforeUpload={() => false}
+                  >
+                    <Button icon={<UploadOutlined />}>Tải lên hình ảnh</Button>
+                  </Upload>
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Divider />
+            <Form.Item style={{ textAlign: "right" }}>
+              <Space>
+                <Button type="primary" onClick={handlePaymentClick}>
+                  Thanh toán
+                </Button>
+
+                <Button type="default" onClick={() => form.submit()}>
+                  Tạo thêm cá mới
+                </Button>
+              </Space>
+            </Form.Item>
+          </Form>
+        </Card>
+
+        <Divider>Danh sách hồ sơ cá Koi</Divider>
+        <Table
+          dataSource={viewFishOrder}
+          columns={columns}
+          bordered
+          rowKey="id"
+        />
+
+        <Modal
+          open={showModal}
+          onCancel={() => setShowModal(false)}
+          onOk={() => formCetificate.submit()}
+          title="Thêm chứng chỉ"
         >
-          <Form.Item
-            name="name"
-            label="Tên cá"
-            rules={[{ required: true, message: "Vui lòng nhập tên Tên cá" }]}
+          <Form
+            form={formCetificate}
+            onFinish={handleAddCertificate}
+            layout="vertical"
           >
-            <Input placeholder="Nhập tên chứng chỉ" />
-          </Form.Item>
-
-          <Form.Item
-            name="species"
-            label="Loài"
-            rules={[{ required: true, message: "Vui lòng nhập loài!" }]}
-          >
-            <Input placeholder="Nhập loài" disabled />
-          </Form.Item>
-
-          <Form.Item
-            name="award"
-            label="Giải thưởng"
-            rules={[{ required: true, message: "Vui lòng nhập giải thưởng!" }]}
-          >
-            <Input placeholder="Nhập giải thưởng" />
-          </Form.Item>
-
-          <Form.Item
-            name="sex"
-            label="Giới tính"
-            rules={[{ required: true, message: "Vui lòng nhập giới tính!" }]}
-          >
-            <Input placeholder="Nhập giới tính" disabled />
-          </Form.Item>
-
-          <Form.Item
-            name="size"
-            label="Kích thước"
-            rules={[{ required: true, message: "Vui lòng nhập kích thước!" }]}
-          >
-            <Input type="number" placeholder="Nhập kích thước" disabled />
-          </Form.Item>
-
-          <Form.Item
-            name="age"
-            label="Tuổi"
-            rules={[{ required: true, message: "Vui lòng nhập tuổi!" }]}
-          >
-            <Input type="number" placeholder="Nhập tuổi" disabled />
-          </Form.Item>
-
-          <Form.Item
-            label="Tải lên hình ảnh"
-            name="image"
-            rules={[{ required: true, message: "Vui lòng tải lên hình ảnh!" }]}
-          >
-            <Upload
-              fileList={fileList}
-              onChange={handleUploadChange}
-              beforeUpload={() => false}
+            <Form.Item
+              name="name"
+              label="Tên cá"
+              rules={[{ required: true, message: "Vui lòng nhập tên Tên cá" }]}
             >
-              <Button icon={<UploadOutlined />}>Tải lên hình ảnh</Button>
-            </Upload>
-          </Form.Item>
-        </Form>
-      </Modal>
+              <Input placeholder="Nhập tên chứng chỉ" />
+            </Form.Item>
 
-      <Modal
-        open={showModalEdit}
-        onCancel={() => setShowModalEdit(false)}
-        onOk={() => formEditCetificate.submit()}
-        title="Edit chứng chỉ"
-      >
-        <Form
-          form={formEditCetificate}
-          onFinish={handleEditCertificate}
-          layout="vertical"
+            <Form.Item
+              name="species"
+              label="Loài"
+              rules={[{ required: true, message: "Vui lòng nhập loài!" }]}
+            >
+              <Input placeholder="Nhập loài" disabled />
+            </Form.Item>
+
+            <Form.Item
+              name="award"
+              label="Giải thưởng"
+              rules={[{ required: true, message: "Vui lòng nhập giải thưởng!" }]}
+            >
+              <Input placeholder="Nhập giải thưởng" />
+            </Form.Item>
+
+            <Form.Item
+              name="sex"
+              label="Giới tính"
+              rules={[{ required: true, message: "Vui lòng nhập giới tính!" }]}
+            >
+              <Input placeholder="Nhập giới tính" disabled />
+            </Form.Item>
+
+            <Form.Item
+              name="size"
+              label="Kích thước"
+              rules={[{ required: true, message: "Vui lòng nhập kích thước!" }]}
+            >
+              <Input type="number" placeholder="Nhập kích thước" disabled />
+            </Form.Item>
+
+            <Form.Item
+              name="age"
+              label="Tuổi"
+              rules={[{ required: true, message: "Vui lòng nhập tuổi!" }]}
+            >
+              <Input type="number" placeholder="Nhập tuổi" disabled />
+            </Form.Item>
+
+            <Form.Item
+              label="Tải lên hình ảnh"
+              name="image"
+              rules={[{ required: true, message: "Vui lòng tải lên hình ảnh!" }]}
+            >
+              <Upload
+                fileList={fileList}
+                onChange={handleUploadChange}
+                beforeUpload={() => false}
+              >
+                <Button icon={<UploadOutlined />}>Tải lên hình ảnh</Button>
+              </Upload>
+            </Form.Item>
+          </Form>
+        </Modal>
+
+        <Modal
+          open={showModalEdit}
+          onCancel={() => setShowModalEdit(false)}
+          onOk={() => formEditCetificate.submit()}
+          title="Edit chứng chỉ"
         >
-          <Form.Item
-            name="name"
-            label="Tên cá"
-            rules={[{ required: true, message: "Vui lòng nhập tên Tên cá" }]}
+          <Form
+            form={formEditCetificate}
+            onFinish={handleEditCertificate}
+            layout="vertical"
           >
-            <Input placeholder="Nhập tên chứng chỉ" />
-          </Form.Item>
-
-          <Form.Item
-            name="species"
-            label="Loài"
-            rules={[{ required: true, message: "Vui lòng nhập loài!" }]}
-          >
-            <Input placeholder="Nhập loài" disabled />
-          </Form.Item>
-
-          <Form.Item
-            name="award"
-            label="Giải thưởng"
-            rules={[{ required: true, message: "Vui lòng nhập giải thưởng!" }]}
-          >
-            <Input placeholder="Nhập giải thưởng" />
-          </Form.Item>
-
-          <Form.Item
-            name="sex"
-            label="Giới tính"
-            rules={[{ required: true, message: "Vui lòng nhập giới tính!" }]}
-          >
-            <Input placeholder="Nhập giới tính" disabled />
-          </Form.Item>
-
-          <Form.Item
-            name="size"
-            label="Kích thước"
-            rules={[{ required: true, message: "Vui lòng nhập kích thước!" }]}
-          >
-            <Input type="number" placeholder="Nhập kích thước" disabled />
-          </Form.Item>
-
-          <Form.Item
-            name="age"
-            label="Tuổi"
-            rules={[{ required: true, message: "Vui lòng nhập tuổi!" }]}
-          >
-            <Input type="number" placeholder="Nhập tuổi" disabled />
-          </Form.Item>
-
-          <Form.Item
-            label="Tải lên hình ảnh"
-            name="image"
-            rules={[{ required: true, message: "Vui lòng tải lên hình ảnh!" }]}
-          >
-            <Upload
-              fileList={fileList}
-              onChange={handleUploadChange}
-              beforeUpload={() => false}
+            <Form.Item
+              name="name"
+              label="Tên cá"
+              rules={[{ required: true, message: "Vui lòng nhập tên Tên cá" }]}
             >
-              <Button icon={<UploadOutlined />}>Tải lên hình ảnh</Button>
-            </Upload>
-          </Form.Item>
-        </Form>
-      </Modal>
+              <Input placeholder="Nhập tên chứng chỉ" />
+            </Form.Item>
 
-      {showCertificates && (
-        <div>
-          <Divider>Danh sách chứng chỉ của cá Koi</Divider>
-          {certificates.length > 0 ? (
-            <Table
-              dataSource={certificates}
-              columns={certificateColumns}
-              rowKey="id"
-              pagination={false}
-            />
-          ) : (
-            <Text>Không có chứng chỉ nào cho cá này.</Text>
-          )}
-        </div>
-      )}
-    </div>
+            <Form.Item
+              name="species"
+              label="Loài"
+              rules={[{ required: true, message: "Vui lòng nhập loài!" }]}
+            >
+              <Input placeholder="Nhập loài" disabled />
+            </Form.Item>
+
+            <Form.Item
+              name="award"
+              label="Giải thưởng"
+              rules={[{ required: true, message: "Vui lòng nhập giải thưởng!" }]}
+            >
+              <Input placeholder="Nhập giải thưởng" />
+            </Form.Item>
+
+            <Form.Item
+              name="sex"
+              label="Giới tính"
+              rules={[{ required: true, message: "Vui lòng nhập giới tính!" }]}
+            >
+              <Input placeholder="Nhập giới tính" disabled />
+            </Form.Item>
+
+            <Form.Item
+              name="size"
+              label="Kích thước"
+              rules={[{ required: true, message: "Vui lòng nhập kích thước!" }]}
+            >
+              <Input type="number" placeholder="Nhập kích thước" disabled />
+            </Form.Item>
+
+            <Form.Item
+              name="age"
+              label="Tuổi"
+              rules={[{ required: true, message: "Vui lòng nhập tuổi!" }]}
+            >
+              <Input type="number" placeholder="Nhập tuổi" disabled />
+            </Form.Item>
+
+            <Form.Item
+              label="Tải lên hình ảnh"
+              name="image"
+              rules={[{ required: true, message: "Vui lòng tải lên hình ảnh!" }]}
+            >
+              <Upload
+                fileList={fileList}
+                onChange={handleUploadChange}
+                beforeUpload={() => false}
+              >
+                <Button icon={<UploadOutlined />}>Tải lên hình ảnh</Button>
+              </Upload>
+            </Form.Item>
+          </Form>
+        </Modal>
+
+        {showCertificates && (
+          <div>
+            <Divider>Danh sách chứng chỉ của cá Koi</Divider>
+            {certificates.length > 0 ? (
+              <Table
+                dataSource={certificates}
+                columns={certificateColumns}
+                rowKey="id"
+                pagination={false}
+              />
+            ) : (
+              <Text>Không có chứng chỉ nào cho cá này.</Text>
+            )}
+          </div>
+        )}
+      </div>
+      <AppFooter />
+    </>
   );
 };
 

@@ -17,6 +17,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../../config/axios";
 import { DeleteOutlined } from "@ant-design/icons";
+import Header from "../../../components/header";
+import AppFooter from "../../../components/footer";
 
 const { Title, Text } = Typography;
 
@@ -246,156 +248,177 @@ function TotalOrder() {
   }
 
   return (
-    <Card title="Thông Tin Tổng Đơn Hàng" bordered={false}>
-      {orderDetails && (
-        <Row gutter={16}>
-          {/* Bên trái: Thông tin đơn hàng và cá */}
-          <Col span={16}>
-            <Card bordered={false}>
-              <Title level={3}>Thông Tin Đơn Hàng</Title>
-
-              {/* Đơn hàng */}
-              <Row gutter={16} style={{ marginBottom: 20 }}>
-                <Col span={12}>
-                  <Title level={4}>Đơn Hàng #{orderDetails.orderCode}</Title>
-                  <Text>
-                    Phương Thức Vận Chuyển: {orderDetails.deliveryMethod}
-                  </Text>
-                </Col>
-              </Row>
-
-              {/* Địa chỉ */}
+    <>
+      <Header />
+      <div style={{
+        marginTop: "30px",
+        marginBottom: "60px",
+        backgroundColor: "#F5F5F5",
+      }}
+      >
+        <div style={{
+          minHeight: "100vh",
+          maxWidth: "900px",
+          margin: "0 auto",
+          border: "2px solid #000",
+          borderRadius: "8px",
+        }}>
+          <Card title="Thông Tin Tổng Đơn Hàng" bordered={false}>
+            {orderDetails && (
               <Row gutter={16}>
-                <Col span={12}>
-                  <Text>Địa Chỉ Khởi Hành: {orderDetails.departure}</Text>
-                </Col>
-                <Col span={12}>
-                  <Text>Địa Chỉ Đến: {orderDetails.destination}</Text>
-                </Col>
-              </Row>
+                {/* Bên trái: Thông tin đơn hàng và cá */}
+                <Col span={16}>
+                  <Card bordered={false}>
+                    <Title level={3} style={{ fontSize: "24px", fontWeight: "bold", color: "#333" }}>
+                      Thông tin đơn hàng
+                    </Title>
 
-              {/* Ngày đặt hàng */}
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Text>
-                    Ngày Đặt Hàng:{" "}
-                    {new Date(orderDetails.orderDate).toLocaleString()}
-                  </Text>
-                </Col>
-              </Row>
+                    {/* Đơn hàng */}
+                    <Row gutter={16} style={{ marginBottom: 20 }}>
+                      <Col span={12}>
+                        <Title level={4}>Đơn Hàng #{orderDetails.orderCode}</Title>
+                        <Text>
+                          Phương Thức Vận Chuyển: {orderDetails.deliveryMethod}
+                        </Text>
+                      </Col>
+                    </Row>
 
-              <Row gutter={16}>
-                <Col span={24}>
-                  <Form form={form} onFinish={handleCreateService}>
-                    <Form.Item
-                      name="selectedServices"
-                      label="Chọn dịch vụ"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Vui lòng chọn ít nhất một dịch vụ!",
-                        },
-                      ]}
-                    >
-                      <Select
-                        mode="multiple"
-                        placeholder="Chọn dịch vụ"
-                        style={{ width: "100%" }}
-                      >
-                        {services.map((service) => (
-                          <Select.Option key={service.id} value={service.id}>
-                            <div>
-                              <strong>{service.serviceName}</strong>
-                              <p style={{ margin: 0 }}>
-                                {service.serviceDescription}
-                              </p>
-                              <p style={{ margin: 0 }}>Giá: {service.price}</p>
-                            </div>
-                          </Select.Option>
+                    {/* Địa chỉ */}
+                    <Row gutter={16}>
+                      <Col span={12}>
+                        <Text>Địa Chỉ Khởi Hành: {orderDetails.departure}</Text>
+                      </Col>
+                      <Col span={12}>
+                        <Text>Địa Chỉ Đến: {orderDetails.destination}</Text>
+                      </Col>
+                    </Row>
+
+                    {/* Ngày đặt hàng */}
+                    <Row gutter={16}>
+                      <Col span={12}>
+                        <Text>
+                          Ngày Đặt Hàng:{" "}
+                          {new Date(orderDetails.orderDate).toLocaleString()}
+                        </Text>
+                      </Col>
+                    </Row>
+
+                    <Row gutter={16}>
+                      <Col span={24}>
+                        <Form form={form} onFinish={handleCreateService}>
+                          <Form.Item
+                            name="selectedServices"
+                            label="Chọn dịch vụ"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng chọn ít nhất một dịch vụ!",
+                              },
+                            ]}
+                          >
+                            <Select
+                              mode="multiple"
+                              placeholder="Chọn dịch vụ"
+                              style={{ width: "100%" }}
+                            >
+                              {services.map((service) => (
+                                <Select.Option key={service.id} value={service.id}>
+                                  <div>
+                                    <strong>{service.serviceName}</strong>
+                                    <p style={{ margin: 0 }}>
+                                      {service.serviceDescription}
+                                    </p>
+                                    <p style={{ margin: 0 }}>Giá: {service.price}</p>
+                                  </div>
+                                </Select.Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+                          <Form.Item>
+                            <Button htmlType="submit">Add</Button>
+                          </Form.Item>
+                        </Form>
+                        <Table
+                          columns={columns}
+                          dataSource={servicesByOrder}
+                          rowKey="id"
+                        />
+                      </Col>
+                    </Row>
+                    {/* Hiển thị thông tin cá */}
+                    <Row gutter={16} style={{ marginTop: 20 }}>
+                      <Col span={24}>
+                        <Title level={5}>Thông Tin Cá</Title>
+                        {viewFishOrder.map((fish) => (
+                          <Card
+                            key={fish.id}
+                            style={{ marginBottom: 20 }}
+                            bordered={false}
+                          >
+                            <Row gutter={16}>
+                              {/* Hiển thị thông tin cá */}
+                              <Col span={18}>
+                                <Text strong>Tên cá: {fish.name}</Text>
+                                <div>
+                                  <Text>Loại Cá: {fish.species}</Text>
+                                </div>
+                              </Col>
+                            </Row>
+                          </Card>
                         ))}
-                      </Select>
-                    </Form.Item>
-                    <Form.Item>
-                      <Button htmlType="submit">Add</Button>
-                    </Form.Item>
-                  </Form>
-                  <Table
-                    columns={columns}
-                    dataSource={servicesByOrder}
-                    rowKey="id"
-                  />
+                      </Col>
+                    </Row>
+                  </Card>
                 </Col>
-              </Row>
-              {/* Hiển thị thông tin cá */}
-              <Row gutter={16} style={{ marginTop: 20 }}>
-                <Col span={24}>
-                  <Title level={5}>Thông Tin Cá</Title>
-                  {viewFishOrder.map((fish) => (
-                    <Card
-                      key={fish.id}
-                      style={{ marginBottom: 20 }}
-                      bordered={false}
-                    >
-                      <Row gutter={16}>
-                        {/* Hiển thị thông tin cá */}
-                        <Col span={18}>
-                          <Text strong>Tên cá: {fish.name}</Text>
-                          <div>
-                            <Text>Loại Cá: {fish.species}</Text>
-                          </div>
-                        </Col>
-                      </Row>
-                    </Card>
-                  ))}
-                </Col>
-              </Row>
-            </Card>
-          </Col>
 
-          {/* Bên phải: Tổng tiền và thanh toán */}
-          <Col span={8}>
-            <Card bordered={false}>
-              <Title level={4}>Tổng Tiền và Thanh Toán</Title>
+                {/* Bên phải: Tổng tiền và thanh toán */}
+                <Col span={8}>
+                  <Card bordered={false}>
+                    <Title level={4}>Tổng Tiền và Thanh Toán</Title>
 
-              {/* Phương thức thanh toán */}
-              <Row gutter={16} style={{ marginBottom: 20 }}>
-                <Col span={24}>
-                  <Radio.Group
-                    value={paymentMethod}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  >
-                    <Radio value="after">Thanh Toán Sau</Radio>
-                    <Radio value="before">Thanh Toán Trước</Radio>
-                  </Radio.Group>
+                    {/* Phương thức thanh toán */}
+                    <Row gutter={16} style={{ marginBottom: 20 }}>
+                      <Col span={24}>
+                        <Radio.Group
+                          value={paymentMethod}
+                          onChange={(e) => setPaymentMethod(e.target.value)}
+                        >
+                          <Radio value="after">Thanh Toán Sau</Radio>
+                          <Radio value="before">Thanh Toán Trước</Radio>
+                        </Radio.Group>
+                      </Col>
+                    </Row>
+
+                    {/* Tổng tiền */}
+                    <Row gutter={16}>
+                      <Col span={12}>
+                        <Text strong>Tổng Tiền:</Text>
+                      </Col>
+                      <Col span={12}>
+                        <Text>{orderDetails.totalAmount} VND</Text>
+                      </Col>
+                    </Row>
+
+                    {/* Thanh toán */}
+                    <Row gutter={16}>
+                      <Col span={12}>
+                        <Button type="primary">Hủy đơn hàng</Button>
+                      </Col>
+                      <Col span={12}>
+                        <Button type="primary" onClick={handlePayment}>
+                          Thanh Toán
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Card>
                 </Col>
               </Row>
-
-              {/* Tổng tiền */}
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Text strong>Tổng Tiền:</Text>
-                </Col>
-                <Col span={12}>
-                  <Text>{orderDetails.totalAmount} VND</Text>
-                </Col>
-              </Row>
-
-              {/* Thanh toán */}
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Button type="primary">Hủy đơn hàng</Button>
-                </Col>
-                <Col span={12}>
-                  <Button type="primary" onClick={handlePayment}>
-                    Thanh Toán
-                  </Button>
-                </Col>
-              </Row>
-            </Card>
-          </Col>
-        </Row>
-      )}
-    </Card>
+            )}
+          </Card>
+        </div>
+      </div>
+      <AppFooter />
+    </>
   );
 }
 
