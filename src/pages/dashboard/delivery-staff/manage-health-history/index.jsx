@@ -119,9 +119,8 @@ const HealthcareHistoryManager = () => {
       );
       toast.success(response.data.message);
 
-      // Close modal after successful update
-      setIsModalVisible(false);
       form.resetFields();
+      setShowModal(false);
       fetchHandOver(); // Refresh data after update
     } catch (error) {
       toast.error("Có lỗi xảy ra khi cập nhật thông tin bàn giao.");
