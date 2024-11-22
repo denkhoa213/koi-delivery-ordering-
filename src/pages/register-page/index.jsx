@@ -31,11 +31,15 @@ function RegisterPage() {
       navigate("/login");
       handleSendVerificationEmail();
     } catch (err) {
-      toast.error(err.response?.data || "Registration failed");
-    } finally {
-      setLoading(false);
+      console.error("Server error:", err.response?.data); // Xem chi tiết lỗi server trả về
+      if (err.response?.data?.message === "Email already registered") {
+        toast.error("Email này đã được đăng ký. Vui lòng đăng nhập!");
+      } else {
+        toast.error(err.response?.data?.message || "Đăng ký không thành công");
+      }
     }
   };
+
 
   return (
     <AuthenTemplate>

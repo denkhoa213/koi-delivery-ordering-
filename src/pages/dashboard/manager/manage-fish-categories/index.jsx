@@ -76,10 +76,14 @@ function ManageFishCategory() {
   const handleDelete = async (id) => {
     try {
       const response = await api.delete(`fish-category/delete/${id}`);
-      toast.success(response.data.message);
+      if (response.data.code === 200) {
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.data.message);
+      }
       fetchFishCategory();
     } catch (error) {
-      toast.error(error.response.data);
+      toast.error(error.response?.data?.message || "Error deleting fish category");
     }
   };
 
@@ -121,7 +125,8 @@ function ManageFishCategory() {
     {
       title: "Giá",
       dataIndex: "price",
-      key: "price",
+      render: (price) => `${price} VND`,
+      width: 120,
     },
     {
       title: "Action",
@@ -167,7 +172,7 @@ function ManageFishCategory() {
         }}
         style={{ marginBottom: "16px" }}
       >
-        Add New User
+        Add New Fish Category
       </Button>
       <Table dataSource={fishCategory} columns={columns} rowKey="id" />
 

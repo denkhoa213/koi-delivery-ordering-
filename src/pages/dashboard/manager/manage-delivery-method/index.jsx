@@ -76,10 +76,14 @@ function ManageDelivery() {
   const handleDelete = async (id) => {
     try {
       const response = await api.delete(`/delivery-method/delete/${id}`);
-      toast.success(response.data.message);
+      if (response.data.code === 200) {
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.data.message);
+      }
       fetchDelivery();
     } catch (error) {
-      toast.error(error.response.data);
+      toast.error(error.response?.data?.message || "Error deleting fish category");
     }
   };
 
@@ -121,7 +125,8 @@ function ManageDelivery() {
     {
       title: "Giá",
       dataIndex: "price",
-      key: "price",
+      render: (price) => `${price}K VND`,
+      width: 120,
     },
     {
       title: "Action",

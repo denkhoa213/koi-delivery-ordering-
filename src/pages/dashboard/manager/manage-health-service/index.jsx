@@ -57,13 +57,20 @@ function ManageHealthService() {
   //DELETE
   const handleDelete = async (id) => {
     try {
-      const response = await api.delete(`heal-service-category/delete/${id}`);
-      toast.success(response.data.message);
+      const response = await api.delete(`/heal-service-category/delete/${id}`);
+
+      if (response.data.code === 200) {
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.data.message);
+      }
+
       fetchHealthService();
     } catch (error) {
-      toast.error(error.response.data);
+      toast.error(error.response?.data?.message || "Error deleting fish category");
     }
   };
+
 
   useEffect(() => {
     fetchHealthService();
@@ -84,7 +91,8 @@ function ManageHealthService() {
       title: "Price",
       dataIndex: "price",
       key: "price",
-      render: (price) => `$${price}`,
+      render: (price) => `${price} VND`,
+      width: 120,
     },
     {
       title: "Created At",
