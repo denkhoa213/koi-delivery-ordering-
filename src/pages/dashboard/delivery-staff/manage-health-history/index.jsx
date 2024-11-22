@@ -190,6 +190,26 @@ const HealthcareHistoryManager = () => {
       title: "Trạng thái bàn giao",
       dataIndex: "handoverStatusEnum",
       key: "handoverStatusEnum",
+      render: (handoverStatusEnum) => {
+        let statusColor = "#d9d9d9"; // Màu mặc định (xám)
+
+        if (handoverStatusEnum === "COMPLETED") {
+          statusColor = "#d9d9d9"; // Màu xanh cho COMPLETED
+        }
+
+        return (
+          <span
+            style={{
+              backgroundColor: statusColor,
+              color: "#fff",
+              padding: "5px 10px",
+              borderRadius: "5px",
+            }}
+          >
+            {handoverStatusEnum}
+          </span>
+        );
+      },
     },
     {
       title: "Hành động",
