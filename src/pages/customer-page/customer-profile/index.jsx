@@ -94,7 +94,7 @@ const CustomerProfile = () => {
 
     const handleChangeAvatar = async (file) => {
         if (file.size > maxFileSize) {
-            toast.error(`Dung lượng tệp phải nhỏ hơn ${maxFileSize / 1000000} MB!`);
+            toast.error(`File size must be smaller than ${maxFileSize / 1000000} MB!`);
             return false;
         }
 
@@ -102,33 +102,19 @@ const CustomerProfile = () => {
         formData.append('avatar', file);
 
         try {
-            // Hiển thị thông báo đang tải lên
-            toast.info("Đang tải ảnh đại diện lên...");
-
-            const response = await api.put('/customer/update-avatar', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-
+            const response = await api.put('/customer/update-profile', formData);
             if (response.status === 200) {
-                // Cập nhật avatar trong state
                 setCustomer((prevState) => ({
                     ...prevState,
-                    avatar: response.data.result.avatarUrl, // Sử dụng URL avatar mới trả về từ server
+                    avatar: response.data.avatarUrl,
                 }));
-                toast.success("Cập nhật ảnh đại diện thành công!");
-            } else {
-                toast.error(response.data.message || "Đã xảy ra lỗi khi cập nhật ảnh đại diện!");
+                toast.success("Cập nhật avatar thành công!");
             }
         } catch (error) {
-            const errorMessage = error.response?.data?.message || "Đã xảy ra lỗi phía server khi cập nhật ảnh đại diện!";
+            const errorMessage = error.response?.data?.message || "Đã xảy ra lỗi khi cập nhật avatar!";
             toast.error(errorMessage);
-            console.error("Error updating avatar:", error);
         }
-        return false; // Trả về false để Ant Design không tự upload
     };
-
 
 
     const onFinish = (values) => {
