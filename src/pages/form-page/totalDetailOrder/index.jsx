@@ -42,6 +42,10 @@ function TotalOrder() {
     }
   };
 
+  const handleBack = () => {
+    navigate(-1); // Quay lại trang trước đó
+  };
+
   const fetchOrderTotal = async () => {
     setLoading(true);
     const orderId = localStorage.getItem("orderId");
@@ -88,6 +92,30 @@ function TotalOrder() {
     }
   };
 
+  const handleCancelOrder = async () => {
+    const orderId = localStorage.getItem("orderId");
+
+    if (!orderId) {
+      toast.error("Không có ID đơn hàng!");
+      return;
+    }
+
+    try {
+      const response = await api.put(`/order/delete/${orderId}`);
+
+      if (response.data.code === 200) {
+        toast.success(response.data.message);
+        navigate("/");
+      } else {
+        toast.error("Không thể hủy đơn hàng!");
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Có lỗi xảy ra khi hủy đơn hàng!"
+      );
+    }
+  };
+
   const handleCreateService = async (values) => {
     const orderId = localStorage.getItem("orderId");
     if (!orderId) {
@@ -117,9 +145,10 @@ function TotalOrder() {
 
         await Promise.all(createServicePromises);
         toast.success("Đã tạo dịch vụ thành công!");
-        form.resetFields();
+
         // Fetch updated services for this order and update state
         fetchServicesByOrder(orderId);
+        form.resetFields();
       }
     } catch (error) {
       toast.error(
@@ -250,6 +279,7 @@ function TotalOrder() {
   return (
     <>
       <Header />
+
       <div
         style={{
           marginTop: "30px",
@@ -260,7 +290,7 @@ function TotalOrder() {
         <div
           style={{
             minHeight: "100vh",
-            maxWidth: "900px",
+            maxWidth: "1300px",
             margin: "0 auto",
             border: "2px solid #000",
             borderRadius: "8px",
@@ -269,7 +299,6 @@ function TotalOrder() {
           <Card title="Thông Tin Tổng Đơn Hàng" bordered={false}>
             {orderDetails && (
               <Row gutter={16}>
-                {/* Bên trái: Thông tin đơn hàng và cá */}
                 <Col span={16}>
                   <Card bordered={false}>
                     <Title
@@ -320,7 +349,9 @@ function TotalOrder() {
                         <Form form={form} onFinish={handleCreateService}>
                           <Form.Item
                             name="selectedServices"
-                            label="Chọn dịch vụ"
+                            style={{
+                              margin: "20px",
+                            }}
                             rules={[
                               {
                                 required: true,
@@ -352,7 +383,9 @@ function TotalOrder() {
                             </Select>
                           </Form.Item>
                           <Form.Item>
-                            <Button htmlType="submit">Add</Button>
+                            <Button type="default" htmlType="submit">
+                              Thêm dịch vụ
+                            </Button>
                           </Form.Item>
                         </Form>
                         <Table
@@ -362,27 +395,49 @@ function TotalOrder() {
                         />
                       </Col>
                     </Row>
+
                     {/* Hiển thị thông tin cá */}
                     <Row gutter={16} style={{ marginTop: 20 }}>
                       <Col span={24}>
                         <Title level={5}>Thông Tin Cá</Title>
-                        {viewFishOrder.map((fish) => (
-                          <Card
-                            key={fish.id}
-                            style={{ marginBottom: 20 }}
-                            bordered={false}
-                          >
-                            <Row gutter={16}>
-                              {/* Hiển thị thông tin cá */}
-                              <Col span={18}>
-                                <Text strong>Tên cá: {fish.name}</Text>
-                                <div>
-                                  <Text>Loại Cá: {fish.species}</Text>
-                                </div>
-                              </Col>
-                            </Row>
-                          </Card>
-                        ))}
+                        <Table
+                          columns={[
+                            {
+                              title: "Tên Cá",
+                              dataIndex: "name",
+                              key: "name",
+                              render: (text) => <Text strong>{text}</Text>,
+                            },
+                            {
+                              title: "Loại Cá",
+                              dataIndex: "species",
+                              key: "species",
+                            },
+                            {
+                              title: "Mô Tả",
+                              dataIndex: "description",
+                              key: "description",
+                            },
+                            {
+                              title: "Hình Ảnh",
+                              dataIndex: "image",
+                              key: "image",
+                              render: (text) => (
+                                <img
+                                  src={text || "defaultImageURL.jpg"}
+                                  alt="Fish Image"
+                                  style={{
+                                    width: "100px",
+                                    height: "100px",
+                                    objectFit: "cover",
+                                  }}
+                                />
+                              ),
+                            },
+                          ]}
+                          dataSource={viewFishOrder}
+                          rowKey="id"
+                        />
                       </Col>
                     </Row>
                   </Card>
@@ -408,22 +463,32 @@ function TotalOrder() {
 
                     {/* Tổng tiền */}
                     <Row gutter={16}>
-                      <Col span={12}>
-                        <Text strong>Tổng Tiền:</Text>
-                      </Col>
-                      <Col span={12}>
-                        <Text>{orderDetails.totalAmount} VND</Text>
+                      <Col style={{ marginBottom: "20px" }} span={24}>
+                        <Text style={{ fontSize: "18px" }} strong>
+                          Tổng Tiền: {orderDetails.totalAmount} VND
+                        </Text>
                       </Col>
                     </Row>
 
                     {/* Thanh toán */}
                     <Row gutter={16}>
                       <Col span={12}>
-                        <Button type="primary">Hủy đơn hàng</Button>
+                        <Button
+                          type="primary"
+                          onClick={handlePayment}
+                          style={{ width: "100%" }}
+                        >
+                          Thanh Toán
+                        </Button>
                       </Col>
                       <Col span={12}>
-                        <Button type="primary" onClick={handlePayment}>
-                          Thanh Toán
+                        <Button
+                          type="primary"
+                          danger
+                          onClick={handleCancelOrder}
+                          style={{ width: "100%" }}
+                        >
+                          Hủy đơn hàng
                         </Button>
                       </Col>
                     </Row>
@@ -431,9 +496,32 @@ function TotalOrder() {
                 </Col>
               </Row>
             )}
+            <Row
+              gutter={16}
+              style={{
+                marginTop: "20px",
+                justifyContent: "center",
+                textAlign: "center",
+              }}
+            >
+              <Col span={24}>
+                <Button
+                  onClick={handleBack}
+                  type="default"
+                  style={{
+                    width: "200px",
+                    marginTop: "20px", // Add some space at the top
+                    fontSize: "16px", // Larger text for better readability
+                  }}
+                >
+                  Quay lại
+                </Button>
+              </Col>
+            </Row>
           </Card>
         </div>
       </div>
+
       <AppFooter />
     </>
   );

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import api from '../../../config/axios';
-import { Card, Layout, Tabs, List, Modal, Typography, DatePicker, Row, Col } from 'antd';
+import { Card, Layout, Tabs, List, Modal, Typography, DatePicker, Row, Col, Button } from 'antd';
 
 const { Content } = Layout;
 const { TabPane } = Tabs;
@@ -13,9 +13,9 @@ const TransactionHistory = () => {
     const [filteredTransactions, setFilteredTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [selectedTransaction, setSelectedTransaction] = useState(null);
-    const [modalVisible, setModalVisible] = useState(false);
-    const [setDateRange] = useState([null]);
+    const [setSelectedTransaction] = useState(null);
+    const [setModalVisible] = useState(false);
+    const [dateRange, setDateRange] = useState([null, null]);
 
     useEffect(() => {
         const fetchTransactions = async () => {
@@ -46,19 +46,19 @@ const TransactionHistory = () => {
     };
 
     const handleDateChange = (dates) => {
-        setDateRange(dates);
-        if (dates && dates[0] && dates[1]) {
-            const [startDate, endDate] = dates;
+        setDateRange(dates); // Lưu khoảng ngày khi người dùng chọn
+    };
+
+    const handleFilter = () => {
+        if (dateRange[0] && dateRange[1]) {
+            const [startDate, endDate] = dateRange;
             const filtered = transactions.filter((transaction) => {
-                const transactionDate = new Date(transaction.date); // Giả sử `transaction.date` là chuỗi ngày
-                return (
-                    transactionDate >= new Date(startDate) &&
-                    transactionDate <= new Date(endDate)
-                );
+                const transactionDate = new Date(transaction.paymentDate);
+                return transactionDate >= new Date(startDate) && transactionDate <= new Date(endDate);
             });
             setFilteredTransactions(filtered);
         } else {
-            setFilteredTransactions(transactions); // Hiển thị tất cả nếu không chọn ngày
+            toast.error('Vui lòng chọn khoảng ngày hợp lệ để lọc.');
         }
     };
 
@@ -81,6 +81,15 @@ const TransactionHistory = () => {
                             <Col span={16}>
                                 <RangePicker onChange={handleDateChange} style={{ width: '100%' }} />
                             </Col>
+                            <Col span={8}>
+                                <Button
+                                    type="primary"
+                                    style={{ width: '20%' }}
+                                    onClick={handleFilter}
+                                >
+                                    Lọc
+                                </Button>
+                            </Col>
                         </Row>
                         <Tabs>
                             <TabPane tab="Danh sách giao dịch" key="1">
@@ -99,32 +108,6 @@ const TransactionHistory = () => {
                                 />
                             </TabPane>
                         </Tabs>
-
-                        <Modal
-                            title="Chi tiết giao dịch"
-                            visible={modalVisible}
-                            onCancel={() => setModalVisible(false)}
-                            footer={null}
-                        >
-                            {selectedTransaction ? (
-                                <>
-                                    <p>
-                                        <strong>Mã giao dịch:</strong> {selectedTransaction.code}
-                                    </p>
-                                    <p>
-                                        <strong>Số tiền:</strong> {selectedTransaction.amount} VNĐ
-                                    </p>
-                                    <p>
-                                        <strong>Trạng thái:</strong> {selectedTransaction.status}
-                                    </p>
-                                    <p>
-                                        <strong>Ngày giao dịch:</strong> {selectedTransaction.paymentDate}
-                                    </p>
-                                </>
-                            ) : (
-                                <p>Không có thông tin giao dịch.</p>
-                            )}
-                        </Modal>
                     </Card>
                 </Content>
             </Layout>

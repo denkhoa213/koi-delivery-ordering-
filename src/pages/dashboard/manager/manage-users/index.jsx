@@ -75,20 +75,27 @@ function ManageUser() {
   };
 
   const handleUploadChange = (info) => {
-    setFileList(info.fileList);
+    // Xóa avatar cũ khỏi fileList khi người dùng chọn file mới
+    if (info.fileList.length === 0) {
+      setFileList([]);  // Nếu không có file nào được chọn, xóa file cũ
+    } else {
+      setFileList(info.fileList);
+    }
   };
+
 
   const handleEditUser = async (userId, updatedUser) => {
     try {
+      // Nếu có ảnh mới thì cập nhật avatar
       const response = await api.put(`/customer/edit-user/${userId}`, {
         name: updatedUser.name,
         address: updatedUser.address,
-        avatar: updatedUser.avatar, // Nếu avatar là đường dẫn đến hình ảnh
+        avatar: updatedUser.avatar, // Avatar được cập nhật nếu có
         phone: updatedUser.phone,
       });
 
       if (response.status === 200) {
-        toast.success('User  updated successfully!');
+        toast.success('User updated successfully!');
         fetchUsers();
       } else {
         toast.error('Failed to update user');
@@ -98,11 +105,29 @@ function ManageUser() {
     }
   };
 
+
   const handleFinish = async (values) => {
+    // Kiểm tra nếu có ảnh mới
+    if (fileList.length > 0) {
+      const file = fileList[0].originFileObj;
+      try {
+        // Upload ảnh mới
+        const url = await uploadFile(file);
+        values.avatar = url; // Cập nhật lại URL ảnh
+        toast.success("Tải lên hình ảnh thành công!");
+      } catch (error) {
+        toast.error(error);
+        return;
+      }
+    }
+
+    // Cập nhật thông tin người dùng (bao gồm ảnh, nếu có)
     await handleEditUser(currentUserId, values);
     setShowEditModal(false);
     form.resetFields();
   };
+
+
 
   const handleBlockUnblockUser = async (userId, isBlocked) => {
     try {
@@ -190,6 +215,11 @@ function ManageUser() {
             onClick={() => {
               setCurrentUserId(record.id);
               form.setFieldsValue(record);
+              setFileList([{
+                uid: record.avatar,
+                name: 'avatar',
+                url: record.avatar,
+              }]);
               setShowEditModal(true);
             }}
           >
@@ -214,7 +244,11 @@ function ManageUser() {
       <Button
         type="primary"
         icon={<PlusOutlined />}
-        onClick={() => setAddShowModal(true)}
+        onClick={() => {
+          setAddShowModal(true);
+          form.resetFields();
+          setFileList([]);
+        }}
         style={{ marginBottom: "16px" }}
       >
         Add New User
