@@ -45,9 +45,7 @@ const Header = () => {
             style={{ width: 570 }}
           />
         </div> */}
-        <div className="nameLogo">
-          Fast Koi
-        </div>
+        <div className="nameLogo">Fast Koi</div>
       </div>
 
       <div className="header-right">
